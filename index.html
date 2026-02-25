@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imidge — Главная страница (Dark Luxury)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-accent: #B68D6A;
+            --primary-bg: #111111;
+            --secondary-bg: #F8F7F5;
+            --secondary-text: #757575;
+            --text-light: #D3D3D3;
+            --white: #FFFFFF;
+            --line: rgba(255, 255, 255, 0.12);
+            --radius: 2px;
+            --transition: all 0.35s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-bg);
+            color: var(--white);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+            color: inherit;
+        }
+
+        .container {
+            width: min(1360px, 100% - 32px);
+            margin: 0 auto;
+        }
+
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 600;
+            margin-bottom: 22px;
+            letter-spacing: 0.4px;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            max-width: 760px;
+            line-height: 1.65;
+            font-size: 15px;
+        }
+
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(17, 17, 17, 0.92);
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .top-line {
+            border-bottom: 1px solid var(--line);
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .top-line-content {
+            min-height: 42px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            padding: 6px 0;
+        }
+
+        .top-menu,
+        .top-contacts {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .lang-switch {
+            display: inline-flex;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .lang-switch button {
+            min-width: 40px;
+            height: 28px;
+            border: 0;
+            background: transparent;
+            color: #CFCFCF;
+            font-size: 11px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .lang-switch button+button {
+            border-left: 1px solid var(--line);
+        }
+
+        .lang-switch button.active {
+            background: rgba(182, 141, 106, 0.18);
+            color: var(--primary-accent);
+        }
+
+        .top-menu a:hover,
+        .top-contacts a:hover {
+            color: var(--primary-accent);
+        }
+
+        .callback-link {
+            color: var(--primary-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .guarantee-strip {
+            border-bottom: 1px solid var(--line);
+            color: #C9C9C9;
+            font-size: 12px;
+            text-align: center;
+            letter-spacing: 0.5px;
+            padding: 10px 0;
+        }
+
+        .main-header {
+            min-height: 78px;
+            display: grid;
+            grid-template-columns: 220px 1fr auto;
+            gap: 16px;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .quick-nav {
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .quick-nav-list {
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            color: #CCCCCC;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+        }
+
+        .quick-nav-list a {
+            display: inline-block;
+            padding: 6px 0;
+        }
+
+        .quick-nav-list a:hover,
+        .quick-nav-list a.active {
+            color: var(--primary-accent);
+        }
+
+        .quick-nav-list a.sale-link {
+            color: var(--primary-accent);
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1;
+        }
+
+        .brand-logo strong {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--white);
+        }
+
+        .brand-logo span {
+            font-size: 10px;
+            letter-spacing: 2.2px;
+            text-transform: uppercase;
+            color: var(--primary-accent);
+            margin-top: 4px;
+        }
+
+        .header-center {
+            display: flex;
+            gap: 10px;
+        }
+
+        .catalog-btn {
+            min-width: 190px;
+            border: 1px solid rgba(182, 141, 106, 0.7);
+            background: transparent;
+            border-radius: var(--radius);
+            height: 46px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .catalog-btn:hover {
+            background: rgba(182, 141, 106, 0.15);
+        }
+
+        .search-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 46px;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0 46px 0 16px;
+        }
+
+        .search-input::placeholder {
+            color: #8B8B8B;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(182, 141, 106, 0.85);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.8;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--white);
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            color: var(--primary-accent);
+            border-color: rgba(182, 141, 106, 0.85);
+        }
+
+        .count-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 30px;
+            background: var(--primary-accent);
+            color: var(--primary-bg);
+            font-size: 11px;
+            font-weight: 700;
+            display: grid;
+            place-items: center;
+        }
+
+        .hero {
+            position: relative;
+            min-height: 68vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .hero-slide::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.74) 20%, rgba(0, 0, 0, 0.26) 100%);
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .hero-content {
+            max-width: 620px;
+            padding: 80px 0 80px 26px;
+        }
+
+        .hero-kicker {
+            color: var(--primary-accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(28px, 4.2vw, 52px);
+            line-height: 1.1;
+            margin-bottom: 18px;
+        }
+
+        .hero p {
+            color: #E1E1E1;
+            line-height: 1.7;
+            margin-bottom: 28px;
+            max-width: 560px;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            padding: 0 26px;
+            border-radius: var(--radius);
+            background: var(--primary-accent);
+            color: var(--primary-bg);
+            text-transform: uppercase;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            border: 1px solid transparent;
+        }
+
+        .cta-btn:hover {
+            background: transparent;
+            color: var(--primary-accent);
+            border-color: rgba(182, 141, 106, 0.85);
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 3;
+        }
+
+        .slider-dots button {
+            width: 30px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.35);
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .slider-dots button.active {
+            background: var(--primary-accent);
+        }
+
+        .slider-nav {
+            position: absolute;
+            z-index: 3;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+            pointer-events: none;
+        }
+
+        .slider-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            border: 1px solid var(--line);
+            background: rgba(17, 17, 17, 0.45);
+            color: var(--white);
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: var(--transition);
+        }
+
+        .slider-btn:hover {
+            color: var(--primary-accent);
+            border-color: rgba(182, 141, 106, 0.85);
+            background: rgba(17, 17, 17, 0.72);
+        }
+
+        .promo-links {
+            border-bottom: 1px solid var(--line);
+            padding: 14px 0;
+        }
+
+        .promo-links-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .promo-pill {
+            border: 1px solid var(--line);
+            padding: 10px 14px;
+            color: #D0D0D0;
+            font-size: 12px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .promo-pill:hover {
+            color: var(--primary-accent);
+            border-color: rgba(182, 141, 106, 0.8);
+        }
+
+        .promo-telegram {
+            border: 1px solid rgba(182, 141, 106, 0.85);
+            background: rgba(182, 141, 106, 0.1);
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+        }
+
+        .promo-telegram-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .promo-telegram-icon {
+            width: 22px;
+            height: 22px;
+            flex: 0 0 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(182, 141, 106, 0.85);
+            border-radius: 50%;
+            color: var(--primary-accent);
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .promo-telegram p {
+            color: #F0E3D8;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .promo-telegram a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+            padding: 0 14px;
+            border: 1px solid rgba(182, 141, 106, 0.85);
+            color: var(--primary-accent);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.9px;
+        }
+
+        .promo-telegram a:hover {
+            background: rgba(182, 141, 106, 0.18);
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .trust-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(182, 141, 106, 0.24);
+            padding: 24px 18px 20px;
+            min-height: 152px;
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+            backdrop-filter: blur(5px);
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .trust-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(182, 141, 106, 0), rgba(182, 141, 106, 0.85), rgba(182, 141, 106, 0));
+        }
+
+        .trust-card::after {
+            content: '';
+            position: absolute;
+            right: -48px;
+            top: -48px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(182, 141, 106, 0.2), rgba(182, 141, 106, 0));
+            pointer-events: none;
+        }
+
+        .trust-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(182, 141, 106, 0.55);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.32);
+        }
+
+        .trust-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(182, 141, 106, 0.55);
+            background: linear-gradient(145deg, rgba(182, 141, 106, 0.28), rgba(182, 141, 106, 0.08));
+            color: #E8C8AB;
+            font-size: 15px;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .trust-card h3 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.15;
+            font-family: 'Playfair Display', serif;
+            color: #F1ECE8;
+        }
+
+        .trust-card p {
+            color: #D1D1D1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .category-tile {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.02);
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .category-tile img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+            filter: brightness(0.96);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .category-tile:hover {
+            transform: translateY(-3px);
+            border-color: rgba(182, 141, 106, 0.6);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+        }
+
+        .category-tile:hover img {
+            transform: scale(1.04);
+        }
+
+        .category-tile span {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 14px 16px 16px;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(24px, 2.1vw, 32px);
+            color: #FFFFFF;
+            line-height: 1.05;
+            text-shadow: none;
+        }
+
+        .category-tile span::after {
+            content: '→';
+            color: var(--primary-accent);
+            font-size: 16px;
+            flex: 0 0 auto;
+            transform: translateY(2px);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn,
+        .subcat-btn {
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--text-light);
+            border-radius: var(--radius);
+            padding: 10px 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .tab-btn.active,
+        .subcat-btn.active {
+            border-color: rgba(182, 141, 106, 0.85);
+            color: var(--primary-accent);
+        }
+
+        .subcats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .product-card {
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.015);
+            transition: var(--transition);
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(182, 141, 106, 0.6);
+        }
+
+        .product-media {
+            position: relative;
+            aspect-ratio: 3 / 4;
+            overflow: hidden;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .product-media img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.45s ease;
+        }
+
+        .product-media img.alt {
+            opacity: 0;
+        }
+
+        .product-card:hover .product-media img.alt {
+            opacity: 1;
+        }
+
+        .product-meta {
+            padding: 14px;
+        }
+
+        .brand {
+            color: #BEBEBE;
+            font-size: 12px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .model {
+            font-size: 15px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .old-price {
+            color: #8B8B8B;
+            text-decoration: line-through;
+            font-size: 13px;
+        }
+
+        .new-price {
+            color: var(--primary-accent);
+            font-size: 21px;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mini-btn {
+            flex: 1;
+            border: 1px solid var(--line);
+            min-height: 40px;
+            background: transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            color: var(--text-light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mini-btn:hover {
+            border-color: rgba(182, 141, 106, 0.85);
+            color: var(--primary-accent);
+        }
+
+        .brands-track {
+            border: 1px solid var(--line);
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(6, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .brands-track .brand-logo {
+            min-height: 74px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.015);
+            transition: var(--transition);
+            padding: 10px;
+        }
+
+        .brands-track .brand-logo img {
+            width: 112px;
+            max-width: 100%;
+            height: 34px;
+            object-fit: contain;
+            opacity: 0.86;
+        }
+
+        .brands-track .brand-fallback {
+            display: none;
+            color: #D8D8D8;
+            font-size: 13px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.2;
+            padding: 0 6px;
+        }
+
+        .brands-track .brand-logo:hover {
+            border-color: rgba(182, 141, 106, 0.6);
+            background: rgba(182, 141, 106, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .brands-track .brand-logo:hover img {
+            opacity: 1;
+        }
+
+        .brands-cta {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .brands-cta a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 16px;
+            border: 1px solid rgba(182, 141, 106, 0.8);
+            border-radius: var(--radius);
+            color: var(--primary-accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+        }
+
+        .brands-cta a:hover {
+            background: rgba(182, 141, 106, 0.12);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .news-card {
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.015);
+            padding: 18px;
+            min-height: 200px;
+        }
+
+        .news-date {
+            color: var(--primary-accent);
+            font-size: 12px;
+            margin-bottom: 10px;
+            letter-spacing: 0.7px;
+        }
+
+        .news-title {
+            font-size: 18px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .news-text {
+            color: #C4C4C4;
+            line-height: 1.6;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .news-link {
+            color: var(--primary-accent);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .seo-block {
+            background: #0D0D0D;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .seo-copy {
+            color: #B8B8B8;
+            font-size: 15px;
+            line-height: 1.8;
+            max-height: 110px;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            margin-bottom: 14px;
+        }
+
+        .seo-copy.expanded {
+            max-height: 700px;
+        }
+
+        .seo-toggle {
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--primary-accent);
+            height: 42px;
+            padding: 0 18px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .site-footer {
+            padding: 56px 0 22px;
+            background: #0D0D0D;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1.1fr;
+            gap: 24px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 28px;
+        }
+
+        .footer-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-accent);
+            margin-bottom: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            color: #C8C8C8;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-accent);
+        }
+
+        .subscribe-note {
+            color: #C8C8C8;
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .subscribe-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .subscribe-row input {
+            flex: 1;
+            height: 42px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0 12px;
+        }
+
+        .subscribe-row button {
+            min-width: 120px;
+            border: 1px solid rgba(182, 141, 106, 0.8);
+            background: transparent;
+            color: var(--primary-accent);
+            border-radius: var(--radius);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .socials {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .socials a {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 8px 12px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #D0D0D0;
+            text-transform: uppercase;
+        }
+
+        .socials a:hover {
+            color: var(--primary-accent);
+            border-color: rgba(182, 141, 106, 0.8);
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 18px;
+            color: #A8A8A8;
+            font-size: 13px;
+        }
+
+        .footer-seo {
+            margin-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 0 16px;
+        }
+
+        .footer-seo summary {
+            list-style: none;
+            cursor: pointer;
+            color: #8A8A8A;
+            font-size: 12px;
+            letter-spacing: 0.9px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-seo summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .footer-seo summary::after {
+            content: '+';
+            color: #7A7A7A;
+            font-size: 14px;
+            transition: transform 0.25s ease;
+        }
+
+        .footer-seo[open] summary::after {
+            transform: rotate(45deg);
+        }
+
+        .footer-seo-content {
+            margin-top: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .footer-seo-links,
+        .footer-seo-cities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+        }
+
+        .footer-seo-links a,
+        .footer-seo-cities a {
+            color: #727272;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .footer-seo-links a:hover,
+        .footer-seo-cities a:hover {
+            color: #9A9A9A;
+        }
+
+        .footer-seo-hint {
+            color: #616161;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1100px) {
+            .main-header {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .header-actions {
+                justify-content: flex-start;
+            }
+
+            .trust-grid,
+            .category-grid,
+            .product-row,
+            .footer-grid,
+            .news-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .brands-track {
+                grid-template-columns: repeat(4, minmax(90px, 1fr));
+            }
+        }
+
+        @media (max-width: 720px) {
+            .section {
+                padding: 44px 0;
+            }
+
+            .container {
+                width: min(1360px, 100% - 20px);
+            }
+
+            .top-line-content {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .header-center {
+                flex-direction: column;
+            }
+
+            .catalog-btn,
+            .search-wrap {
+                width: 100%;
+            }
+
+            .trust-grid,
+            .category-grid,
+            .product-row,
+            .footer-grid,
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .brands-track {
+                grid-template-columns: repeat(2, minmax(120px, 1fr));
+            }
+
+            .hero {
+                min-height: 60vh;
+            }
+
+            .hero-content {
+                padding: 64px 16px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+            }
+
+            .footer-seo-links,
+            .footer-seo-cities {
+                gap: 6px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="top-line">
+            <div class="container top-line-content">
+                <ul class="top-menu">
+                    <li><a href="https://imidge.com.ua/ru/f-watches/">Копии часов</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-handbags/">Копии сумок</a></li>
+                    <li><a href="https://imidge.com.ua/about/">О нас</a></li>
+                    <li><a href="https://imidge.com.ua/delivery-payment/">Доставка и оплата</a></li>
+                    <li><a href="https://imidge.com.ua/news/">Новости и акции</a></li>
+                    <li><a href="https://imidge.com.ua/about/contacts/">Контакты</a></li>
+                </ul>
+                <div class="lang-switch" aria-label="Переключение языка">
+                    <button type="button" data-lang="ua" class="active">UA</button>
+                    <button type="button" data-lang="ru">RU</button>
+                </div>
+                <ul class="top-contacts">
+                    <li><a href="tel:+380443343715">(044) 334-37-15</a></li>
+                    <li><a href="tel:+380509939553">(050) 993-95-53</a></li>
+                    <li><a href="https://imidge.com.ua/about/contacts/" class="callback-link">Перезвонить Вам?</a></li>
+                    <li><a href="https://imidge.com.ua/registration/">Вход / Регистрация</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="guarantee-strip">Доставка по Украине за 2 дня | Оплата после просмотра | Люкс качество 1:1</div>
+        <div class="container main-header">
+            <a href="https://imidge.com.ua/" class="brand-logo" aria-label="Imidge">
+                <strong>IMIDGE</strong>
+                <span>Watches & Accessories</span>
+            </a>
+            <div class="header-center">
+                <a class="catalog-btn" href="https://imidge.com.ua/ru/">☰ Каталог товаров</a>
+                <label class="search-wrap" aria-label="Поиск">
+                    <input class="search-input" type="search" placeholder="Умный поиск по сайту: Rolex, Omega, Gucci...">
+                    <span class="search-icon">⌕</span>
+                </label>
+            </div>
+            <div class="header-actions">
+                <a class="icon-btn" href="https://imidge.com.ua/ru/" aria-label="Избранное">♡</a>
+                <a class="icon-btn" href="https://imidge.com.ua/ru/" aria-label="Корзина">👜<span class="count-badge">2</span></a>
+            </div>
+        </div>
+        <nav class="quick-nav">
+            <div class="container">
+                <ul class="quick-nav-list">
+                    <li><a href="https://imidge.com.ua/ru/f-watches/" class="active">Часы</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-1184-1851-1852-1853-1890-1919-1927-1933-1934-1935-1939/">Одежда</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-1797-1798-1824-1926-1938/">Обувь</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-1199-1225-1284-1285/">Сумки</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-belts/">Ремни</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-1199-1201/">Кошельки</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-1174-1175-1176-1177-1178-1179-1180-1181-1184-1185-1186-1188-1191-1192-1193-1196-1197-1198-1210/">Сувениры и подарки</a></li>
+                    <li><a href="https://imidge.com.ua/ru/f-sale/" class="sale-link">Sale</a></li>
+                    <li><a href="https://imidge.com.ua/manufacturers/">Бренды</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero" id="heroSlider" aria-label="Главный баннер">
+            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=1920&auto=format&fit=crop');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?q=80&w=1920&auto=format&fit=crop');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?q=80&w=1920&auto=format&fit=crop');"></div>
+
+            <div class="container hero-inner">
+                <div class="hero-content">
+                    <p class="hero-kicker">Эксклюзивная акция Imidge</p>
+                    <h1>Супер скидка до -75% на все модели мужских часов Rolex.</h1>
+                    <p>Только ограниченное время: премиальные модели Rolex в люкс качестве 1:1 с доставкой по Украине и оплатой после осмотра.</p>
+                    <a class="cta-btn" href="https://imidge.com.ua/ru/f-watches-rolex/">Смотреть коллекцию Rolex</a>
+                </div>
+            </div>
+
+            <div class="slider-nav">
+                <button class="slider-btn" type="button" data-slide-nav="prev" aria-label="Предыдущий баннер">‹</button>
+                <button class="slider-btn" type="button" data-slide-nav="next" aria-label="Следующий баннер">›</button>
+            </div>
+
+            <div class="slider-dots" aria-label="Переключение баннеров">
+                <button class="active" type="button" data-slide="0" aria-label="Баннер 1"></button>
+                <button type="button" data-slide="1" aria-label="Баннер 2"></button>
+                <button type="button" data-slide="2" aria-label="Баннер 3"></button>
+            </div>
+        </section>
+
+        <section class="promo-links">
+            <div class="container promo-links-wrap reveal">
+                <a class="promo-pill" href="https://imidge.com.ua/ru/f-sale/">Ликвидация старых коллекций</a>
+                <a class="promo-pill" href="https://imidge.com.ua/ru/f-1851-1852-1853-1890/">Брендовая одежда 2026</a>
+                <a class="promo-pill" href="https://imidge.com.ua/ru/f-male-handbags/">Брендовые сумки 2026</a>
+                <a class="promo-pill" href="https://imidge.com.ua/ru/f-belts/">Брендовые ремни 2026</a>
+            </div>
+            <div class="container reveal">
+                <div class="promo-telegram">
+                    <div class="promo-telegram-info">
+                        <span class="promo-telegram-icon" aria-hidden="true">✈</span>
+                        <p>Подпишитесь на Telegram-канал Imidge, чтобы первыми видеть новинки и акции</p>
+                    </div>
+                    <a href="https://t.me/Imidge_watch">Перейти в Telegram</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="trust-grid reveal">
+                    <article class="trust-card">
+                        <div class="trust-icon">★</div>
+                        <h3>Люкс качество 1:1</h3>
+                        <p>Максимально точные реплики топовых брендов с аккуратной отделкой деталей.</p>
+                    </article>
+                    <article class="trust-card">
+                        <div class="trust-icon">◆</div>
+                        <h3>Премиальные материалы</h3>
+                        <p>Сапфировое стекло, закаленная сталь, титан и натуральная кожа.</p>
+                    </article>
+                    <article class="trust-card">
+                        <div class="trust-icon">✓</div>
+                        <h3>Гарантия на весь ассортимент</h3>
+                        <p>Поддержка после покупки и прозрачные правила обмена и возврата.</p>
+                    </article>
+                    <article class="trust-card">
+                        <div class="trust-icon">◍</div>
+                        <h3>Оплата после осмотра</h3>
+                        <p>Проверяйте товар перед оплатой и примеряйте без лишнего риска.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container reveal">
+                <h2 class="section-title">Популярные категории</h2>
+                <div class="category-grid">
+                    <a class="category-tile" href="https://imidge.com.ua/ru/f-watches/">
+                        <img src="https://imidge.com.ua/upload/resize_cache/iblock/bf4/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_longines_model_mx3895.png" alt="Часы">
+                        <span>Часы</span>
+                    </a>
+                    <a class="category-tile" href="https://imidge.com.ua/ru/f-1184-1851-1852-1853-1890-1919-1927-1933-1934-1935-1939/">
+                        <img src="https://imidge.com.ua/upload/resize_cache/iblock/d73/600_480_10bcdf2ffa4a6625b617c01ff490c7234/futbolka_polo_gucci_model_ts0121.jpg" alt="Одежда">
+                        <span>Одежда</span>
+                    </a>
+                    <a class="category-tile" href="https://imidge.com.ua/ru/f-1797-1798-1824-1926-1938/">
+                        <img src="https://imidge.com.ua/upload/resize_cache/iblock/169/600_480_10bcdf2ffa4a6625b617c01ff490c7234/krossovki_kiton_model_f428.jpg" alt="Обувь">
+                        <span>Обувь</span>
+                    </a>
+                    <a class="category-tile" href="https://imidge.com.ua/ru/f-1199-1225-1284-1285/">
+                        <img src="https://imidge.com.ua/upload/resize_cache/iblock/f74/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_chanel_model_s1238.jpg" alt="Сумки">
+                        <span>Сумки</span>
+                    </a>
+                    <a class="category-tile" href="https://imidge.com.ua/ru/f-belts/">
+                        <img src="https://imidge.com.ua/upload/resize_cache/iblock/4f7/600_480_10bcdf2ffa4a6625b617c01ff490c7234/remen_celine_model_b239.jpg" alt="Ремни">
+                        <span>Ремни</span>
+                    </a>
+                    <a class="category-tile" href="https://imidge.com.ua/ru/f-1199-1201/">
+                        <img src="https://imidge.com.ua/upload/resize_cache/iblock/24c/600_480_10bcdf2ffa4a6625b617c01ff490c7234/koshelek_louis_vuitton_model_s827.png" alt="Кошельки">
+                        <span>Кошельки</span>
+                    </a>
+                    <a class="category-tile" href="https://imidge.com.ua/ru/f-1174-1175-1176-1177-1178-1179-1180-1181-1184-1185-1186-1188-1191-1192-1193-1196-1197-1198-1210/">
+                        <img src="https://imidge.com.ua/upload/resize_cache/iblock/d62/600_480_10bcdf2ffa4a6625b617c01ff490c7234/ruchka_montblanc_model_0607.jpg" alt="Сувениры и подарки">
+                        <span>Сувениры и подарки</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container reveal">
+                <h2 class="section-title">Хиты продаж и новинки</h2>
+                <div class="tabs" role="tablist" aria-label="Тип витрины">
+                    <button class="tab-btn active" data-tab="hits" type="button">Хиты продаж</button>
+                    <button class="tab-btn" data-tab="new" type="button">Новинки</button>
+                </div>
+                <div class="subcats" role="tablist" aria-label="Подкатегории">
+                    <button class="subcat-btn active" data-subcat="all" type="button">Все</button>
+                    <button class="subcat-btn" data-subcat="watch" type="button">Часы</button>
+                    <button class="subcat-btn" data-subcat="bag" type="button">Сумки</button>
+                    <button class="subcat-btn" data-subcat="clothes" type="button">Одежда</button>
+                    <button class="subcat-btn" data-subcat="shoes" type="button">Обувь</button>
+                </div>
+
+                <div class="product-row" id="products">
+                    <article class="product-card" data-tab="hits" data-subcat="watch">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/bf4/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_longines_model_mx3895.png" alt="Longines MX3895">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/5b7/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_longines_model_mx3895_1.png" alt="Longines MX3895 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Longines</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">Мужские часы Модель MX3895</a></p>
+                            <div class="price-row"><span class="old-price">18 900 грн</span><span class="new-price">14 990 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+
+                    <article class="product-card" data-tab="hits" data-subcat="bag">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/sumka-gucci-model-s711/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/e8c/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_gucci_model_s711.jpg" alt="Gucci S711">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/sumka-gucci-model-s711/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/280/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_gucci_model_s711_1.jpg" alt="Gucci S711 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Gucci</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/sumka-gucci-model-s711/">Сумка Модель S711</a></p>
+                            <div class="price-row"><span class="old-price">16 700 грн</span><span class="new-price">12 480 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/sumka-gucci-model-s711/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+
+                    <article class="product-card" data-tab="hits" data-subcat="clothes">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/futbolka-polo-gucci-model-ts0121/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/d73/600_480_10bcdf2ffa4a6625b617c01ff490c7234/futbolka_polo_gucci_model_ts0121.jpg" alt="Gucci TS0121">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/futbolka-polo-gucci-model-ts0121/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/884/600_480_10bcdf2ffa4a6625b617c01ff490c7234/futbolka_polo_gucci_model_ts0121_1.jpg" alt="Gucci TS0121 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Gucci</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/futbolka-polo-gucci-model-ts0121/">Мужская футболка-поло Модель TS0121</a></p>
+                            <div class="price-row"><span class="old-price">2 393 грн</span><span class="new-price">1 914 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/futbolka-polo-gucci-model-ts0121/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+
+                    <article class="product-card" data-tab="hits" data-subcat="shoes">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/krossovki-kiton-model-f428/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/169/600_480_10bcdf2ffa4a6625b617c01ff490c7234/krossovki_kiton_model_f428.jpg" alt="Kiton F428">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/krossovki-kiton-model-f428/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/5ca/600_480_10bcdf2ffa4a6625b617c01ff490c7234/krossovki_kiton_model_f428_1.jpg" alt="Kiton F428 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Kiton</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/krossovki-kiton-model-f428/">Мужские кроссовки Модель F428</a></p>
+                            <div class="price-row"><span class="old-price">10 005 грн</span><span class="new-price">9 505 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/krossovki-kiton-model-f428/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+
+                    <article class="product-card" data-tab="new" data-subcat="watch">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/muzhskie-chasy-tag-heuer-model-mx3834/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/f4b/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_tag_heuer_model_mx3834.jpg" alt="Tag Heuer MX3834">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/muzhskie-chasy-tag-heuer-model-mx3834/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/92d/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_tag_heuer_model_mx3834_2.jpg" alt="Tag Heuer MX3834 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Tag Heuer</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/muzhskie-chasy-tag-heuer-model-mx3834/">Мужские часы Модель MX3834</a></p>
+                            <div class="price-row"><span class="old-price">34 365 грн</span><span class="new-price">27 492 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/muzhskie-chasy-tag-heuer-model-mx3834/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+
+                    <article class="product-card" data-tab="new" data-subcat="bag">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/sumka-chanel-model-s1238/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/f74/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_chanel_model_s1238.jpg" alt="Chanel S1238">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/sumka-chanel-model-s1238/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/463/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_chanel_model_s1238_1.jpg" alt="Chanel S1238 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Chanel</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/sumka-chanel-model-s1238/">Женская сумка Модель S1238</a></p>
+                            <div class="price-row"><span class="old-price">24 360 грн</span><span class="new-price">23 142 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/sumka-chanel-model-s1238/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+
+                    <article class="product-card" data-tab="new" data-subcat="clothes">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/futbolka-dsquared2-model-ts0119/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/761/600_480_10bcdf2ffa4a6625b617c01ff490c7234/futbolka_dsquared2_model_ts0119.jpg" alt="Dsquared2 TS0119">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/futbolka-dsquared2-model-ts0119/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/012/600_480_10bcdf2ffa4a6625b617c01ff490c7234/futbolka_dsquared2_model_ts0119.jpg" alt="Dsquared2 TS0119 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Dsquared2</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/futbolka-dsquared2-model-ts0119/">Мужская футболка Модель TS0119</a></p>
+                            <div class="price-row"><span class="old-price">7 800 грн</span><span class="new-price">5 990 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/futbolka-dsquared2-model-ts0119/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+
+                    <article class="product-card" data-tab="new" data-subcat="shoes">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/tufli-loro-piana-model-f371/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/89a/600_480_10bcdf2ffa4a6625b617c01ff490c7234/tufli_loro_piana_model_f371.jpg" alt="Loro Piana F371">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/tufli-loro-piana-model-f371/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/b88/600_480_10bcdf2ffa4a6625b617c01ff490c7234/tufli_loro_piana_model_f371_1.jpg" alt="Loro Piana F371 alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Loro Piana</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/tufli-loro-piana-model-f371/">Мужские туфли (лоферы) Модель F371</a></p>
+                            <div class="price-row"><span class="old-price">13 600 грн</span><span class="new-price">10 490 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/tufli-loro-piana-model-f371/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container reveal">
+                <h2 class="section-title">Популярные бренды</h2>
+                <div class="brands-track">
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-watches-rolex/"><img src="https://logo.clearbit.com/rolex.com?size=256" alt="Rolex" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Rolex</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-watches-omega/"><img src="https://logo.clearbit.com/omegawatches.com?size=256" alt="Omega" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Omega</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-watches-hublot/"><img src="https://logo.clearbit.com/hublot.com?size=256" alt="Hublot" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Hublot</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-watches-patek_philippe/"><img src="https://logo.clearbit.com/patek.com?size=256" alt="Patek Philippe" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Patek Philippe</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-gucci/"><img src="https://logo.clearbit.com/gucci.com?size=256" alt="Gucci" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Gucci</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-louis_vuitton/"><img src="https://logo.clearbit.com/louisvuitton.com?size=256" alt="Louis Vuitton" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Louis Vuitton</span></a>
+
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-christian_dior/"><img src="https://logo.clearbit.com/dior.com?size=256" alt="Dior" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Dior</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-prada/"><img src="https://logo.clearbit.com/prada.com?size=256" alt="Prada" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Prada</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-chanel/"><img src="https://logo.clearbit.com/chanel.com?size=256" alt="Chanel" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Chanel</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-hermes/"><img src="https://logo.clearbit.com/hermes.com?size=256" alt="Hermes" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Hermes</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-balenciaga/"><img src="https://logo.clearbit.com/balenciaga.com?size=256" alt="Balenciaga" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Balenciaga</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-versace/"><img src="https://logo.clearbit.com/versace.com?size=256" alt="Versace" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Versace</span></a>
+
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-fendi/"><img src="https://logo.clearbit.com/fendi.com?size=256" alt="Fendi" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Fendi</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-givenchy/"><img src="https://logo.clearbit.com/givenchy.com?size=256" alt="Givenchy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Givenchy</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-bvlgari/"><img src="https://logo.clearbit.com/bulgari.com?size=256" alt="Bvlgari" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Bvlgari</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-dolce_gabbana/"><img src="https://logo.clearbit.com/dolcegabbana.com?size=256" alt="Dolce and Gabbana" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Dolce and Gabbana</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-burberry/"><img src="https://logo.clearbit.com/burberry.com?size=256" alt="Burberry" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Burberry</span></a>
+                    <a class="brand-logo" href="https://imidge.com.ua/ru/f-tom_ford/"><img src="https://logo.clearbit.com/tomford.com?size=256" alt="Tom Ford" onerror="this.style.display='none';this.nextElementSibling.style.display='block';"><span class="brand-fallback">Tom Ford</span></a>
+                </div>
+                <div class="brands-cta">
+                    <a href="https://imidge.com.ua/manufacturers/">Все бренды</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container reveal">
+                <h2 class="section-title">Товары месяца</h2>
+                <div class="product-row">
+                    <article class="product-card">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/bf4/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_longines_model_mx3895.png" alt="Longines month">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/5b7/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_longines_model_mx3895_1.png" alt="Longines month alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Longines</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">Мужские часы Модель MX3895</a></p>
+                            <div class="price-row"><span class="old-price">10 440 грн</span><span class="new-price">9 918 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/muzhskie-chasy-longines-model-mx3895/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+                    <article class="product-card">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/sumka-miu-miu-model-s1167/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/844/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_miu_miu_model_s1167.png" alt="Miu Miu month">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/sumka-miu-miu-model-s1167/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/189/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_miu_miu_model_s1167_1.jpg" alt="Miu Miu month alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Miu Miu</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/sumka-miu-miu-model-s1167/">Женская сумка Модель S1167</a></p>
+                            <div class="price-row"><span class="old-price">2 175 грн</span><span class="new-price">2 066 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/sumka-miu-miu-model-s1167/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+                    <article class="product-card">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/futbolka-stefano-ricci-model-ts0176/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/10d/600_480_10bcdf2ffa4a6625b617c01ff490c7234/futbolka_stefano_ricci_model_ts0176.jpg" alt="Stefano Ricci month">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/futbolka-stefano-ricci-model-ts0176/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/705/600_480_10bcdf2ffa4a6625b617c01ff490c7234/futbolka_stefano_ricci_model_ts0176_1.jpg" alt="Stefano Ricci month alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Stefano Ricci</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/futbolka-stefano-ricci-model-ts0176/">Мужская футболка Модель TS0176</a></p>
+                            <div class="price-row"><span class="old-price">4 133 грн</span><span class="new-price">3 306 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/futbolka-stefano-ricci-model-ts0176/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+                    <article class="product-card">
+                        <div class="product-media">
+                            <a href="https://imidge.com.ua/ru/remen-cartier-model-b338/">
+                                <img src="https://imidge.com.ua/upload/resize_cache/iblock/121/600_480_10bcdf2ffa4a6625b617c01ff490c7234/remen_cartier_model_b338_1.jpg" alt="Cartier belt month">
+                            </a>
+                            <a href="https://imidge.com.ua/ru/remen-cartier-model-b338/">
+                                <img class="alt" src="https://imidge.com.ua/upload/resize_cache/iblock/837/601_480_10bcdf2ffa4a6625b617c01ff490c7234/remen_cartier_model_b338.jpg" alt="Cartier belt month alt">
+                            </a>
+                        </div>
+                        <div class="product-meta">
+                            <p class="brand">Cartier</p>
+                            <p class="model"><a href="https://imidge.com.ua/ru/remen-cartier-model-b338/">Ремень двухсторонний Модель B338</a></p>
+                            <div class="price-row"><span class="old-price">4 350 грн</span><span class="new-price">4 133 грн</span></div>
+                            <div class="actions"><a class="mini-btn" href="https://imidge.com.ua/ru/remen-cartier-model-b338/">👜</a><button class="mini-btn" type="button">♡</button></div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container reveal">
+                <h2 class="section-title">Новости и статьи</h2>
+                <div class="news-grid">
+                    <article class="news-card">
+                        <p class="news-date">18.02.2026</p>
+                        <h3 class="news-title">Какие наручные часы самые точные</h3>
+                        <p class="news-text">Разбираем типы механизмов и объясняем, на что смотреть при выборе часов на каждый день.</p>
+                        <a class="news-link" href="https://imidge.com.ua/news/stati/kakie-naruchnye-chasy-samye-tochnye/">Читать статью</a>
+                    </article>
+                    <article class="news-card">
+                        <p class="news-date">11.02.2026</p>
+                        <h3 class="news-title">Гравировки на часовых механизмах</h3>
+                        <p class="news-text">Как тонкие детали отделки влияют на визуальную ценность модели и общее впечатление.</p>
+                        <a class="news-link" href="https://imidge.com.ua/news/stati/gravirovki-na-chasovykh-mekhanizmakh/">Читать статью</a>
+                    </article>
+                    <article class="news-card">
+                        <p class="news-date">05.02.2026</p>
+                        <h3 class="news-title">Тренды брендовых аксессуаров 2026</h3>
+                        <p class="news-text">Подборка актуальных категорий: сумки, ремни, кошельки и аксессуары для подарков.</p>
+                        <a class="news-link" href="https://imidge.com.ua/news/">Читать статью</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section seo-block">
+            <div class="container reveal">
+                <h2 class="section-title">Люксовые копии часов, сумок, одежды и обуви в магазине Имидж</h2>
+                <div class="seo-copy" id="seoCopy">
+                    Imidge — интернет-магазин премиальных реплик, где эстетика и надежность важны так же, как цена. Мы
+                    собрали модели, которые визуально повторяют оригинальные бутики и помогают подчеркнуть статус в повседневном
+                    образе. В каталоге представлены люксовые копии часов с японскими и швейцарскими механизмами, сумки из
+                    качественной экокожи и натуральной кожи, брендовая одежда и обувь в актуальных коллекциях. Перед
+                    отправкой каждая позиция проходит дополнительную проверку внешнего вида, комплектации и работы фурнитуры.
+                    Для покупателей по Украине доступна быстрая доставка, удобный формат оплаты после осмотра и поддержка по
+                    подбору модели под стиль и бюджет.
+                </div>
+                <button class="seo-toggle" id="seoToggle" type="button">Читать далее...</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid reveal">
+                <div>
+                    <h3 class="footer-title">Каталог</h3>
+                    <div class="footer-links">
+                        <a href="https://imidge.com.ua/ru/f-watches/">Часы</a>
+                        <a href="https://imidge.com.ua/ru/f-1199-1225-1284-1285/">Сумки</a>
+                        <a href="https://imidge.com.ua/ru/f-1184-1851-1852-1853-1890-1919-1927-1933-1934-1935-1939/">Одежда</a>
+                        <a href="https://imidge.com.ua/ru/f-1797-1798-1824-1926-1938/">Обувь</a>
+                        <a href="https://imidge.com.ua/ru/f-belts/">Ремни</a>
+                        <a href="https://imidge.com.ua/ru/f-1199-1201/">Кошельки</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="footer-title">Покупателям</h3>
+                    <div class="footer-links">
+                        <a href="https://imidge.com.ua/delivery-payment/">Доставка</a>
+                        <a href="https://imidge.com.ua/guarantee/">Гарантия</a>
+                        <a href="https://imidge.com.ua/return-repair/">Возврат</a>
+                        <a href="https://imidge.com.ua/about/faq/">Помощь (FAQ)</a>
+                        <a href="https://imidge.com.ua/public-offer/">Публичная оферта</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="footer-title">О нас</h3>
+                    <div class="footer-links">
+                        <a href="https://imidge.com.ua/about/contacts/">Контакты</a>
+                        <a href="https://imidge.com.ua/about/client-reviews/">Отзывы</a>
+                        <a href="https://imidge.com.ua/news/">Новости и статьи</a>
+                        <a href="https://imidge.com.ua/news/promotions/">Акции и скидки</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="footer-title">Скидка 5% на первый заказ</h3>
+                    <p class="subscribe-note">Оставьте email и получите промокод на первый заказ.</p>
+                    <form class="subscribe-row" action="#" method="post">
+                        <input type="email" placeholder="Ваш e-mail" required>
+                        <button type="submit">Получить</button>
+                    </form>
+                    <div class="socials">
+                        <a href="https://t.me/Imidge_watch">Telegram</a>
+                        <a href="https://www.tiktok.com/@imidge.shop">TikTok</a>
+                        <a href="https://www.youtube.com/channel/UCv2ObgugaaZ4iUVH4VvhIsw">YouTube</a>
+                    </div>
+                </div>
+            </div>
+
+            <details class="footer-seo reveal">
+                <summary>Доставка по Украине и SEO-разделы</summary>
+                <div class="footer-seo-content">
+                    <div class="footer-seo-links">
+                        <a href="https://imidge.com.ua/sitemap/">Карта сайта</a>
+                        <a href="https://imidge.com.ua/privacy-policy/">Конфиденциальность</a>
+                        <a href="https://imidge.com.ua/collections/">Коллекции</a>
+                        <a href="https://imidge.com.ua/celeb-clock/">Часы знаменитостей</a>
+                        <a href="https://imidge.com.ua/dictionary/">Словарь терминов</a>
+                        <a href="https://imidge.com.ua/news/stati/what-is-the-difference-between-originals-and-copies-hours/">О часах</a>
+                        <a href="https://imidge.com.ua/watch-to-order/">Часы под заказ</a>
+                        <a href="https://imidge.com.ua/news/care-tip/">Советы по уходу</a>
+                        <a href="https://www.youtube.com/channel/UCv2ObgugaaZ4iUVH4VvhIsw/videos">Видеообзоры товаров</a>
+                    </div>
+                    <div class="footer-seo-cities">
+                        <a href="https://imidge.com.ua/watches-kyiv/">Киев</a>
+                        <a href="https://imidge.com.ua/watches-odessa/">Одесса</a>
+                        <a href="https://imidge.com.ua/watches-kharkiv/">Харьков</a>
+                        <a href="https://imidge.com.ua/watches-dnipro/">Днепр</a>
+                        <a href="https://imidge.com.ua/watches-lviv/">Львов</a>
+                        <a href="https://imidge.com.ua/watches-kryvyi-rih/">Кривой Рог</a>
+                        <a href="https://imidge.com.ua/watches-vinnytsia/">Винница</a>
+                        <a href="https://imidge.com.ua/watches-zaporizhzhia/">Запорожье</a>
+                        <a href="https://imidge.com.ua/watches-kherson/">Херсон</a>
+                        <a href="https://imidge.com.ua/watches-chernihiv/">Чернигов</a>
+                        <a href="https://imidge.com.ua/watches-kropyvnytskyi/">Кропивницкий</a>
+                        <a href="https://imidge.com.ua/watches-mykolaiv/">Николаев</a>
+                        <a href="https://imidge.com.ua/watches-poltava/">Полтава</a>
+                        <a href="https://imidge.com.ua/watches-rivne/">Ровно</a>
+                        <a href="https://imidge.com.ua/watches-lutsk/">Луцк</a>
+                        <a href="https://imidge.com.ua/watches-khmelnytskyi/">Хмельницкий</a>
+                        <a href="https://imidge.com.ua/watches-zhytomyr/">Житомир</a>
+                        <a href="https://imidge.com.ua/watches-sumy/">Сумы</a>
+                        <a href="https://imidge.com.ua/watches-cherkasy/">Черкасы</a>
+                        <a href="https://imidge.com.ua/watches-ternopil/">Тернополь</a>
+                        <a href="https://imidge.com.ua/watches-uzhgorod/">Ужгород</a>
+                        <a href="https://imidge.com.ua/watches-chernivtsi/">Черновцы</a>
+                        <a href="https://imidge.com.ua/watches-ivano-frankivsk/">Ивано-Франковск</a>
+                        <a href="https://imidge.com.ua/delivery-payment/">Доставка и оплата</a>
+                        <a href="https://imidge.com.ua/guarantee/">Гарантия</a>
+                        <a href="https://imidge.com.ua/return-repair/">Возврат и ремонт товара</a>
+                    </div>
+                </div>
+            </details>
+
+            <div class="footer-bottom">
+                <div>IMIDGE | (044) 334-37-15 | (050) 993-95-53 | contact@imidge.com.ua</div>
+                <div>© Имидж</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const subcatButtons = document.querySelectorAll('.subcat-btn');
+        const productCards = document.querySelectorAll('#products .product-card');
+
+        let activeTab = 'hits';
+        let activeSubcat = 'all';
+
+        function filterProducts() {
+            productCards.forEach((card) => {
+                const matchTab = card.dataset.tab === activeTab;
+                const matchSubcat = activeSubcat === 'all' || card.dataset.subcat === activeSubcat;
+                card.style.display = matchTab && matchSubcat ? 'block' : 'none';
+            });
+        }
+
+        tabButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach((item) => item.classList.remove('active'));
+                button.classList.add('active');
+                activeTab = button.dataset.tab;
+                filterProducts();
+            });
+        });
+
+        subcatButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                subcatButtons.forEach((item) => item.classList.remove('active'));
+                button.classList.add('active');
+                activeSubcat = button.dataset.subcat;
+                filterProducts();
+            });
+        });
+
+        filterProducts();
+
+        const seoToggle = document.getElementById('seoToggle');
+        const seoCopy = document.getElementById('seoCopy');
+
+        seoToggle.addEventListener('click', () => {
+            seoCopy.classList.toggle('expanded');
+            seoToggle.textContent = seoCopy.classList.contains('expanded') ? 'Скрыть текст' : 'Читать далее...';
+        });
+
+        const heroSlider = document.getElementById('heroSlider');
+
+        if (heroSlider) {
+            const heroSlides = heroSlider.querySelectorAll('.hero-slide');
+            const heroDots = heroSlider.querySelectorAll('.slider-dots button');
+            const prevSlideBtn = heroSlider.querySelector('[data-slide-nav="prev"]');
+            const nextSlideBtn = heroSlider.querySelector('[data-slide-nav="next"]');
+            let currentSlide = 0;
+            let heroTimer;
+
+            function setSlide(index) {
+                currentSlide = (index + heroSlides.length) % heroSlides.length;
+
+                heroSlides.forEach((slide, slideIndex) => {
+                    slide.classList.toggle('active', slideIndex === currentSlide);
+                });
+
+                heroDots.forEach((dot, dotIndex) => {
+                    const isActive = dotIndex === currentSlide;
+                    dot.classList.toggle('active', isActive);
+                    dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+                });
+            }
+
+            function startSliderAutoplay() {
+                clearInterval(heroTimer);
+                heroTimer = setInterval(() => {
+                    setSlide(currentSlide + 1);
+                }, 5000);
+            }
+
+            heroDots.forEach((dot) => {
+                dot.addEventListener('click', () => {
+                    setSlide(Number(dot.dataset.slide));
+                    startSliderAutoplay();
+                });
+            });
+
+            if (prevSlideBtn) {
+                prevSlideBtn.addEventListener('click', () => {
+                    setSlide(currentSlide - 1);
+                    startSliderAutoplay();
+                });
+            }
+
+            if (nextSlideBtn) {
+                nextSlideBtn.addEventListener('click', () => {
+                    setSlide(currentSlide + 1);
+                    startSliderAutoplay();
+                });
+            }
+
+            setSlide(0);
+            startSliderAutoplay();
+        }
+
+        const languageButtons = document.querySelectorAll('.lang-switch [data-lang]');
+        let currentLanguage = 'ua';
+
+        const i18n = {
+            ru: {
+                pageTitle: 'Imidge — Главная страница (Dark Luxury)',
+                topMenu: ['Копии часов', 'Копии сумок', 'О нас', 'Доставка и оплата', 'Новости и акции', 'Контакты'],
+                topContactsTail: ['Перезвонить Вам?', 'Вход / Регистрация'],
+                guarantee: 'Доставка по Украине за 2 дня | Оплата после просмотра | Люкс качество 1:1',
+                catalogBtn: '☰ Каталог товаров',
+                searchPlaceholder: 'Умный поиск по сайту: Rolex, Omega, Gucci...',
+                quickNav: ['Часы', 'Одежда', 'Обувь', 'Сумки', 'Ремни', 'Кошельки', 'Сувениры и подарки', 'Sale', 'Бренды'],
+                heroKicker: 'Эксклюзивная акция Imidge',
+                heroTitle: 'Супер скидка до -75% на все модели мужских часов Rolex.',
+                heroText: 'Только ограниченное время: премиальные модели Rolex в люкс качестве 1:1 с доставкой по Украине и оплатой после осмотра.',
+                heroCta: 'Смотреть коллекцию Rolex',
+                promoPills: ['Ликвидация старых коллекций', 'Брендовая одежда 2026', 'Брендовые сумки 2026', 'Брендовые ремни 2026'],
+                promoTelegram: 'Подпишитесь на Telegram-канал Imidge, чтобы первыми видеть новинки и акции',
+                promoTelegramBtn: 'Перейти в Telegram',
+                trustTitles: ['Люкс качество 1:1', 'Премиальные материалы', 'Гарантия на весь ассортимент', 'Оплата после осмотра'],
+                trustText: ['Максимально точные реплики топовых брендов с аккуратной отделкой деталей.', 'Сапфировое стекло, закаленная сталь, титан и натуральная кожа.', 'Поддержка после покупки и прозрачные правила обмена и возврата.', 'Проверяйте товар перед оплатой и примеряйте без лишнего риска.'],
+                sectionTitles: ['Популярные категории', 'Хиты продаж и новинки', 'Популярные бренды', 'Товары месяца', 'Новости и статьи', 'Люксовые копии часов, сумок, одежды и обуви в магазине Имидж'],
+                categories: ['Часы', 'Одежда', 'Обувь', 'Сумки', 'Ремни', 'Кошельки', 'Сувениры и подарки'],
+                tabs: ['Хиты продаж', 'Новинки'],
+                subcats: ['Все', 'Часы', 'Сумки', 'Одежда', 'Обувь'],
+                allBrands: 'Все бренды',
+                newsTitles: ['Какие наручные часы самые точные', 'Гравировки на часовых механизмах', 'Тренды брендовых аксессуаров 2026'],
+                newsText: ['Разбираем типы механизмов и объясняем, на что смотреть при выборе часов на каждый день.', 'Как тонкие детали отделки влияют на визуальную ценность модели и общее впечатление.', 'Подборка актуальных категорий: сумки, ремни, кошельки и аксессуары для подарков.'],
+                newsRead: 'Читать статью',
+                seoMore: 'Читать далее...',
+                seoHide: 'Скрыть текст',
+                footerTitles: ['Каталог', 'Покупателям', 'О нас', 'Скидка 5% на первый заказ'],
+                footerCatalog: ['Часы', 'Сумки', 'Одежда', 'Обувь', 'Ремни', 'Кошельки'],
+                footerBuyer: ['Доставка', 'Гарантия', 'Возврат', 'Помощь (FAQ)', 'Публичная оферта'],
+                footerAbout: ['Контакты', 'Отзывы', 'Новости и статьи', 'Акции и скидки'],
+                subscribeNote: 'Оставьте email и получите промокод на первый заказ.',
+                emailPh: 'Ваш e-mail',
+                getBtn: 'Получить',
+                footerSeoSummary: 'Доставка по Украине и SEO-разделы'
+            },
+            ua: {
+                pageTitle: 'Imidge — Головна сторінка (Dark Luxury)',
+                topMenu: ['Копії годинників', 'Копії сумок', 'Про нас', 'Доставка та оплата', 'Новини та акції', 'Контакти'],
+                topContactsTail: ['Передзвонити вам?', 'Вхід / Реєстрація'],
+                guarantee: 'Доставка по Україні за 2 дні | Оплата після огляду | Люкс якість 1:1',
+                catalogBtn: '☰ Каталог товарів',
+                searchPlaceholder: 'Розумний пошук по сайту: Rolex, Omega, Gucci...',
+                quickNav: ['Годинники', 'Одяг', 'Взуття', 'Сумки', 'Ремені', 'Гаманці', 'Сувеніри та подарунки', 'Sale', 'Бренди'],
+                heroKicker: 'Ексклюзивна акція Imidge',
+                heroTitle: 'Супер знижка до -75% на всі моделі чоловічих годинників Rolex.',
+                heroText: 'Лише обмежений час: преміальні моделі Rolex у люкс якості 1:1 з доставкою по Україні та оплатою після огляду.',
+                heroCta: 'Дивитися колекцію Rolex',
+                promoPills: ['Ліквідація старих колекцій', 'Брендовий одяг 2026', 'Брендові сумки 2026', 'Брендові ремені 2026'],
+                promoTelegram: 'Підпишіться на Telegram-канал Imidge, щоб першими бачити новинки та акції',
+                promoTelegramBtn: 'Перейти в Telegram',
+                trustTitles: ['Люкс якість 1:1', 'Преміальні матеріали', 'Гарантія на весь асортимент', 'Оплата після огляду'],
+                trustText: ['Максимально точні репліки топових брендів з акуратним оздобленням деталей.', 'Сапфірове скло, загартована сталь, титан і натуральна шкіра.', 'Підтримка після покупки та прозорі правила обміну й повернення.', 'Перевіряйте товар перед оплатою та приміряйте без зайвого ризику.'],
+                sectionTitles: ['Популярні категорії', 'Хіти продажу та новинки', 'Популярні бренди', 'Товари місяця', 'Новини та статті', 'Люксові копії годинників, сумок, одягу та взуття в магазині Імідж'],
+                categories: ['Годинники', 'Одяг', 'Взуття', 'Сумки', 'Ремені', 'Гаманці', 'Сувеніри та подарунки'],
+                tabs: ['Хіти продажу', 'Новинки'],
+                subcats: ['Усі', 'Годинники', 'Сумки', 'Одяг', 'Взуття'],
+                allBrands: 'Усі бренди',
+                newsTitles: ['Які наручні годинники найточніші', 'Гравіювання на годинникових механізмах', 'Тренди брендових аксесуарів 2026'],
+                newsText: ['Розбираємо типи механізмів і пояснюємо, на що дивитися при виборі годинника на щодень.', 'Як тонкі деталі оздоблення впливають на візуальну цінність моделі та загальне враження.', 'Добірка актуальних категорій: сумки, ремені, гаманці й аксесуари для подарунків.'],
+                newsRead: 'Читати статтю',
+                seoMore: 'Читати далі...',
+                seoHide: 'Сховати текст',
+                footerTitles: ['Каталог', 'Покупцям', 'Про нас', 'Знижка 5% на перше замовлення'],
+                footerCatalog: ['Годинники', 'Сумки', 'Одяг', 'Взуття', 'Ремені', 'Гаманці'],
+                footerBuyer: ['Доставка', 'Гарантія', 'Повернення', 'Допомога (FAQ)', 'Публічна оферта'],
+                footerAbout: ['Контакти', 'Відгуки', 'Новини та статті', 'Акції та знижки'],
+                subscribeNote: 'Залиште email і отримайте промокод на перше замовлення.',
+                emailPh: 'Ваш e-mail',
+                getBtn: 'Отримати',
+                footerSeoSummary: 'Доставка по Україні та SEO-розділи'
+            }
+        };
+
+        function setTexts(selector, values) {
+            const nodes = document.querySelectorAll(selector);
+            nodes.forEach((node, index) => {
+                if (values[index] !== undefined) {
+                    node.textContent = values[index];
+                }
+            });
+        }
+
+        function applyLanguage(lang) {
+            const t = i18n[lang];
+            currentLanguage = lang;
+            document.documentElement.lang = lang === 'ua' ? 'uk' : 'ru';
+            document.title = t.pageTitle;
+
+            languageButtons.forEach((button) => button.classList.toggle('active', button.dataset.lang === lang));
+
+            setTexts('.top-menu a', t.topMenu);
+            const topContactLinks = document.querySelectorAll('.top-contacts a');
+            if (topContactLinks[2]) {
+                topContactLinks[2].textContent = t.topContactsTail[0];
+            }
+            if (topContactLinks[3]) {
+                topContactLinks[3].textContent = t.topContactsTail[1];
+            }
+            setTexts('.quick-nav-list a', t.quickNav);
+            setTexts('.promo-pill', t.promoPills);
+            setTexts('.trust-card h3', t.trustTitles);
+            setTexts('.trust-card p', t.trustText);
+            setTexts('.section-title', t.sectionTitles);
+            setTexts('.category-tile span', t.categories);
+            setTexts('.tab-btn', t.tabs);
+            setTexts('.subcat-btn', t.subcats);
+            setTexts('.news-title', t.newsTitles);
+            setTexts('.news-text', t.newsText);
+            setTexts('.news-link', [t.newsRead, t.newsRead, t.newsRead]);
+            setTexts('.footer-title', t.footerTitles);
+            setTexts('.footer-grid > div:nth-child(1) .footer-links a', t.footerCatalog);
+            setTexts('.footer-grid > div:nth-child(2) .footer-links a', t.footerBuyer);
+            setTexts('.footer-grid > div:nth-child(3) .footer-links a', t.footerAbout);
+
+            document.querySelector('.guarantee-strip').textContent = t.guarantee;
+            document.querySelector('.catalog-btn').textContent = t.catalogBtn;
+            document.querySelector('.search-input').placeholder = t.searchPlaceholder;
+            document.querySelector('.hero-kicker').textContent = t.heroKicker;
+            document.querySelector('.hero h1').textContent = t.heroTitle;
+            document.querySelector('.hero p').textContent = t.heroText;
+            document.querySelector('.cta-btn').textContent = t.heroCta;
+            document.querySelector('.promo-telegram p').textContent = t.promoTelegram;
+            document.querySelector('.promo-telegram a').textContent = t.promoTelegramBtn;
+            document.querySelector('.brands-cta a').textContent = t.allBrands;
+            document.querySelector('.subscribe-note').textContent = t.subscribeNote;
+            document.querySelector('.subscribe-row input').placeholder = t.emailPh;
+            document.querySelector('.subscribe-row button').textContent = t.getBtn;
+            document.querySelector('.footer-seo summary').textContent = t.footerSeoSummary;
+
+            if (seoToggle) {
+                seoToggle.textContent = seoCopy.classList.contains('expanded') ? t.seoHide : t.seoMore;
+            }
+        }
+
+        languageButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const lang = button.dataset.lang;
+                applyLanguage(lang);
+                const url = new URL(window.location.href);
+                url.searchParams.set('lang', lang);
+                window.history.replaceState({}, '', url.toString());
+            });
+        });
+
+        const queryLang = new URLSearchParams(window.location.search).get('lang');
+        const initialLang = queryLang === 'ru' || queryLang === 'ua' ? queryLang : 'ua';
+        applyLanguage(initialLang);
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+    </script>
+</body>
+
+</html>
