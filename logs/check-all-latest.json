@@ -1,0 +1,128 @@
+{
+  "startedAt": "2026-03-06T07:32:48.710Z",
+  "finishedAt": "2026-03-06T07:33:42.748Z",
+  "totalElapsedMs": 54038,
+  "ok": true,
+  "checks": [
+    {
+      "command": "npm run check:preflight",
+      "preview": "cmd.exe /c npm run check:preflight",
+      "status": 0,
+      "elapsedMs": 405
+    },
+    {
+      "command": "npm run check:smoke",
+      "preview": "cmd.exe /c npm run check:smoke",
+      "status": 0,
+      "elapsedMs": 17379
+    },
+    {
+      "command": "npm run check:catalog-speed",
+      "preview": "cmd.exe /c npm run check:catalog-speed",
+      "status": 0,
+      "elapsedMs": 8466
+    },
+    {
+      "command": "npm run audit:catalog-text",
+      "preview": "cmd.exe /c npm run audit:catalog-text",
+      "status": 0,
+      "elapsedMs": 5510
+    },
+    {
+      "command": "npm run check:search-equivalence",
+      "preview": "cmd.exe /c npm run check:search-equivalence",
+      "status": 0,
+      "elapsedMs": 1521
+    },
+    {
+      "command": "npm run check:add-to-cart",
+      "preview": "cmd.exe /c npm run check:add-to-cart",
+      "status": 0,
+      "elapsedMs": 844
+    },
+    {
+      "command": "npm run check:cart-quantity",
+      "preview": "cmd.exe /c npm run check:cart-quantity",
+      "status": 0,
+      "elapsedMs": 679
+    },
+    {
+      "command": "npm run check:checkout-empty-guard",
+      "preview": "cmd.exe /c npm run check:checkout-empty-guard",
+      "status": 0,
+      "elapsedMs": 439
+    },
+    {
+      "command": "npm run check:payment-session-smoke",
+      "preview": "cmd.exe /c npm run check:payment-session-smoke",
+      "status": 0,
+      "elapsedMs": 584
+    },
+    {
+      "command": "npm run check:shipping-options-fallback",
+      "preview": "cmd.exe /c npm run check:shipping-options-fallback",
+      "status": 0,
+      "elapsedMs": 597
+    },
+    {
+      "command": "npm run check:store-api-guards",
+      "preview": "cmd.exe /c npm run check:store-api-guards",
+      "status": 0,
+      "elapsedMs": 305
+    },
+    {
+      "command": "npm run check:order-complete-smoke",
+      "preview": "cmd.exe /c npm run check:order-complete-smoke",
+      "status": 0,
+      "elapsedMs": 1912
+    },
+    {
+      "command": "npm run check:region-price-guard",
+      "preview": "cmd.exe /c npm run check:region-price-guard",
+      "status": 0,
+      "elapsedMs": 4430
+    },
+    {
+      "command": "npm run check:e2e-flow",
+      "preview": "cmd.exe /c npm run check:e2e-flow",
+      "status": 0,
+      "elapsedMs": 676
+    },
+    {
+      "command": "npm run check:jsonld",
+      "preview": "cmd.exe /c npm run check:jsonld",
+      "status": 0,
+      "elapsedMs": 472
+    },
+    {
+      "command": "npm run check:internal-links",
+      "preview": "cmd.exe /c npm run check:internal-links",
+      "status": 0,
+      "elapsedMs": 7081
+    },
+    {
+      "command": "npm run check:seo-redirect-map",
+      "preview": "cmd.exe /c npm run check:seo-redirect-map",
+      "status": 0,
+      "elapsedMs": 370
+    },
+    {
+      "command": "npm run report:seo-migration-manifest",
+      "preview": "cmd.exe /c npm run report:seo-migration-manifest",
+      "status": 0,
+      "elapsedMs": 1146
+    },
+    {
+      "command": "npm run check:seo-migration-policy",
+      "preview": "cmd.exe /c npm run check:seo-migration-policy",
+      "status": 0,
+      "elapsedMs": 305
+    },
+    {
+      "command": "npm run check:seo-pages",
+      "preview": "cmd.exe /c npm run check:seo-pages",
+      "status": 0,
+      "elapsedMs": 906
+    }
+  ]
+}

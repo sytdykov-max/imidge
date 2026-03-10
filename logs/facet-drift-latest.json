@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-03-06T13:35:57.275Z",
+  "medusaUrl": "http://127.0.0.1:9000",
+  "snapshotPath": "C:\\Users\\Pavel\\Desktop\\Imidge дизайн\\imidge_headless\\apps\\medusa\\src\\scripts\\legacy-filters.json",
+  "maxDriftPct": 3,
+  "minMatched": 100,
+  "productsTotal": 13480,
+  "matchedProducts": 13475,
+  "drift": {
+    "brand": {
+      "count": 0,
+      "pct": 0
+    },
+    "category": {
+      "count": 0,
+      "pct": 0
+    },
+    "priceRange": {
+      "count": 0,
+      "pct": 0
+    },
+    "availability": {
+      "count": 0,
+      "pct": 0
+    }
+  },
+  "violations": [],
+  "ok": true,
+  "samples": []
+}

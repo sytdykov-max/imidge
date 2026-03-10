@@ -1,0 +1,43 @@
+name: Post Deploy Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      storefront_url:
+        description: "Storefront URL"
+        required: true
+        default: "http://127.0.0.1:3002"
+      backend_url:
+        description: "Backend health URL"
+        required: true
+        default: "http://127.0.0.1:9000/health"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Preflight on deployed env
+        run: npm run check:preflight
+        env:
+          STOREFRONT_URL: ${{ inputs.storefront_url }}
+          BACKEND_URL: ${{ inputs.backend_url }}
+
+      - name: Route smoke on deployed env
+        run: npm run check:e2e-flow
+        env:
+          STOREFRONT_URL: ${{ inputs.storefront_url }}
+
+      - name: SEO smoke on deployed env
+        run: npm run check:seo-pages
+        env:
+          STOREFRONT_URL: ${{ inputs.storefront_url }}

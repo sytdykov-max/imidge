@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-03-06T08:04:39.063Z",
+  "maxAgeMinutes": 180,
+  "total": 7,
+  "failed": 0,
+  "ok": true,
+  "rows": [
+    {
+      "artifact": "logs/check-all-latest.json",
+      "exists": true,
+      "modifiedAt": "2026-03-06T07:33:42.750Z",
+      "ageMinutes": 30.94,
+      "maxAgeMinutes": 180,
+      "ok": true,
+      "reason": "ok"
+    },
+    {
+      "artifact": "logs/check-all-latest.junit.xml",
+      "exists": true,
+      "modifiedAt": "2026-03-06T07:33:42.751Z",
+      "ageMinutes": 30.94,
+      "maxAgeMinutes": 180,
+      "ok": true,
+      "reason": "ok"
+    },
+    {
+      "artifact": "logs/weekly-kpi-latest.json",
+      "exists": true,
+      "modifiedAt": "2026-03-06T07:34:01.480Z",
+      "ageMinutes": 30.63,
+      "maxAgeMinutes": 180,
+      "ok": true,
+      "reason": "ok"
+    },
+    {
+      "artifact": "logs/weekly-rollup-latest.json",
+      "exists": true,
+      "modifiedAt": "2026-03-06T07:51:18.439Z",
+      "ageMinutes": 13.34,
+      "maxAgeMinutes": 180,
+      "ok": true,
+      "reason": "ok"
+    },
+    {
+      "artifact": "logs/seo-migration-policy-latest.json",
+      "exists": true,
+      "modifiedAt": "2026-03-06T07:51:08.253Z",
+      "ageMinutes": 13.51,
+      "maxAgeMinutes": 180,
+      "ok": true,
+      "reason": "ok"
+    },
+    {
+      "artifact": "logs/ready-runtime-probes-latest.json",
+      "exists": true,
+      "modifiedAt": "2026-03-06T07:51:18.137Z",
+      "ageMinutes": 13.35,
+      "maxAgeMinutes": 180,
+      "ok": true,
+      "reason": "ok"
+    },
+    {
+      "artifact": "logs/release-go-no-go-latest.json",
+      "exists": true,
+      "modifiedAt": "2026-03-06T08:00:53.140Z",
+      "ageMinutes": 3.77,
+      "maxAgeMinutes": 180,
+      "ok": true,
+      "reason": "ok"
+    }
+  ]
+}

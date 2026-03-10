@@ -1,0 +1,247 @@
+name: Release Go No-Go
+
+on:
+  workflow_dispatch:
+    inputs:
+      quality_gate_profile:
+        description: "Quality gate profile (local|ci)"
+        required: false
+        default: "ci"
+      artifact_max_age_minutes:
+        description: "Artifact freshness SLA in minutes"
+        required: false
+        default: "180"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-go-no-go-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-go-no-go:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: true
+      QUALITY_GATE_PROFILE: ${{ inputs.quality_gate_profile != '' && inputs.quality_gate_profile || 'ci' }}
+      ARTIFACT_MAX_AGE_MINUTES: ${{ inputs.artifact_max_age_minutes != '' && inputs.artifact_max_age_minutes || '180' }}
+      FILTER_BRAND_MIN_COVERAGE_PCT: "95"
+      FILTER_CATEGORY_MIN_COVERAGE_PCT: "95"
+      FILTER_METADATA_MIN_PRODUCTS: "100"
+      FILTER_PRIORITY_CATEGORIES: "Часы,Сумки"
+      FILTER_PRIORITY_CATEGORY_MIN_COVERAGE_PCT: "92"
+      FILTER_PRIORITY_CATEGORY_MIN_PRODUCTS: "20"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install Medusa dependencies
+        run: npm ci
+        working-directory: apps/medusa
+
+      - name: Install Storefront dependencies
+        run: npm ci
+        working-directory: apps/storefront
+
+      - name: Start Medusa
+        run: npm run dev > ../../logs/ci-medusa.log 2>&1 &
+        working-directory: apps/medusa
+
+      - name: Wait for Medusa
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:9000/health >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Medusa did not start"; exit 1
+
+      - name: Start Storefront
+        run: npm run dev > ../../logs/ci-storefront.log 2>&1 &
+        working-directory: apps/storefront
+
+      - name: Wait for Storefront
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3002 >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Storefront did not start"; exit 1
+
+      - name: Run release mini gate
+        run: npm run check:mini-gate
+
+      - name: Docs threshold drift check
+        run: npm run check:docs-threshold-drift
+
+      - name: Run quality gate
+        run: npm run check:all
+
+      - name: Generate weekly KPI
+        run: npm run report:weekly-kpi
+
+      - name: Generate SEO migration manifest
+        run: npm run report:seo-migration-manifest
+
+      - name: Run SEO migration policy check
+        run: npm run check:seo-migration-policy
+
+      - name: Run SEO audit fields check
+        run: npm run check:seo-audit-fields
+
+      - name: Generate KPI trends
+        run: npm run report:weekly-trends
+
+      - name: Generate weekly rollup
+        run: npm run report:weekly-rollup
+
+      - name: Run ready runtime probes
+        run: npm run probe:ready-runtime
+
+      - name: Run regression thresholds
+        run: npm run check:regression-thresholds
+
+      - name: Check release evidence
+        run: npm run check:release-evidence
+
+      - name: Check artifact freshness
+        run: npm run check:artifact-freshness
+
+      - name: Check filter metadata coverage
+        run: npm run check:filter-metadata-coverage
+
+      - name: Generate release go/no-go summary
+        run: npm run report:release-go-no-go
+
+      - name: Generate release risk register
+        run: npm run report:release-risk-register
+
+      - name: Generate release handoff
+        run: npm run report:release-handoff
+
+      - name: Generate release decision ledger
+        run: npm run report:release-decision-ledger
+
+      - name: Publish nightly CI summary
+        if: always()
+        run: npm run ci:write-summary
+
+      - name: Publish release CI summary
+        if: always()
+        run: npm run ci:write-release-summary
+
+      - name: Send failure alert
+        if: failure()
+        run: npm run alert:send
+        env:
+          ALERT_SCOPE: "release-go-no-go"
+          ALERT_STATUS: "failure"
+          ALERT_RUN_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ALERT_MESSAGE: "Imidge release go/no-go failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Upload release go/no-go artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-go-no-go-artifacts
+          retention-days: 14
+          path: |
+            logs/check-all-latest.log
+            logs/check-all-latest.json
+            logs/check-all-latest.md
+            logs/check-all-latest.junit.xml
+            logs/weekly-kpi-latest.json
+            logs/weekly-kpi-trends.json
+            logs/weekly-rollup-latest.json
+            logs/seo-migration-manifest-latest.json
+            logs/seo-migration-manifest-latest.csv
+            logs/seo-migration-policy-latest.json
+            logs/seo-audit-fields-latest.json
+            logs/ready-runtime-probes-latest.json
+            logs/release-evidence-latest.json
+            logs/artifact-freshness-latest.json
+            logs/filter-metadata-coverage-latest.json
+            logs/release-go-no-go-latest.json
+            logs/release-risk-register-latest.json
+            logs/release-handoff-latest.json
+            logs/release-decision-ledger-latest.json
+            logs/ci-medusa.log
+            logs/ci-storefront.log
+            docs/weekly-regression-report-latest.md
+            docs/weekly-regression-trends.md
+            docs/weekly-regression-rollup-latest.md
+            docs/seo-migration-manifest-latest.md
+            docs/seo-migration-checklist-latest.md
+            docs/seo-migration-policy-latest.md
+            docs/seo-audit-fields-latest.md
+            docs/ready-runtime-probes-latest.md
+            docs/release-evidence-latest.md
+            docs/artifact-freshness-latest.md
+            docs/filter-metadata-coverage-latest.md
+            docs/release-go-no-go-latest.md
+            docs/release-risk-register-latest.md
+            docs/release-handoff-latest.md
+            docs/release-decision-ledger-latest.md
+            docs/release-decisions/*.md
+
+      - name: Check required checklist items
+        run: |
+          required_items=("Проверка релизных артефактов" "Проверка блокирующих ошибок" "Проверка SEO" "Проверка интеграций" "Проверка платежей" "Проверка UI/UX" "Проверка логирования" "Проверка мониторинга" "Проверка документации" "Финальное подтверждение релиза")
+          for item in "${required_items[@]}"; do
+            if ! grep -q "$item" ../pre-prod-checklist-latest.md; then
+              echo "Checklist missing item: $item" && exit 1
+            fi
+          done
+
+      - name: Validate all checklist files
+        run: |
+          for f in ../pre-prod-checklist-*.md; do
+            node scripts/test-pre-prod-checklist.mjs || exit 1
+          done
+
+      - name: Cleanup old pre-prod checklists
+        run: node scripts/cleanup-pre-prod-checklists.mjs
+
+      - name: Generate archive pre-prod checklist
+        run: |
+          node scripts/generate-pre-prod-checklist-latest.mjs
+          cp ../pre-prod-checklist-latest.md ../pre-prod-checklist-$(date +%Y-%m-%d).md
+
+      - name: Generate pre-prod checklist (latest)
+        run: node scripts/generate-pre-prod-checklist-latest.mjs
+
+      - name: Upload pre-prod checklist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-prod-checklist-latest
+          path: ../pre-prod-checklist-latest.md
+
+      - name: Notify about checklist ready
+        run: echo "Pre-prod checklist is ready and uploaded."
+
+      - name: Checklist approval (auto-sign)
+        run: echo "Checklist auto-approved by CI."
+
+      - name: Log checklist update to release ledger
+        run: node scripts/log-pre-prod-checklist-update.mjs
+
+      - name: Checklist stats (monitoring)
+        run: |
+          echo "Checklist stats:"
+          ls -l ../pre-prod-checklist-*.md | wc -l

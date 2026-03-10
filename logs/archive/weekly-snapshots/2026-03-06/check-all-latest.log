@@ -1,0 +1,294 @@
+check:all started at 2026-03-06T07:32:48.710Z
+
+>>> cmd.exe /c npm run check:preflight
+
+> check:preflight
+> node ./scripts/check-preflight.mjs
+
+Preflight check (2026-03-06T07:32:48.999Z)
+backend_health: status=200, time=30ms, url=http://127.0.0.1:9000/health
+storefront_home: status=200, time=40ms, url=http://127.0.0.1:3002
+
+>>> cmd.exe /c npm run check:smoke
+
+> check:smoke
+> powershell -ExecutionPolicy Bypass -File ./scripts/smoke-check.ps1
+
+Smoke check @ 2026-03-06T09:33:06
+backend_health: 200 - http://127.0.0.1:9000/health
+home: 200 - http://127.0.0.1:3002/
+catalog: 200 - http://127.0.0.1:3002/catalog
+catalog_page_2: 200 - http://127.0.0.1:3002/catalog?page=2
+catalog_query_bmw: 200 - http://127.0.0.1:3002/catalog?q=bmw
+search: 200 - http://127.0.0.1:3002/search
+product_sample: 200 - http://127.0.0.1:3002/product/shorts
+cart: 200 - http://127.0.0.1:3002/cart
+checkout: 200 - http://127.0.0.1:3002/checkout
+blog: 200 - http://127.0.0.1:3002/blog
+account: 200 - http://127.0.0.1:3002/account
+
+>>> cmd.exe /c npm run check:catalog-speed
+
+> check:catalog-speed
+> node ./scripts/check-catalog-speed.mjs
+
+Catalog speed check (2026-03-06T07:33:13.324Z)
+http://127.0.0.1:3002/catalog -> 200 in 118.92 ms
+http://127.0.0.1:3002/catalog?page=2 -> 200 in 121.07 ms
+http://127.0.0.1:3002/catalog?q=bmw -> 200 in 237.71 ms
+http://127.0.0.1:3002/catalog?q=%D0%B1%D0%BC%D0%B2 -> 200 in 232.28 ms
+http://127.0.0.1:3002/catalog?q=bmw+x5 -> 200 in 351.48 ms
+http://127.0.0.1:3002/catalog?q=%D0%B1%D0%BC%D0%B2+%D1%855 -> 200 in 354.18 ms
+Summary: avg=235.94 ms, max=354.18 ms, total=6523.01 ms
+
+>>> cmd.exe /c npm run audit:catalog-text
+
+> audit:catalog-text
+> node ./scripts/audit-catalog-text.mjs
+
+Catalog text audit (2026-03-06T07:33:20.453Z)
+Checked products: 5000
+Suspected mojibake products: 0
+
+>>> cmd.exe /c npm run check:search-equivalence
+
+> check:search-equivalence
+> node ./scripts/check-search-equivalence.mjs
+
+Search equivalence check (2026-03-06T07:33:20.755Z)
+BMW vs БМВ: 8 vs 8 -> OK
+BMW X5 vs БМВ Х5: 8 vs 8 -> OK
+
+>>> cmd.exe /c npm run check:add-to-cart
+
+> check:add-to-cart
+> node ./scripts/check-add-to-cart.mjs
+
+Add-to-cart check (2026-03-06T07:33:22.282Z)
+valid_variant: status=200, item=OK, quantity=1
+repeat_variant: status=200, quantity=2, expected_ge_2=OK
+invalid_variant: status=400, expected_error=OK
+
+>>> cmd.exe /c npm run check:cart-quantity
+
+> check:cart-quantity
+> node ./scripts/check-cart-quantity.mjs
+
+Cart quantity check (2026-03-06T07:33:23.130Z)
+update_quantity: status=200, quantity=3, expected=3
+remove_item: status=200, removed=OK
+
+>>> cmd.exe /c npm run check:checkout-empty-guard
+
+> check:checkout-empty-guard
+> node ./scripts/check-checkout-empty-guard.mjs
+
+Checkout empty-guard check (2026-03-06T07:33:23.802Z)
+api_empty_cart=OK
+client_guard_present=OK
+
+>>> cmd.exe /c npm run check:payment-session-smoke
+
+> check:payment-session-smoke
+> node ./scripts/check-payment-session-smoke.mjs
+
+Payment session smoke (2026-03-06T07:33:24.279Z)
+payment_session: status=200, ok=OK
+payment_collection: status=200, ok=OK
+
+>>> cmd.exe /c npm run check:shipping-options-fallback
+
+> check:shipping-options-fallback
+> node ./scripts/check-shipping-options-fallback.mjs
+
+Shipping options fallback smoke (2026-03-06T07:33:24.842Z)
+shipping_options: region=reg_01KJWQDGH6QNW6T5A6JEGXPXP3, status=200, option=OK
+
+>>> cmd.exe /c npm run check:store-api-guards
+
+> check:store-api-guards
+> node ./scripts/check-store-api-guards.mjs
+
+timeout_const=OK
+timeout_error_message=OK
+country_resolver=OK
+country_fallback_debug=OK
+country_code_assignment=OK
+
+>>> cmd.exe /c npm run check:order-complete-smoke
+
+> check:order-complete-smoke
+> node ./scripts/check-order-complete-smoke.mjs
+
+Order complete smoke (2026-03-06T07:33:25.729Z)
+order_complete: status=200, type=order, order=OK
+success_page: status=200, ok=OK
+
+>>> cmd.exe /c npm run check:region-price-guard
+
+> check:region-price-guard
+> node ./scripts/check-region-price-guard.mjs
+
+Region price guard check (2026-03-06T07:33:27.641Z)
+product=kopiya-chasov-louis-vuitton-model-h0475
+status=200, message=OK, disabled=OK
+
+>>> cmd.exe /c npm run check:e2e-flow
+
+> check:e2e-flow
+> node ./scripts/check-e2e-flow.mjs
+
+E2E flow check (2026-03-06T07:33:32.071Z)
+catalog: status=200, marker=OK
+product: status=200, marker=OK
+cart: status=200, marker=OK
+checkout: status=200, marker=OK
+
+>>> cmd.exe /c npm run check:jsonld
+
+> check:jsonld
+> node ./apps/storefront/scripts/check-jsonld.mjs
+
+JSONLD_COUNT: 1
+HAS_PRODUCT: true
+HAS_OFFERS: true
+HAS_AGGREGATE_RATING: true
+HAS_REVIEW: true
+OFFER_PRICE: 10
+OFFER_CURRENCY: EUR
+OFFER_AVAILABILITY: https://schema.org/InStock
+RATING_VALUE: 4.9
+RATING_COUNT: 16
+REVIEW_AUTHOR: Ольга
+
+>>> cmd.exe /c npm run check:internal-links
+
+> check:internal-links
+> node ./scripts/check-internal-links.mjs
+
+Internal links check (2026-03-06T07:33:33.234Z)
+/: status=200, OK
+/catalog: status=200, OK
+/search: status=200, OK
+/product/shorts: status=200, OK
+/cart: status=200, OK
+/checkout: status=200, OK
+/blog: status=200, OK
+/account: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413274: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413274: status=200, OK
+/favicon.ico?603d046c9a6fdfbb: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413316: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413316: status=200, OK
+/catalog?sort=price_asc: status=200, OK
+/catalog?sort=price_desc: status=200, OK
+/catalog?sort=title_asc: status=200, OK
+/catalog?cat=%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3: status=200, OK
+/catalog?cat=%D0%A4%D1%83%D1%82%D0%B1%D0%BE%D0%BB%D0%BA%D0%B8: status=200, OK
+/catalog?cat=%D0%91%D1%80%D1%8E%D0%BA%D0%B8: status=200, OK
+/catalog?cat=%D0%9F%D0%BB%D0%B0%D1%82%D1%8C%D1%8F: status=200, OK
+/catalog?cat=%D0%A8%D0%BE%D1%80%D1%82%D1%8B: status=200, OK
+/catalog?brand=%D0%91%D0%B5%D0%B7+%D0%B1%D1%80%D0%B5%D0%BD%D0%B4%D0%B0: status=200, OK
+/catalog?brand=Hublot: status=200, OK
+/catalog?brand=PATEK: status=200, OK
+/catalog?brand=Vacheron: status=200, OK
+/catalog?brand=OMEGA: status=200, OK
+/catalog?brand=Breitling: status=200, OK
+/catalog?brand=Cartier: status=200, OK
+/catalog?brand=Chopard: status=200, OK
+/catalog?brand=Ulysse: status=200, OK
+/catalog?brand=Breguet: status=200, OK
+/catalog?brand=TAG: status=200, OK
+/catalog?brand=ROLEX: status=200, OK
+/catalog?brand=IWC: status=200, OK
+/catalog?brand=Montblanc: status=200, OK
+/catalog?brand=LOUIS: status=200, OK
+/catalog?brand=Franck: status=200, OK
+/catalog?price=under_300: status=200, OK
+/catalog?price=300_600: status=200, OK
+/catalog?price=over_600: status=200, OK
+/product/sweatshirt: status=200, OK
+/product/sweatpants: status=200, OK
+/product/t-shirt: status=200, OK
+/product/plate-midi-iz-viskozy: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-h0475: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-h0474: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-s020: status=200, OK
+/product/kopiya-chasov-tag-heuer-model-h0329: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-s016: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-s018: status=200, OK
+/product/kopiya-chasov-tag-heuer-model-h0260: status=200, OK
+/product/kopiya-chasov-tag-heuer-model-h0323: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-h0420: status=200, OK
+/product/kopiya-chasov-audemars-piguet-model-c0887: status=200, OK
+/product/kopiya-chasov-tag-heuer-model-h0198: status=200, OK
+/product/kopiya-chasov-tag-heuer-model-s720: status=200, OK
+/product/kopiya-chasov-tag-heuer-model-h0345: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-c0243: status=200, OK
+/product/kopiya-chasov-tag-heuer-model-h0377: status=200, OK
+/product/kopiya-chasov-audemars-piguet-model-sap1: status=200, OK
+/product/kopiya-chasov-audemars-piguet-model-c0864: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-h0427: status=200, OK
+/product/kopiya-chasov-louis-vuitton-model-c0228: status=200, OK
+/catalog?page=2: status=200, OK
+/catalog?page=3: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413446: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413446: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413658: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413658: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413737: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413737: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413769: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413769: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413816: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413816: status=200, OK
+/_next/static/css/app/layout.css?v=1772782413860: status=200, OK
+/_next/static/chunks/webpack.js?v=1772782413860: status=200, OK
+
+>>> cmd.exe /c npm run check:seo-redirect-map
+
+> check:seo-redirect-map
+> node ./scripts/check-seo-redirect-map.mjs
+
+[seo-redirect-map] started at 2026-03-06T07:33:40.300Z
+[seo-redirect-map] /catalogue -> /catalog (308)
+[seo-redirect-map] /katalog -> /catalog (308)
+[seo-redirect-map] /shop -> /catalog (308)
+[seo-redirect-map] /products -> /catalog (308)
+[seo-redirect-map] /cart.php -> /cart (308)
+[seo-redirect-map] /checkout.php -> /checkout (308)
+[seo-redirect-map] /search.php -> /search (308)
+[seo-redirect-map] /blog.php -> /blog (308)
+[seo-redirect-map] /account.php -> /account (308)
+[seo-redirect-map] OK: 9 redirects verified
+
+>>> cmd.exe /c npm run report:seo-migration-manifest
+
+> report:seo-migration-manifest
+> node ./scripts/generate-seo-migration-manifest.mjs
+
+seo_migration_manifest: status=OK, entries=9, verified=9, redirect_ok=9, destination_ok=9, runtime_ok=9
+
+>>> cmd.exe /c npm run check:seo-migration-policy
+
+> check:seo-migration-policy
+> node ./scripts/check-seo-migration-policy.mjs
+
+seo_migration_policy: status=OK, total=9, ready=9, violations=0
+
+>>> cmd.exe /c npm run check:seo-pages
+
+> check:seo-pages
+> node ./scripts/check-seo-pages.mjs
+
+SEO policy check (2026-03-06T07:33:42.123Z)
+/: status=200, canonical=OK, robots=index
+/catalog: status=200, canonical=OK, robots=index
+/search: status=200, canonical=OK, robots=noindex
+/account: status=200, canonical=OK, robots=noindex
+/cart: status=200, canonical=OK, robots=noindex
+/checkout: status=200, canonical=OK, robots=noindex
+/blog: status=200, canonical=OK, robots=index
+/product/shorts: status=200, canonical=OK, robots=index
+
+check:all finished at 2026-03-06T07:33:42.748Z; ok=true; totalElapsedMs=54038

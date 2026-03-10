@@ -1,0 +1,21 @@
+{
+  "defaultProfile": "local",
+  "profiles": {
+    "local": {
+      "MAX_GATE_MS": 60000,
+      "MAX_SINGLE_CHECK_MS": 20000,
+      "MIN_PASS_RATE": 100,
+      "MAX_READY_RUNTIME_VIOLATIONS": 0,
+      "READY_RUNTIME_MAX_MS": 1500,
+      "READY_RUNTIME_MAX_FAILS": 0
+    },
+    "ci": {
+      "MAX_GATE_MS": 75000,
+      "MAX_SINGLE_CHECK_MS": 25000,
+      "MIN_PASS_RATE": 100,
+      "MAX_READY_RUNTIME_VIOLATIONS": 0,
+      "READY_RUNTIME_MAX_MS": 2000,
+      "READY_RUNTIME_MAX_FAILS": 0
+    }
+  }
+}

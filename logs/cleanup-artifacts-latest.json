@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-03-06T08:36:17.380Z",
+  "keepHistoryRuns": 30,
+  "keepArchiveWeeks": 8,
+  "historyResults": [
+    {
+      "file": "logs/check-all-history.jsonl",
+      "before": 4,
+      "after": 4,
+      "archived": 0,
+      "trimmed": false,
+      "archiveFile": ""
+    },
+    {
+      "file": "logs/weekly-kpi-history.jsonl",
+      "before": 2,
+      "after": 2,
+      "archived": 0,
+      "trimmed": false,
+      "archiveFile": ""
+    }
+  ],
+  "snapshot": {
+    "weekLabel": "2026-03-06",
+    "directory": "logs/archive/weekly-snapshots/2026-03-06",
+    "copiedCount": 15,
+    "copied": [
+      "logs/archive/weekly-snapshots/2026-03-06/check-all-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/check-all-latest.log",
+      "logs/archive/weekly-snapshots/2026-03-06/check-all-latest.junit.xml",
+      "logs/archive/weekly-snapshots/2026-03-06/weekly-kpi-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/weekly-kpi-trends.json",
+      "logs/archive/weekly-snapshots/2026-03-06/weekly-rollup-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/seo-migration-policy-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/ready-runtime-probes-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/release-go-no-go-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/release-risk-register-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/release-handoff-latest.json",
+      "logs/archive/weekly-snapshots/2026-03-06/weekly-regression-rollup-latest.md",
+      "logs/archive/weekly-snapshots/2026-03-06/release-go-no-go-latest.md",
+      "logs/archive/weekly-snapshots/2026-03-06/release-risk-register-latest.md",
+      "logs/archive/weekly-snapshots/2026-03-06/release-handoff-latest.md"
+    ],
+    "prunedDirectories": [],
+    "keptDirectories": [
+      "2026-03-06"
+    ]
+  }
+}

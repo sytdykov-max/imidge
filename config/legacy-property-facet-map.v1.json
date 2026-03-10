@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "legacySource": "bitrix_iblock_26",
+  "mappings": [
+    {
+      "legacyField": "NAME",
+      "facet": "filter_brand",
+      "strategy": "extract_brand_from_title"
+    },
+    {
+      "legacyField": "SECTION_NAME",
+      "facet": "filter_category",
+      "strategy": "normalize_category_label"
+    },
+    {
+      "legacyField": "PRICE_MIN",
+      "facet": "filter_price_range",
+      "strategy": "bucket_price_range"
+    },
+    {
+      "legacyField": "QUANTITY",
+      "facet": "filter_availability",
+      "strategy": "quantity_to_stock_flag"
+    },
+    {
+      "legacyField": "PROPERTY_GENDER",
+      "facet": "filter_gender",
+      "strategy": "normalize_gender"
+    },
+    {
+      "legacyField": "PROPERTY_ITEM_TYPE",
+      "facet": "filter_type",
+      "strategy": "normalize_product_type"
+    },
+    {
+      "legacyField": "PROPERTY_IS_SALE",
+      "facet": "filter_is_sale",
+      "strategy": "normalize_boolean"
+    },
+    {
+      "legacyField": "PROPERTY_IS_NEW",
+      "facet": "filter_is_new",
+      "strategy": "normalize_boolean"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-03-06T13:49:50.512Z",
+  "baseUrl": "http://127.0.0.1:3002",
+  "checks": [
+    {
+      "name": "base_canonical_exists",
+      "ok": true,
+      "detail": "status=200, canonical=http://127.0.0.1:3002/catalog"
+    },
+    {
+      "name": "filtered_canonical_exists",
+      "ok": true,
+      "detail": "status=200, canonical=http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B&amp;brand=Hublot&amp;page=2"
+    },
+    {
+      "name": "deep_page_noindex",
+      "ok": true,
+      "detail": "status=200, robots=noindex, follow"
+    }
+  ],
+  "violations": [],
+  "ok": true,
+  "sampledPages": {
+    "base": {
+      "url": "http://127.0.0.1:3002/catalog",
+      "canonical": "http://127.0.0.1:3002/catalog",
+      "robots": "index, follow"
+    },
+    "filtered": {
+      "url": "http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B&brand=Hublot&page=2",
+      "canonical": "http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B&amp;brand=Hublot&amp;page=2",
+      "robots": "index, follow"
+    },
+    "deep": {
+      "url": "http://127.0.0.1:3002/catalog?page=11&cat=%D0%A7%D0%B0%D1%81%D1%8B",
+      "canonical": "http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B&amp;page=11",
+      "robots": "noindex, follow"
+    }
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-03-06T13:35:49.210Z",
+  "medusaUrl": "http://127.0.0.1:9000",
+  "requiredFacets": [
+    "filter_brand",
+    "filter_category",
+    "filter_price_range",
+    "filter_availability"
+  ],
+  "defaultThresholds": {
+    "minCoveragePct": 95,
+    "minProducts": 100
+  },
+  "categories": [
+    {
+      "category": "Часы",
+      "total": 8215,
+      "minCoveragePct": 98,
+      "minProducts": 100,
+      "facetCoverage": [
+        {
+          "facet": "filter_brand",
+          "present": 8215,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_category",
+          "present": 8215,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_price_range",
+          "present": 8215,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_availability",
+          "present": 8215,
+          "missing": 0,
+          "coveragePct": 100
+        }
+      ],
+      "ok": true,
+      "violations": []
+    },
+    {
+      "category": "Сумки",
+      "total": 20,
+      "minCoveragePct": 95,
+      "minProducts": 20,
+      "facetCoverage": [
+        {
+          "facet": "filter_brand",
+          "present": 20,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_category",
+          "present": 20,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_price_range",
+          "present": 20,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_availability",
+          "present": 20,
+          "missing": 0,
+          "coveragePct": 100
+        }
+      ],
+      "ok": true,
+      "violations": []
+    },
+    {
+      "category": "Одежда",
+      "total": 8,
+      "minCoveragePct": 95,
+      "minProducts": 5,
+      "facetCoverage": [
+        {
+          "facet": "filter_brand",
+          "present": 8,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_category",
+          "present": 8,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_price_range",
+          "present": 8,
+          "missing": 0,
+          "coveragePct": 100
+        },
+        {
+          "facet": "filter_availability",
+          "present": 8,
+          "missing": 0,
+          "coveragePct": 100
+        }
+      ],
+      "ok": true,
+      "violations": []
+    }
+  ],
+  "violations": [],
+  "ok": true
+}

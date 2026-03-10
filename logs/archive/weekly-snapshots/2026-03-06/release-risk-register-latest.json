@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-03-06T08:12:46.470Z",
+  "total": 8,
+  "openTotal": 0,
+  "monitorTotal": 1,
+  "highTotal": 0,
+  "mediumTotal": 1,
+  "lowTotal": 7,
+  "risks": [
+    {
+      "id": "RISK-008",
+      "title": "Historical runtime coverage drift",
+      "severity": "medium",
+      "owner": "seo",
+      "status": "monitor",
+      "evidence": "logs/weekly-kpi-trends.json",
+      "value": 0.5,
+      "threshold": 0,
+      "action": "Keep runtime_ok coverage at 100% for ready entries over time"
+    },
+    {
+      "id": "RISK-001",
+      "title": "Quality gate overall status",
+      "severity": "low",
+      "owner": "release",
+      "status": "closed",
+      "evidence": "logs/check-all-latest.json",
+      "value": true,
+      "threshold": true,
+      "action": "Run check:all and resolve failed checks before release"
+    },
+    {
+      "id": "RISK-002",
+      "title": "Pass rate degradation",
+      "severity": "low",
+      "owner": "release",
+      "status": "closed",
+      "evidence": "logs/weekly-kpi-latest.json",
+      "value": 100,
+      "threshold": 100,
+      "action": "Investigate failed checks and recover pass rate to 100%"
+    },
+    {
+      "id": "RISK-003",
+      "title": "Quality gate duration regression",
+      "severity": "low",
+      "owner": "perf",
+      "status": "closed",
+      "evidence": "logs/check-all-latest.json",
+      "value": 54038,
+      "threshold": 60000,
+      "action": "Profile slow checks and optimize top duration contributors"
+    },
+    {
+      "id": "RISK-004",
+      "title": "SEO migration policy violations",
+      "severity": "low",
+      "owner": "seo",
+      "status": "closed",
+      "evidence": "logs/seo-migration-policy-latest.json",
+      "value": 0,
+      "threshold": 0,
+      "action": "Fix status=ready entries that are not runtime validated"
+    },
+    {
+      "id": "RISK-005",
+      "title": "SEO audit metadata quality",
+      "severity": "low",
+      "owner": "seo",
+      "status": "closed",
+      "evidence": "logs/seo-migration-policy-latest.json",
+      "value": 0,
+      "threshold": 0,
+      "action": "Fill owner/ticket/approvedAt for all ready migration entries"
+    },
+    {
+      "id": "RISK-006",
+      "title": "Runtime probe failures",
+      "severity": "low",
+      "owner": "platform",
+      "status": "closed",
+      "evidence": "logs/ready-runtime-probes-latest.json",
+      "value": 0,
+      "threshold": 0,
+      "action": "Restore availability for failing ready routes"
+    },
+    {
+      "id": "RISK-007",
+      "title": "Runtime probe latency budget",
+      "severity": "low",
+      "owner": "perf",
+      "status": "closed",
+      "evidence": "logs/ready-runtime-probes-latest.json",
+      "value": 0,
+      "threshold": 0,
+      "action": "Investigate latency spikes for ready URLs"
+    }
+  ]
+}

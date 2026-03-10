@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-03-06T13:50:08.457Z",
+  "medusaUrl": "http://127.0.0.1:9000",
+  "productsTotal": 13480,
+  "categories": [
+    {
+      "label": "Одежда",
+      "total": 8,
+      "problematic": 0,
+      "problemRatePct": 0,
+      "issues": [],
+      "samples": []
+    },
+    {
+      "label": "Платья",
+      "total": 1,
+      "problematic": 0,
+      "problemRatePct": 0,
+      "issues": [],
+      "samples": []
+    },
+    {
+      "label": "Часы",
+      "total": 8215,
+      "problematic": 0,
+      "problemRatePct": 0,
+      "issues": [],
+      "samples": []
+    },
+    {
+      "label": "Каталог",
+      "total": 5236,
+      "problematic": 0,
+      "problemRatePct": 0,
+      "issues": [],
+      "samples": []
+    },
+    {
+      "label": "Сумки",
+      "total": 20,
+      "problematic": 0,
+      "problemRatePct": 0,
+      "issues": [],
+      "samples": []
+    }
+  ],
+  "topProblematicCategories": []
+}

@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-03-06T13:50:22.023Z",
+  "configVersion": "2.0.0",
+  "currentStage": 10,
+  "targetStage": 50,
+  "decision": "proceed",
+  "shouldRollback": false,
+  "metrics": {
+    "brandCoverage": 100,
+    "categoryCoverage": 100,
+    "performanceP95Ms": 134,
+    "seoOk": true,
+    "e2eOk": true
+  },
+  "violations": [],
+  "ok": true
+}

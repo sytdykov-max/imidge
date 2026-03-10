@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Платье миди из вискозы",
+    "handle": "plate-midi-iz-viskozy",
+    "description": "Легкое платье на каждый день.",
+    "metadata": {
+      "legacy_id": "imidge-1001",
+      "legacy_category": "Платья"
+    },
+    "variants": [
+      {
+        "title": "S",
+        "prices": [
+          { "currency_code": "eur", "amount": 89 },
+          { "currency_code": "usd", "amount": 95 }
+        ]
+      },
+      {
+        "title": "M",
+        "prices": [
+          { "currency_code": "eur", "amount": 89 },
+          { "currency_code": "usd", "amount": 95 }
+        ]
+      }
+    ]
+  }
+]

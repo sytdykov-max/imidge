@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "stages": [10, 50, 100],
+  "defaultStage": 10,
+  "rollbackRules": {
+    "minBrandCoveragePct": 95,
+    "minCategoryCoveragePct": 95,
+    "maxPerformanceP95Ms": 2000,
+    "requireSeoCheckOk": true,
+    "requireE2ECheckOk": true
+  }
+}

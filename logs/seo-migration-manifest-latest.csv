@@ -1,0 +1,10 @@
+source,destination,type,route_group,owner,ticket,approved_at,priority,status,source_type,target_type,notes,runtime_verified,runtime_ok,expected_status,source_status,source_location,destination_status,redirect_ok,destination_ok,error
+"/catalogue","/catalog","permanent","catalog","seo","IM-SEO-1001","2026-03-06T08:10:00.000Z","p0","ready","legacy_path","listing","Legacy EN path","true","true","308","308","/catalog","200","true","true",""
+"/katalog","/catalog","permanent","catalog","seo","IM-SEO-1002","2026-03-06T08:10:00.000Z","p0","ready","legacy_translit","listing","Legacy translit alias","true","true","308","308","/catalog","200","true","true",""
+"/shop","/catalog","permanent","catalog","seo","IM-SEO-1003","2026-03-06T08:10:00.000Z","p1","ready","legacy_path","listing","Legacy shop alias","true","true","308","308","/catalog","200","true","true",""
+"/products","/catalog","permanent","catalog","seo","IM-SEO-1004","2026-03-06T08:10:00.000Z","p1","ready","legacy_path","listing","Legacy products listing","true","true","308","308","/catalog","200","true","true",""
+"/cart.php","/cart","permanent","checkout","frontend","IM-FE-2001","2026-03-06T08:10:00.000Z","p0","ready","legacy_script","service","Checkout critical","true","true","308","308","/cart","200","true","true",""
+"/checkout.php","/checkout","permanent","checkout","frontend","IM-FE-2002","2026-03-06T08:10:00.000Z","p0","ready","legacy_script","service","Checkout critical","true","true","308","308","/checkout","200","true","true",""
+"/search.php","/search","permanent","search","seo","IM-SEO-1005","2026-03-06T08:10:00.000Z","p1","ready","legacy_script","service","Search entrypoint","true","true","308","308","/search","200","true","true",""
+"/blog.php","/blog","permanent","content","content","IM-CNT-3001","2026-03-06T08:10:00.000Z","p2","ready","legacy_script","content","Blog listing","true","true","308","308","/blog","200","true","true",""
+"/account.php","/account","permanent","account","frontend","IM-FE-2003","2026-03-06T08:10:00.000Z","p2","ready","legacy_script","service","Personal area","true","true","308","308","/account","200","true","true",""

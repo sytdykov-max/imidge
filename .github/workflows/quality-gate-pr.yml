@@ -1,0 +1,151 @@
+name: Quality Gate PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-gate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gate:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: true
+      QUALITY_GATE_PROFILE: ci
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install Medusa dependencies
+        run: npm ci
+        working-directory: apps/medusa
+
+      - name: Install Storefront dependencies
+        run: npm ci
+        working-directory: apps/storefront
+
+      - name: Start Medusa
+        run: npm run dev > ../../logs/ci-medusa.log 2>&1 &
+        working-directory: apps/medusa
+
+      - name: Wait for Medusa
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:9000/health >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Medusa did not start"; exit 1
+
+      - name: Start Storefront
+        run: npm run dev > ../../logs/ci-storefront.log 2>&1 &
+        working-directory: apps/storefront
+
+      - name: Wait for Storefront
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3002 >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Storefront did not start"; exit 1
+
+      - name: Run pre-merge lightweight gate (exact)
+        run: |
+          npm run check:preflight
+          npm run check:seo-migration-policy
+          npm run check:regression-thresholds
+
+      - name: Run pre-merge mini gate (strict)
+        run: npm run check:mini-gate:strict
+
+      - name: Run quality gate
+        run: npm run check:all
+
+      - name: Generate KPI and trend artifacts
+        if: success()
+        run: |
+          npm run report:weekly-kpi
+          npm run report:weekly-trends
+          npm run report:weekly-rollup
+
+      - name: Threshold check (profile-aware)
+        if: success()
+        run: npm run check:regression-thresholds
+
+      - name: Send failure alert
+        if: failure()
+        run: npm run alert:send
+        env:
+          ALERT_SCOPE: "quality-gate-pr"
+          ALERT_STATUS: "failure"
+          ALERT_RUN_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ALERT_MESSAGE: "Imidge quality-gate PR failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Upload quality artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-gate-artifacts
+          retention-days: 14
+          path: |
+            logs/check-all-latest.log
+            logs/check-all-latest.json
+            logs/check-all-latest.md
+            logs/check-all-latest.junit.xml
+            logs/seo-migration-manifest-latest.json
+            logs/seo-migration-manifest-latest.csv
+            logs/seo-migration-policy-latest.json
+            logs/weekly-kpi-latest.json
+            logs/weekly-kpi-trends.json
+            logs/weekly-rollup-latest.json
+            logs/ci-medusa.log
+            logs/ci-storefront.log
+            docs/seo-migration-manifest-latest.md
+            docs/seo-migration-checklist-latest.md
+            docs/seo-migration-policy-latest.md
+            docs/weekly-regression-report-latest.md
+            docs/weekly-regression-trends.md
+            docs/weekly-regression-rollup-latest.md
+
+  merge-block-policy:
+    if: always()
+    needs:
+      - quality-gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Enforce merge-block policy
+        run: |
+          echo "quality-gate result: ${{ needs.quality-gate.result }}"
+          if [ "${{ needs.quality-gate.result }}" != "success" ]; then
+            echo "Merge is blocked: quality gate must pass"
+            exit 1
+          fi

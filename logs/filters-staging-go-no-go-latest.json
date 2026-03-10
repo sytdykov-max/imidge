@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-03-06T13:50:22.408Z",
+  "decision": "GO",
+  "blockers": [],
+  "warnings": [],
+  "metrics": {
+    "brandCoveragePct": 100,
+    "categoryCoveragePct": 100,
+    "consistencyViolations": 0,
+    "perfP95Ms": 134,
+    "seoOk": true,
+    "e2eOk": true,
+    "driftOk": true
+  }
+}

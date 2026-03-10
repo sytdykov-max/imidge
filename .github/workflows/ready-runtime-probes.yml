@@ -1,0 +1,72 @@
+name: Ready Runtime Probes
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      storefront_url:
+        description: "Storefront URL for runtime probes"
+        required: false
+        default: ""
+
+jobs:
+  probes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      QUALITY_GATE_PROFILE: ci
+      STOREFRONT_URL: ${{ inputs.storefront_url != '' && inputs.storefront_url || secrets.STOREFRONT_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Validate storefront URL is configured
+        run: |
+          if [ -z "${STOREFRONT_URL}" ]; then
+            echo "STOREFRONT_URL is not configured (workflow input or secret STOREFRONT_URL)."
+            exit 1
+          fi
+
+      - name: Build SEO migration manifest against target URL
+        run: npm run report:seo-migration-manifest
+
+      - name: Run SEO migration policy check
+        run: npm run check:seo-migration-policy
+
+      - name: Run ready runtime probes
+        run: npm run probe:ready-runtime
+
+      - name: Send failure alert
+        if: failure()
+        run: npm run alert:send
+        env:
+          ALERT_SCOPE: "ready-runtime-probes"
+          ALERT_STATUS: "failure"
+          ALERT_RUN_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ALERT_MESSAGE: "Imidge ready runtime probes failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Upload probe artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ready-runtime-probes-artifacts
+          retention-days: 7
+          path: |
+            logs/seo-migration-manifest-latest.json
+            logs/seo-migration-policy-latest.json
+            logs/ready-runtime-probes-latest.json
+            docs/seo-migration-manifest-latest.md
+            docs/seo-migration-policy-latest.md
+            docs/ready-runtime-probes-latest.md

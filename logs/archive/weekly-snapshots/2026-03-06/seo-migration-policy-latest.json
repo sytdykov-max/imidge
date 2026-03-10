@@ -1,0 +1,14 @@
+{
+  "startedAt": "2026-03-06T08:21:31.349Z",
+  "finishedAt": "2026-03-06T08:21:31.350Z",
+  "manifestPath": "C:\\Users\\Pavel\\Desktop\\Imidge дизайн\\imidge_headless\\logs\\seo-migration-manifest-latest.json",
+  "total": 9,
+  "readyTotal": 9,
+  "violationsTotal": 0,
+  "missingFieldsTotal": 0,
+  "auditWarningsTotal": 0,
+  "ok": true,
+  "violations": [],
+  "missingFields": [],
+  "auditWarnings": []
+}

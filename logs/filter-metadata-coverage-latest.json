@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-03-06T13:16:46.946Z",
+  "medusaUrl": "http://127.0.0.1:9000",
+  "thresholds": {
+    "minBrandCoveragePct": 95,
+    "minCategoryCoveragePct": 95,
+    "minProductsForGate": 1,
+    "priorityCategoryMinCoveragePct": 92,
+    "priorityCategoryMinProducts": 20,
+    "priorityCategoryLabels": [
+      "Часы",
+      "Сумки"
+    ]
+  },
+  "totals": {
+    "scannedProducts": 13480,
+    "coveredBrand": 13480,
+    "missingBrand": 0,
+    "coveredCategory": 13480,
+    "missingCategory": 0,
+    "brandCoveragePct": 100,
+    "categoryCoveragePct": 100
+  },
+  "ok": true,
+  "violations": [],
+  "samples": {
+    "missingBrand": [],
+    "missingCategory": []
+  },
+  "priorityCategories": [
+    {
+      "label": "Часы",
+      "scannedProducts": 8215,
+      "coveredBrand": 8215,
+      "missingBrand": 0,
+      "brandCoveragePct": 100,
+      "ok": true,
+      "violations": []
+    },
+    {
+      "label": "Сумки",
+      "scannedProducts": 20,
+      "coveredBrand": 20,
+      "missingBrand": 0,
+      "brandCoveragePct": 100,
+      "ok": true,
+      "violations": []
+    }
+  ]
+}

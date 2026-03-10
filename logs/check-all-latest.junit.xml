@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="imidge-quality-gate" tests="20" failures="0" time="54.038">
+    <testcase classname="quality-gate" name="npm run check:preflight" time="0.405" />
+    <testcase classname="quality-gate" name="npm run check:smoke" time="17.379" />
+    <testcase classname="quality-gate" name="npm run check:catalog-speed" time="8.466" />
+    <testcase classname="quality-gate" name="npm run audit:catalog-text" time="5.510" />
+    <testcase classname="quality-gate" name="npm run check:search-equivalence" time="1.521" />
+    <testcase classname="quality-gate" name="npm run check:add-to-cart" time="0.844" />
+    <testcase classname="quality-gate" name="npm run check:cart-quantity" time="0.679" />
+    <testcase classname="quality-gate" name="npm run check:checkout-empty-guard" time="0.439" />
+    <testcase classname="quality-gate" name="npm run check:payment-session-smoke" time="0.584" />
+    <testcase classname="quality-gate" name="npm run check:shipping-options-fallback" time="0.597" />
+    <testcase classname="quality-gate" name="npm run check:store-api-guards" time="0.305" />
+    <testcase classname="quality-gate" name="npm run check:order-complete-smoke" time="1.912" />
+    <testcase classname="quality-gate" name="npm run check:region-price-guard" time="4.430" />
+    <testcase classname="quality-gate" name="npm run check:e2e-flow" time="0.676" />
+    <testcase classname="quality-gate" name="npm run check:jsonld" time="0.472" />
+    <testcase classname="quality-gate" name="npm run check:internal-links" time="7.081" />
+    <testcase classname="quality-gate" name="npm run check:seo-redirect-map" time="0.370" />
+    <testcase classname="quality-gate" name="npm run report:seo-migration-manifest" time="1.146" />
+    <testcase classname="quality-gate" name="npm run check:seo-migration-policy" time="0.305" />
+    <testcase classname="quality-gate" name="npm run check:seo-pages" time="0.906" />
+</testsuite>

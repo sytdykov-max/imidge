@@ -1,0 +1,1 @@
+﻿on-subtitle">Каталог показывает товары из Medusa Store API с серверной фильтрацией и сортировкой.</p><div class="catalog-toolbar"><p class="catalog-count">Найдено: <!-- -->8<!-- --> · Стр. <!-- -->1<!-- -->/<!-- -->1</p><form class="catalog-search-form" role="search" aria-label="Поиск в каталоге" action="/catalog" meth

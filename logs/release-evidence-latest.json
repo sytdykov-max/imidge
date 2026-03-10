@@ -1,0 +1,86 @@
+{
+  "startedAt": "2026-03-06T08:04:38.649Z",
+  "total": 11,
+  "passed": 11,
+  "failed": 0,
+  "ok": true,
+  "rows": [
+    {
+      "artifact": "logs/check-all-latest.json",
+      "type": "json",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 3472
+    },
+    {
+      "artifact": "logs/check-all-latest.md",
+      "type": "text",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 1090
+    },
+    {
+      "artifact": "logs/check-all-latest.log",
+      "type": "text",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 10486
+    },
+    {
+      "artifact": "logs/check-all-latest.junit.xml",
+      "type": "junit",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 1967
+    },
+    {
+      "artifact": "logs/weekly-kpi-latest.json",
+      "type": "json",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 703
+    },
+    {
+      "artifact": "logs/weekly-rollup-latest.json",
+      "type": "json",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 3545
+    },
+    {
+      "artifact": "docs/weekly-regression-rollup-latest.md",
+      "type": "text",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 307
+    },
+    {
+      "artifact": "logs/seo-migration-policy-latest.json",
+      "type": "json",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 1715
+    },
+    {
+      "artifact": "docs/seo-migration-policy-latest.md",
+      "type": "text",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 1056
+    },
+    {
+      "artifact": "logs/ready-runtime-probes-latest.json",
+      "type": "json",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 2231
+    },
+    {
+      "artifact": "docs/ready-runtime-probes-latest.md",
+      "type": "text",
+      "ok": true,
+      "reason": "ok",
+      "bytes": 757
+    }
+  ]
+}

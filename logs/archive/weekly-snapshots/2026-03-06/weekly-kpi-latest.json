@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-03-06T07:34:01.478Z",
+  "week": "2026-W10",
+  "overallStatus": "OK",
+  "totalChecks": 20,
+  "passedChecks": 20,
+  "failedChecks": [],
+  "passRate": 100,
+  "totalDurationMs": 54038,
+  "medianDurationMs": 762,
+  "slowestChecks": [
+    {
+      "command": "npm run check:smoke",
+      "elapsedMs": 17379
+    },
+    {
+      "command": "npm run check:catalog-speed",
+      "elapsedMs": 8466
+    },
+    {
+      "command": "npm run check:internal-links",
+      "elapsedMs": 7081
+    }
+  ],
+  "catalogAvgMs": 235.94,
+  "catalogMaxMs": 354.18,
+  "mojibakeSuspects": 0,
+  "searchEquivalenceOk": true,
+  "addToCartOk": true,
+  "checkoutSmokeOk": true,
+  "readyEntriesWithoutRuntimeOk": 0
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0.0",
+  "defaultThresholds": {
+    "minCoveragePct": 95,
+    "minProducts": 100
+  },
+  "requiredFacets": [
+    "filter_brand",
+    "filter_category",
+    "filter_price_range",
+    "filter_availability"
+  ],
+  "categories": [
+    {
+      "label": "Часы",
+      "minProducts": 100,
+      "minCoveragePct": 98
+    },
+    {
+      "label": "Сумки",
+      "minProducts": 20,
+      "minCoveragePct": 95
+    },
+    {
+      "label": "Одежда",
+      "minProducts": 5,
+      "minCoveragePct": 95
+    }
+  ]
+}

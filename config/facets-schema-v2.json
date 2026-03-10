@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "2.0.0",
+  "generatedAt": "2026-03-06T00:00:00.000Z",
+  "description": "Canonical facet model for catalog filters and quality gates",
+  "requiredFacets": [
+    "filter_brand",
+    "filter_category",
+    "filter_price_range",
+    "filter_availability"
+  ],
+  "facets": {
+    "filter_brand": {
+      "type": "string",
+      "required": true,
+      "allowEmpty": false,
+      "fallback": "Без бренда"
+    },
+    "filter_category": {
+      "type": "string",
+      "required": true,
+      "allowEmpty": false,
+      "fallback": "Каталог"
+    },
+    "filter_price_range": {
+      "type": "enum",
+      "required": true,
+      "allowEmpty": false,
+      "fallback": "unknown",
+      "allowedValues": [
+        "lt_100",
+        "100_300",
+        "300_600",
+        "600_1000",
+        "gte_1000",
+        "unknown"
+      ]
+    },
+    "filter_availability": {
+      "type": "enum",
+      "required": true,
+      "allowEmpty": false,
+      "fallback": "out_of_stock",
+      "allowedValues": [
+        "in_stock",
+        "out_of_stock"
+      ]
+    },
+    "filter_gender": {
+      "type": "enum",
+      "required": false,
+      "allowEmpty": true,
+      "allowedValues": [
+        "male",
+        "female",
+        "unisex",
+        "unknown"
+      ]
+    },
+    "filter_type": {
+      "type": "string",
+      "required": false,
+      "allowEmpty": true
+    },
+    "filter_is_sale": {
+      "type": "boolean",
+      "required": false,
+      "allowEmpty": false,
+      "fallback": false
+    },
+    "filter_is_new": {
+      "type": "boolean",
+      "required": false,
+      "allowEmpty": false,
+      "fallback": false
+    }
+  }
+}

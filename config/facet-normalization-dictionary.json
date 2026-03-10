@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "brandAliases": {
+    "louis vuiton": "Louis Vuitton",
+    "louis-vuitton": "Louis Vuitton",
+    "tagheuer": "Tag Heuer",
+    "audemarspiguet": "Audemars Piguet",
+    "без бренда": "Без бренда"
+  },
+  "categoryAliases": {
+    "watch": "Часы",
+    "watches": "Часы",
+    "часов": "Часы",
+    "sumki": "Сумки",
+    "bags": "Сумки",
+    "одежда": "Одежда"
+  },
+  "priceRangeAliases": {
+    "<100": "lt_100",
+    "100-300": "100_300",
+    "300-600": "300_600",
+    "600-1000": "600_1000",
+    ">=1000": "gte_1000"
+  },
+  "availabilityAliases": {
+    "available": "in_stock",
+    "in-stock": "in_stock",
+    "instock": "in_stock",
+    "out": "out_of_stock",
+    "out-of-stock": "out_of_stock",
+    "oos": "out_of_stock"
+  }
+}

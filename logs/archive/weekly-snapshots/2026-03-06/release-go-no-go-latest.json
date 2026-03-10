@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-03-06T08:09:28.518Z",
+  "decision": "GO",
+  "blockers": [],
+  "warnings": [],
+  "metrics": {
+    "checkAllOk": true,
+    "checkAllTotalMs": 54038,
+    "passRate": 100,
+    "readyEntriesWithoutRuntimeOk": 0,
+    "policyViolationsTotal": 0,
+    "policyMissingFieldsTotal": 0,
+    "policyAuditWarningsTotal": 0,
+    "probesFailed": 0,
+    "probesSlow": 0,
+    "probesTotal": 9,
+    "rollupOverallStatus": "OK"
+  },
+  "evidence": {
+    "checkAll": "logs/check-all-latest.json",
+    "weeklyKpi": "logs/weekly-kpi-latest.json",
+    "weeklyRollup": "logs/weekly-rollup-latest.json",
+    "seoPolicy": "logs/seo-migration-policy-latest.json",
+    "readyRuntimeProbes": "logs/ready-runtime-probes-latest.json"
+  }
+}

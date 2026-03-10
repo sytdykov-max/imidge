@@ -1,0 +1,7 @@
+KILLED=
+LOCK_EXISTS=False
+  TCP    0.0.0.0:3000           0.0.0.0:0              LISTENING       13800
+  TCP    127.0.0.1:3000         127.0.0.1:57522        TIME_WAIT       0
+  TCP    127.0.0.1:57560        127.0.0.1:3000         TIME_WAIT       0
+  TCP    127.0.0.1:58082        127.0.0.1:3000         TIME_WAIT       0
+  TCP    [::]:3000              [::]:0                 LISTENING       13800

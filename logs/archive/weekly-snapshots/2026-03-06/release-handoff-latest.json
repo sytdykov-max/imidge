@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-03-06T08:12:46.885Z",
+  "releaseDecision": "GO",
+  "metrics": {
+    "releaseDecision": "GO",
+    "blockers": 0,
+    "warnings": 0,
+    "policyViolations": 0,
+    "auditWarnings": 0,
+    "runtimeFailed": 0,
+    "runtimeSlow": 0,
+    "gateTotalMs": 54038,
+    "checkoutChecksFailed": 0,
+    "openRisks": 0,
+    "monitorRisks": 1
+  },
+  "owners": [
+    {
+      "owner": "SEO",
+      "status": "ready",
+      "notes": [
+        "Policy violations: 0",
+        "Audit warnings: 0",
+        "Runtime failed: 0"
+      ],
+      "actions": [
+        "Confirm final redirect map owners",
+        "Confirm SEO sign-off in release decision ledger"
+      ]
+    },
+    {
+      "owner": "Checkout",
+      "status": "ready",
+      "notes": [
+        "Checkout checks failed: 0"
+      ],
+      "actions": [
+        "Re-run checkout smoke suite after deploy",
+        "Validate /checkout success page"
+      ]
+    },
+    {
+      "owner": "Performance",
+      "status": "ready",
+      "notes": [
+        "Gate total ms: 54038",
+        "Runtime slow probes: 0"
+      ],
+      "actions": [
+        "Track top 3 slow checks trend",
+        "Monitor probe latency during release window"
+      ]
+    },
+    {
+      "owner": "Release",
+      "status": "ready",
+      "notes": [
+        "Decision: GO",
+        "Blockers: 0",
+        "Warnings: 0",
+        "Open risks: 0"
+      ],
+      "actions": [
+        "Publish go/no-go summary",
+        "Trigger post-deploy smoke and incident watch"
+      ]
+    }
+  ],
+  "evidence": {
+    "goNoGo": "logs/release-go-no-go-latest.json",
+    "riskRegister": "logs/release-risk-register-latest.json",
+    "checkAll": "logs/check-all-latest.json",
+    "seoPolicy": "logs/seo-migration-policy-latest.json",
+    "probes": "logs/ready-runtime-probes-latest.json"
+  }
+}

@@ -1,0 +1,170 @@
+name: Nightly Regression
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      QUALITY_GATE_PROFILE: ci
+      FILTER_BRAND_MIN_COVERAGE_PCT: "95"
+      FILTER_CATEGORY_MIN_COVERAGE_PCT: "95"
+      FILTER_METADATA_MIN_PRODUCTS: "100"
+      FILTER_PRIORITY_CATEGORIES: "Часы,Сумки"
+      FILTER_PRIORITY_CATEGORY_MIN_COVERAGE_PCT: "92"
+      FILTER_PRIORITY_CATEGORY_MIN_PRODUCTS: "20"
+      FACET_DRIFT_MAX_PCT: "3"
+      FACET_DRIFT_MIN_MATCHED_PRODUCTS: "100"
+      CATALOG_FILTERS_MAX_RESPONSE_MS: "2500"
+      CATALOG_FILTERS_P95_BUDGET_MS: "2000"
+      FILTERS_ROLLOUT_STAGE: "10"
+      FILTER_BACKFILL_LOOKBACK_HOURS: "48"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install Medusa dependencies
+        run: npm ci
+        working-directory: apps/medusa
+
+      - name: Install Storefront dependencies
+        run: npm ci
+        working-directory: apps/storefront
+
+      - name: Backfill filter metadata (incremental)
+        run: npm run backfill:filter-metadata:incremental
+        working-directory: apps/medusa
+
+      - name: Start Medusa
+        run: npm run dev > ../../logs/ci-medusa.log 2>&1 &
+        working-directory: apps/medusa
+
+      - name: Wait for Medusa
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:9000/health >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Medusa did not start"; exit 1
+
+      - name: Start Storefront
+        run: npm run dev > ../../logs/ci-storefront.log 2>&1 &
+        working-directory: apps/storefront
+
+      - name: Wait for Storefront
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3002 >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Storefront did not start"; exit 1
+
+      - name: Run quality gate
+        run: npm run check:all
+
+      - name: Docs threshold drift check
+        run: npm run check:docs-threshold-drift
+
+      - name: Generate weekly KPI report
+        run: npm run report:weekly-kpi
+
+      - name: Generate SEO migration manifest
+        run: npm run report:seo-migration-manifest
+
+      - name: SEO migration policy check
+        run: npm run check:seo-migration-policy
+
+      - name: Generate KPI trends
+        run: npm run report:weekly-trends
+
+      - name: Generate weekly rollup
+        run: npm run report:weekly-rollup
+
+      - name: Regression thresholds
+        run: npm run check:regression-thresholds
+
+      - name: Publish CI summary
+        if: always()
+        run: npm run ci:write-summary
+
+      - name: Send failure alert
+        if: failure()
+        run: npm run alert:send
+        env:
+          ALERT_SCOPE: "nightly-regression"
+          ALERT_STATUS: "failure"
+          ALERT_RUN_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ALERT_MESSAGE: "Imidge nightly regression failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ALERT_INCLUDE_FACET_SUMMARY: "true"
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Upload nightly artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-quality-artifacts
+          path: |
+            logs/check-all-latest.log
+            logs/check-all-latest.json
+            logs/check-all-latest.md
+            logs/check-all-latest.junit.xml
+            logs/check-all-history.jsonl
+            logs/check-all-history-latest.json
+            logs/weekly-kpi-latest.json
+            logs/seo-migration-manifest-latest.json
+            logs/seo-migration-manifest-latest.csv
+            logs/seo-migration-policy-latest.json
+            logs/weekly-kpi-trends.json
+            logs/weekly-rollup-latest.json
+            logs/ready-runtime-probes-latest.json
+            logs/filter-metadata-coverage-latest.json
+            logs/facet-coverage-latest.json
+            logs/facet-diagnostics-latest.json
+            logs/critical-facets-by-category-latest.json
+            logs/facet-consistency-latest.json
+            logs/filter-migration-diff-latest.json
+            logs/facet-drift-latest.json
+            logs/check-catalog-filters-e2e-latest.json
+            logs/check-catalog-filters-performance-latest.json
+            logs/check-catalog-filters-seo-latest.json
+            logs/filters-rollout-v2-latest.json
+            logs/filters-staging-go-no-go-latest.json
+            logs/filter-backfill-checkpoint.json
+            logs/ci-medusa.log
+            logs/ci-storefront.log
+            docs/weekly-regression-report-latest.md
+            docs/seo-migration-manifest-latest.md
+            docs/seo-migration-checklist-latest.md
+            docs/seo-migration-policy-latest.md
+            docs/weekly-regression-trends.md
+            docs/weekly-regression-rollup-latest.md
+            docs/ready-runtime-probes-latest.md
+            docs/filter-metadata-coverage-latest.md
+            docs/facet-coverage-latest.md
+            docs/facet-diagnostics-latest.md
+            docs/critical-facets-by-category-latest.md
+            docs/facet-consistency-latest.md
+            docs/filter-migration-diff-latest.md
+            docs/facet-drift-latest.md
+            docs/check-catalog-filters-e2e-latest.md
+            docs/check-catalog-filters-performance-latest.md
+            docs/check-catalog-filters-seo-latest.md
+            docs/filters-rollout-v2-latest.md
+            docs/filters-staging-go-no-go-latest.md

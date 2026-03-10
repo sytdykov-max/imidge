@@ -1,0 +1,4 @@
+﻿http://127.0.0.1:3002/catalog?q=bmw -> found=8
+http://127.0.0.1:3002/catalog?q=%D0%B1%D0%BC%D0%B2 -> found=8
+http://127.0.0.1:3002/catalog?q=bmw+x5 -> found=8
+http://127.0.0.1:3002/catalog?q=%D0%B1%D0%BC%D0%B2+%D1%855 -> found=8

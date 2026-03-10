@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-03-06T08:21:32.910Z",
+  "baseUrl": "http://127.0.0.1:3002",
+  "profile": "local",
+  "total": 9,
+  "failed": 0,
+  "slow": 0,
+  "maxAllowedLatencyMs": 1500,
+  "maxAllowedFailures": 0,
+  "probes": [
+    {
+      "source": "/catalogue",
+      "destination": "/catalog",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/catalog",
+      "elapsedMs": 167,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/katalog",
+      "destination": "/catalog",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/catalog",
+      "elapsedMs": 163,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/shop",
+      "destination": "/catalog",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/catalog",
+      "elapsedMs": 119,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/products",
+      "destination": "/catalog",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/catalog",
+      "elapsedMs": 116,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/cart.php",
+      "destination": "/cart",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/cart",
+      "elapsedMs": 47,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/checkout.php",
+      "destination": "/checkout",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/checkout",
+      "elapsedMs": 40,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/search.php",
+      "destination": "/search",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/search",
+      "elapsedMs": 143,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/blog.php",
+      "destination": "/blog",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/blog",
+      "elapsedMs": 63,
+      "ok": true,
+      "error": ""
+    },
+    {
+      "source": "/account.php",
+      "destination": "/account",
+      "sourceStatus": 308,
+      "destinationStatus": 200,
+      "location": "/account",
+      "elapsedMs": 74,
+      "ok": true,
+      "error": ""
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-03-06T07:51:18.437Z",
+  "kpi": {
+    "generatedAt": "2026-03-06T07:34:01.478Z",
+    "week": "2026-W10",
+    "overallStatus": "OK",
+    "totalChecks": 20,
+    "passedChecks": 20,
+    "failedChecks": [],
+    "passRate": 100,
+    "totalDurationMs": 54038,
+    "medianDurationMs": 762,
+    "slowestChecks": [
+      {
+        "command": "npm run check:smoke",
+        "elapsedMs": 17379
+      },
+      {
+        "command": "npm run check:catalog-speed",
+        "elapsedMs": 8466
+      },
+      {
+        "command": "npm run check:internal-links",
+        "elapsedMs": 7081
+      }
+    ],
+    "catalogAvgMs": 235.94,
+    "catalogMaxMs": 354.18,
+    "mojibakeSuspects": 0,
+    "searchEquivalenceOk": true,
+    "addToCartOk": true,
+    "checkoutSmokeOk": true,
+    "readyEntriesWithoutRuntimeOk": 0
+  },
+  "trends": {
+    "generatedAt": "2026-03-06T07:34:01.767Z",
+    "runsAnalyzed": 4,
+    "passRate": 100,
+    "avgDurationMs": 46412.25,
+    "minDurationMs": 30820,
+    "maxDurationMs": 54038,
+    "avgReadyWithoutRuntime": 0.5,
+    "maxReadyWithoutRuntime": 1,
+    "topFailureSources": [],
+    "latestRun": {
+      "startedAt": "2026-03-06T07:32:48.710Z",
+      "finishedAt": "2026-03-06T07:33:42.748Z",
+      "totalElapsedMs": 54038,
+      "ok": true,
+      "checksTotal": 20,
+      "checksFailed": 0,
+      "slowestCheck": {
+        "command": "npm run check:smoke",
+        "preview": "cmd.exe /c npm run check:smoke",
+        "status": 0,
+        "elapsedMs": 17379
+      }
+    }
+  },
+  "policy": {
+    "startedAt": "2026-03-06T07:51:08.251Z",
+    "finishedAt": "2026-03-06T07:51:08.251Z",
+    "manifestPath": "C:\\Users\\Pavel\\Desktop\\Imidge дизайн\\imidge_headless\\logs\\seo-migration-manifest-latest.json",
+    "total": 9,
+    "readyTotal": 9,
+    "violationsTotal": 0,
+    "missingFieldsTotal": 0,
+    "auditWarningsTotal": 9,
+    "ok": true,
+    "violations": [],
+    "missingFields": [],
+    "auditWarnings": [
+      {
+        "source": "/catalogue",
+        "destination": "/catalog",
+        "owner": "seo",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/katalog",
+        "destination": "/catalog",
+        "owner": "seo",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/shop",
+        "destination": "/catalog",
+        "owner": "seo",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/products",
+        "destination": "/catalog",
+        "owner": "seo",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/cart.php",
+        "destination": "/cart",
+        "owner": "frontend",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/checkout.php",
+        "destination": "/checkout",
+        "owner": "frontend",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/search.php",
+        "destination": "/search",
+        "owner": "seo",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/blog.php",
+        "destination": "/blog",
+        "owner": "content",
+        "ticket": "n/a",
+        "approvedAt": ""
+      },
+      {
+        "source": "/account.php",
+        "destination": "/account",
+        "owner": "frontend",
+        "ticket": "n/a",
+        "approvedAt": ""
+      }
+    ]
+  },
+  "summary": {
+    "overallStatus": "OK",
+    "passRate": 100,
+    "gateTotalMs": 54038,
+    "trendPassRate": 100,
+    "readyRuntimeViolations": 0
+  }
+}

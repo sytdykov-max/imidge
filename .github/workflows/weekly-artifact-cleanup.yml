@@ -1,0 +1,52 @@
+name: Weekly Artifact Cleanup
+
+on:
+  schedule:
+    - cron: "15 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      keep_history_runs:
+        description: "History retention (runs per jsonl)"
+        required: false
+        default: "30"
+      keep_archive_weeks:
+        description: "Weekly snapshot retention (weeks)"
+        required: false
+        default: "8"
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLEANUP_KEEP_HISTORY_RUNS: ${{ inputs.keep_history_runs != '' && inputs.keep_history_runs || '30' }}
+      CLEANUP_KEEP_ARCHIVE_WEEKS: ${{ inputs.keep_archive_weeks != '' && inputs.keep_archive_weeks || '8' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Cleanup artifact rotation
+        run: npm run cleanup:artifacts
+
+      - name: Upload cleanup artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-artifact-cleanup
+          retention-days: 14
+          path: |
+            logs/cleanup-artifacts-latest.json
+            docs/cleanup-artifacts-latest.md
+            logs/archive/history/**
+            logs/archive/weekly-snapshots/**

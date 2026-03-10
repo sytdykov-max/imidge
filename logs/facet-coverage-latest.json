@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-03-06T13:51:15.465Z",
+  "medusaUrl": "http://127.0.0.1:9000",
+  "schemaVersion": "2.0.0",
+  "productsTotal": 13480,
+  "requiredFacets": [
+    "filter_brand",
+    "filter_category",
+    "filter_price_range",
+    "filter_availability"
+  ],
+  "perFacet": [
+    {
+      "facet": "filter_brand",
+      "present": 13480,
+      "missing": 0,
+      "coveragePct": 100
+    },
+    {
+      "facet": "filter_category",
+      "present": 13480,
+      "missing": 0,
+      "coveragePct": 100
+    },
+    {
+      "facet": "filter_price_range",
+      "present": 13480,
+      "missing": 0,
+      "coveragePct": 100
+    },
+    {
+      "facet": "filter_availability",
+      "present": 13480,
+      "missing": 0,
+      "coveragePct": 100
+    }
+  ],
+  "topCategoryCoverage": [
+    {
+      "label": "Часы",
+      "products": 8215,
+      "brandCoveragePct": 100,
+      "requiredFacetCoveragePct": 100
+    },
+    {
+      "label": "Каталог",
+      "products": 5236,
+      "brandCoveragePct": 100,
+      "requiredFacetCoveragePct": 100
+    },
+    {
+      "label": "Сумки",
+      "products": 20,
+      "brandCoveragePct": 100,
+      "requiredFacetCoveragePct": 100
+    },
+    {
+      "label": "Одежда",
+      "products": 8,
+      "brandCoveragePct": 100,
+      "requiredFacetCoveragePct": 100
+    },
+    {
+      "label": "Платья",
+      "products": 1,
+      "brandCoveragePct": 100,
+      "requiredFacetCoveragePct": 100
+    }
+  ],
+  "degradation": {
+    "thresholdPct": 97,
+    "minProducts": 10,
+    "problematicCategories": [],
+    "topProblematicCategories": []
+  }
+}

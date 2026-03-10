@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-03-06T13:49:48.613Z",
+  "baseUrl": "http://127.0.0.1:3002",
+  "total": 5,
+  "failed": 0,
+  "ok": true,
+  "rows": [
+    {
+      "name": "catalog_default",
+      "url": "http://127.0.0.1:3002/catalog",
+      "status": 200,
+      "markerOk": true,
+      "elapsedMs": 4316,
+      "ok": true
+    },
+    {
+      "name": "catalog_brand_filter",
+      "url": "http://127.0.0.1:3002/catalog?brand=Hublot",
+      "status": 200,
+      "markerOk": true,
+      "elapsedMs": 115,
+      "ok": true
+    },
+    {
+      "name": "catalog_category_filter",
+      "url": "http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B",
+      "status": 200,
+      "markerOk": true,
+      "elapsedMs": 122,
+      "ok": true
+    },
+    {
+      "name": "catalog_price_filter",
+      "url": "http://127.0.0.1:3002/catalog?price=100_300",
+      "status": 200,
+      "markerOk": true,
+      "elapsedMs": 113,
+      "ok": true
+    },
+    {
+      "name": "catalog_combined_filters",
+      "url": "http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B&brand=Hublot&price=100_300",
+      "status": 200,
+      "markerOk": true,
+      "elapsedMs": 95,
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-03-06T07:34:01.767Z",
+  "runsAnalyzed": 4,
+  "passRate": 100,
+  "avgDurationMs": 46412.25,
+  "minDurationMs": 30820,
+  "maxDurationMs": 54038,
+  "avgReadyWithoutRuntime": 0.5,
+  "maxReadyWithoutRuntime": 1,
+  "topFailureSources": [],
+  "latestRun": {
+    "startedAt": "2026-03-06T07:32:48.710Z",
+    "finishedAt": "2026-03-06T07:33:42.748Z",
+    "totalElapsedMs": 54038,
+    "ok": true,
+    "checksTotal": 20,
+    "checksFailed": 0,
+    "slowestCheck": {
+      "command": "npm run check:smoke",
+      "preview": "cmd.exe /c npm run check:smoke",
+      "status": 0,
+      "elapsedMs": 17379
+    }
+  }
+}
