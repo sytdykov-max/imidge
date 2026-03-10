@@ -60,6 +60,7 @@
     "check:product-content-quality": "node ./scripts/check-product-content-quality.mjs",
     "check:seo-ui-text-drift": "node ./scripts/check-seo-ui-text-drift.mjs",
     "check:release-freeze": "node ./scripts/check-release-freeze.mjs",
+    "check:canary-rollout": "node ./scripts/check-canary-rollout-state.mjs",
     "check:regression-thresholds": "node ./scripts/check-regression-thresholds.mjs",
     "check:regression-thresholds:light": "node ./scripts/check-regression-thresholds-light.mjs",
     "alert:send": "node ./scripts/send-quality-alert.mjs",
@@ -67,6 +68,9 @@
     "ci:write-release-summary": "node ./scripts/ci-write-release-summary.mjs",
     "report:release-changelog": "node ./scripts/generate-release-changelog.mjs",
     "report:release-health-dashboard": "node ./scripts/generate-release-health-dashboard.mjs",
+    "report:wave3-closeout": "node ./scripts/generate-wave3-closeout.mjs",
+    "ops:freeze:on": "node ./scripts/update-release-freeze.mjs on",
+    "ops:freeze:off": "node ./scripts/update-release-freeze.mjs off",
     "ops:log-incident": "node ./scripts/log-incident-event.mjs"
   }
 }

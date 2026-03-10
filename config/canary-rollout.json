@@ -1,0 +1,9 @@
+{
+  "active": false,
+  "currentStage": 0,
+  "stages": [10, 25, 50, 100],
+  "minHoldMinutes": 30,
+  "lastPromotedAt": "",
+  "owner": "",
+  "notes": ""
+}

@@ -1,0 +1,30 @@
+name: Wave 3 Closeout
+
+on:
+  workflow_dispatch:
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate wave 3 closeout
+        run: npm run report:wave3-closeout
+
+      - name: Upload closeout artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wave3-closeout
+          path: |
+            docs/wave-3-closeout-latest.md
