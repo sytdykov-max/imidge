@@ -26,6 +26,7 @@ jobs:
     env:
       CI: true
       QUALITY_GATE_PROFILE: ci
+      FREEZE_OVERRIDE: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'release-override') }}
 
     steps:
       - uses: actions/checkout@v4
@@ -79,6 +80,9 @@ jobs:
 
       - name: Validate SEO manifest schema
         run: npm run check:seo-migration-schema
+
+      - name: Validate SEO redirect schema
+        run: npm run check:seo-redirect-schema
 
       - name: Run pre-merge lightweight gate (exact)
         run: |

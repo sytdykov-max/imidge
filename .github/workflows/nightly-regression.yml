@@ -83,6 +83,9 @@ jobs:
       - name: Manifest schema check
         run: npm run check:seo-migration-schema
 
+      - name: Redirect schema check
+        run: npm run check:seo-redirect-schema
+
       - name: Product content quality check
         run: npm run check:product-content-quality
 
@@ -106,6 +109,9 @@ jobs:
 
       - name: Regression thresholds
         run: npm run check:regression-thresholds
+
+      - name: Quality gate by level (strict)
+        run: npm run check:gate:strict
 
       - name: Publish CI summary
         if: always()

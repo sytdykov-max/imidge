@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imidge.local/schemas/seo-redirects.schema.json",
+  "title": "SEO Redirect Map",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["source", "destination", "permanent", "status", "owner", "ticket", "approvedAt"],
+    "properties": {
+      "source": { "type": "string", "pattern": "^/" },
+      "destination": { "type": "string", "pattern": "^/" },
+      "permanent": { "type": "boolean" },
+      "status": { "type": "string", "enum": ["ready", "legacy", "disabled"] },
+      "owner": { "type": "string", "minLength": 1 },
+      "ticket": { "type": "string", "minLength": 1 },
+      "approvedAt": { "type": "string", "format": "date-time" }
+    },
+    "additionalProperties": true
+  }
+}

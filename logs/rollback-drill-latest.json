@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-03-10T12:08:33.713Z",
+  "mode": "simulation",
+  "status": "OK",
+  "steps": [
+    "capture_baseline",
+    "inject_controlled_failure",
+    "detect_failure_by_checks",
+    "execute_rollback",
+    "verify_post_rollback",
+    "record_mttr"
+  ],
+  "mttrSeconds": 1
+}

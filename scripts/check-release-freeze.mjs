@@ -15,5 +15,10 @@ if (!freeze?.active) {
   process.exit(0);
 }
 
+if ((process.env.FREEZE_OVERRIDE ?? "").toLowerCase() === "true") {
+  console.log("release_freeze: status=OK, active=true, override=true");
+  process.exit(0);
+}
+
 console.error(`release_freeze: status=FAIL, reason=${freeze.reason || "release_freeze_active"}`);
 process.exit(1);

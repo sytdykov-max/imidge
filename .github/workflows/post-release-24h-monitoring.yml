@@ -1,0 +1,37 @@
+name: Post Release 24h Monitoring
+
+on:
+  workflow_dispatch:
+
+jobs:
+  monitoring:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run post-release monitoring checks
+        run: |
+          npm run probe:ready-runtime
+          npm run check:seo-migration-policy
+          npm run check:payment-session-smoke
+          npm run report:release-health-dashboard
+
+      - name: Upload monitoring artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-release-24h-monitoring
+          path: |
+            logs/ready-runtime-probes-latest.json
+            logs/seo-migration-policy-latest.json
+            logs/release-health-dashboard-latest.json
+            docs/release-health-dashboard-latest.md
