@@ -1,0 +1,30 @@
+[
+  {
+    "label": "Футболки",
+    "keywords": ["t-shirt", "tshirt", "tee", "футболк"]
+  },
+  {
+    "label": "Свитшоты",
+    "keywords": ["sweatshirt", "hoodie", "свитшот", "худи"]
+  },
+  {
+    "label": "Брюки",
+    "keywords": ["pants", "trousers", "брюк", "штаны"]
+  },
+  {
+    "label": "Шорты",
+    "keywords": ["shorts", "шорт"]
+  },
+  {
+    "label": "Рубашки",
+    "keywords": ["shirt", "рубаш"]
+  },
+  {
+    "label": "Платья",
+    "keywords": ["dress", "плать"]
+  },
+  {
+    "label": "Верхняя одежда",
+    "keywords": ["coat", "jacket", "outerwear", "пальто", "куртк"]
+  }
+]
