@@ -55,6 +55,11 @@ feat: wave-3 launch readiness + storefront migration baseline
 - `npm run check:gate:quick`
 - `npm run report:rollback-drill`
 
+## Pre-review status (verified)
+- [x] Branch is pushed and up to date with `origin/release/wave3-final`
+- [x] PR range contains 0 merge commits (`git rev-list --merges origin/main..HEAD --count`)
+- [x] Local validation commands above pass
+
 ## Risks / Notes
 - `main` is protected and disallows merge commits/direct pushes.
 - This branch is prepared for PR flow only (`release/wave3-final`).
