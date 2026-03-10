@@ -80,6 +80,15 @@ jobs:
       - name: Docs threshold drift check
         run: npm run check:docs-threshold-drift
 
+      - name: Manifest schema check
+        run: npm run check:seo-migration-schema
+
+      - name: Product content quality check
+        run: npm run check:product-content-quality
+
+      - name: SEO UI drift check
+        run: npm run check:seo-ui-text-drift
+
       - name: Generate weekly KPI report
         run: npm run report:weekly-kpi
 

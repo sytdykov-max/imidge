@@ -1,0 +1,17 @@
+# Global fallback
+* @imidge-core/platform
+
+# Storefront
+/apps/storefront/ @imidge-core/frontend @imidge-core/seo
+
+# Medusa backend
+/apps/medusa/ @imidge-core/backend @imidge-core/checkout
+
+# Quality scripts and release automation
+/scripts/ @imidge-core/platform @imidge-core/release
+
+# Product docs and runbooks
+/docs/ @imidge-core/release @imidge-core/seo
+
+# Config and policies
+/config/ @imidge-core/platform @imidge-core/seo

@@ -1,0 +1,36 @@
+name: CI Smoke
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install Medusa dependencies
+        run: npm ci
+        working-directory: apps/medusa
+
+      - name: Install Storefront dependencies
+        run: npm ci
+        working-directory: apps/storefront
+
+      - name: Run smoke checks
+        run: |
+          npm run check:preflight
+          npm run check:seo-migration-schema
+          npm run check:seo-audit-fields

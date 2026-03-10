@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imidge.local/schemas/seo-migration-manifest.schema.json",
+  "title": "SEO Migration Manifest",
+  "type": "object",
+  "required": ["generatedAt", "total", "rows"],
+  "properties": {
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "summary": {
+      "type": "object",
+      "required": ["total", "ready", "legacy", "disabled"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "ready": { "type": "integer", "minimum": 0 },
+        "legacy": { "type": "integer", "minimum": 0 },
+        "disabled": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slug", "status", "owner", "ticket", "approvedAt"],
+        "properties": {
+          "slug": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "enum": ["ready", "legacy", "disabled"] },
+          "owner": { "type": "string", "minLength": 1 },
+          "ticket": { "type": "string", "minLength": 1 },
+          "approvedAt": { "type": "string", "format": "date" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "destination", "status", "owner", "ticket", "approvedAt"],
+        "properties": {
+          "source": { "type": "string", "minLength": 1 },
+          "destination": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "enum": ["ready", "legacy", "disabled"] },
+          "owner": { "type": "string", "minLength": 1 },
+          "ticket": { "type": "string", "minLength": 1 },
+          "approvedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

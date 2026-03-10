@@ -74,6 +74,12 @@ jobs:
           done
           echo "Storefront did not start"; exit 1
 
+      - name: Check release freeze
+        run: npm run check:release-freeze
+
+      - name: Validate SEO manifest schema
+        run: npm run check:seo-migration-schema
+
       - name: Run pre-merge lightweight gate (exact)
         run: |
           npm run check:preflight
