@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/site-header";
 import { ScrollFadeRow } from "@/components/scroll-fade-row";
 import { CatalogV2FilterForm } from "@/components/catalog-v2-filter-form";
 import { CatalogCardActions } from "@/components/catalog-card-actions";
+import { CatalogSortSelectAuto } from "@/components/catalog-sort-select-auto";
+import { CatalogV2SearchAuto } from "@/components/catalog-v2-search-auto";
 import { extractProductBrand } from "@/lib/catalog-brand";
 import { getCountMap, getPriceCountMap, getTopFacetValues } from "@/lib/catalog-facets";
 import { matchPriceRange, sortByCatalogRule } from "@/lib/catalog-filters";
@@ -158,6 +160,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   const buildCurrentQuery = (overrides: CatalogQueryInput = {}) => {
     return buildCatalogQuery({
+      v2: isCatalogRedesign,
       cat: categoryQueryValue,
       sort: selectedSort !== "popular" ? selectedSort : undefined,
       brand: brandQueryValue,
@@ -307,6 +310,8 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     selectedQuery.length > 0 ||
     currentPage > 1;
 
+  const catalogRootHref = isCatalogRedesign ? "/catalog?v2=1" : "/catalog";
+
   const activeFilterPills: Array<{ key: string; label: string; href: string }> = [];
 
   if (hasCategoryFilter) {
@@ -315,6 +320,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         key: `cat-${categoryValue}`,
         label: `Категория: ${categoryValue}`,
         href: buildCatalogQuery({
+          v2: isCatalogRedesign,
           cat: selectedCategories.filter((item) => item !== categoryValue),
           sort: selectedSort !== "popular" ? selectedSort : undefined,
           brand: brandQueryValue,
@@ -332,6 +338,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         key: `brand-${brandValue}`,
         label: `Бренд: ${brandValue}`,
         href: buildCatalogQuery({
+          v2: isCatalogRedesign,
           cat: categoryQueryValue,
           sort: selectedSort !== "popular" ? selectedSort : undefined,
           brand: selectedBrands.filter((item) => item !== brandValue),
@@ -410,7 +417,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                     <div className="catalog-v2-active-head">
                       <p>Активные фильтры</p>
                       {hasActiveFilters && (
-                        <Link href="/catalog" className="catalog-v2-reset-link">
+                        <Link href={catalogRootHref} className="catalog-v2-reset-link">
                           Сбросить
                         </Link>
                       )}
@@ -469,25 +476,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             <p className="catalog-count">Найдено: {visibleProducts.length} · Стр. {currentPage}/{totalPages}</p>
             {isCatalogRedesign ? (
               <>
-                <form className="catalog-search-form-v2" method="get" action="/catalog" role="search" aria-label="Поиск в каталоге">
-                  <input type="hidden" name="v2" value="1" />
-                  {(categoryQueryValue ?? []).map((category) => (
-                    <input key={`search-cat-${category}`} type="hidden" name="cat" value={category} />
-                  ))}
-                  {selectedSort !== "popular" && <input type="hidden" name="sort" value={selectedSort} />}
-                  {(brandQueryValue ?? []).map((brand) => (
-                    <input key={`search-brand-${brand}`} type="hidden" name="brand" value={brand} />
-                  ))}
-                  {selectedPrice !== "all" && <input type="hidden" name="price" value={selectedPrice} />}
-                  <input
-                    type="search"
-                    name="q"
-                    defaultValue={selectedQuery}
-                    placeholder="Поиск по названию"
-                    className="catalog-search-input-v2"
-                    aria-label="Поиск по названию"
-                  />
-                </form>
+                <CatalogV2SearchAuto
+                  initialQuery={selectedQuery}
+                  selectedCategories={selectedCategories}
+                  selectedBrands={selectedBrands}
+                  selectedPrice={selectedPrice}
+                  selectedSort={selectedSort}
+                />
 
                 <div className="catalog-toolbar-v2-right">
                 <form className="catalog-sort-form-v2" method="get" action="/catalog" aria-label="Сортировка каталога">
@@ -500,14 +495,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   ))}
                   {selectedPrice !== "all" && <input type="hidden" name="price" value={selectedPrice} />}
                   {selectedQuery && <input type="hidden" name="q" value={selectedQuery} />}
-                  <select name="sort" defaultValue={selectedSort} className="catalog-sort-select-v2" aria-label="Сортировка">
-                    {CATALOG_SORT_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <button type="submit" className="catalog-sort-apply-v2">Применить</button>
+                  <CatalogSortSelectAuto
+                    name="sort"
+                    defaultValue={selectedSort}
+                    className="catalog-sort-select-v2"
+                    ariaLabel="Сортировка"
+                    options={CATALOG_SORT_OPTIONS}
+                  />
                 </form>
                 </div>
               </>
@@ -529,7 +523,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   <button type="submit" className="catalog-search-btn">Найти</button>
                 </form>
                 {hasActiveFilters && (
-                  <Link href="/catalog" className="catalog-reset-link">
+                  <Link href={catalogRootHref} className="catalog-reset-link">
                     Сбросить фильтры
                   </Link>
                 )}
@@ -714,21 +708,30 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           )}
 
           <div className={`catalog-grid${isCatalogRedesign ? " catalog-grid-v2" : ""}`}>
-            {renderedProducts.map(({ product, category, brand, minPrice }) => (
+            {renderedProducts.map(({ product, category, brand, minPrice }) => {
+              const productHref = isCatalogRedesign ? `/product/${product.handle}?v2=1` : `/product/${product.handle}`;
+
+              return (
               <article className={`product-card${isCatalogRedesign ? " product-card-v2" : ""}`} key={product.id}>
-                <div className={`product-image-wrap${isCatalogRedesign ? " product-image-wrap-v2" : ""}`}>
-                  {product.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={product.thumbnail} alt={product.title} className="product-image" />
-                  ) : (
-                    <div className="product-image placeholder">IMIDGE</div>
-                  )}
-                </div>
+                <Link href={productHref} aria-label={`Открыть товар ${product.title}`}>
+                  <div className={`product-image-wrap${isCatalogRedesign ? " product-image-wrap-v2" : ""}`}>
+                    {product.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={product.thumbnail} alt={product.title} className="product-image" />
+                    ) : (
+                      <div className="product-image placeholder">IMIDGE</div>
+                    )}
+                  </div>
+                </Link>
 
                 {isCatalogRedesign ? (
                   <div className="catalog-card-body-v2">
                     <p className="product-kicker-v2">{brand || category}</p>
-                    <h3 className="product-title-v2">{highlightTitle(product.title, selectedQuery)}</h3>
+                    <h3 className="product-title-v2">
+                      <Link href={productHref} aria-label={`Открыть товар ${product.title}`}>
+                        {highlightTitle(product.title, selectedQuery)}
+                      </Link>
+                    </h3>
                     <div className="catalog-price-row-v2">
                       {minPrice && (
                         <span className="product-price-old-v2">
@@ -740,7 +743,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                       </strong>
                     </div>
                     <CatalogCardActions
-                      href={`/product/${product.handle}?v2=1`}
+                      href={productHref}
                       variantId={product.variants?.find((variant) =>
                         (variant.prices ?? []).some((price) => typeof price.amount === "number" && price.amount > 0)
                       )?.id}
@@ -755,18 +758,23 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                 ) : (
                   <>
                     <p className="hero-kicker">{category}</p>
-                    <h3>{highlightTitle(product.title, selectedQuery)}</h3>
+                    <h3>
+                      <Link href={productHref} aria-label={`Открыть товар ${product.title}`}>
+                        {highlightTitle(product.title, selectedQuery)}
+                      </Link>
+                    </h3>
                     <p className="product-handle">/{product.handle}</p>
                     <p className="product-price">
                       {minPrice ? `${minPrice.amount.toLocaleString("ru-RU")} ${minPrice.currency}` : "Цена уточняется"}
                     </p>
-                    <Link href={`/product/${product.handle}`} className="cta-btn product-btn">
+                    <Link href={productHref} className="cta-btn product-btn">
                       Открыть товар
                     </Link>
                   </>
                 )}
               </article>
-            ))}
+              );
+            })}
           </div>
 
           {isCatalogRedesign && totalPages > 1 && (

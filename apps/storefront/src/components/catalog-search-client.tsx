@@ -81,16 +81,22 @@ export function CatalogSearchClient({ initialQuery, items }: CatalogSearchClient
             {filteredItems.map((item) => (
               <article className="product-card" key={item.id}>
                 <p className="hero-kicker" style={{ marginBottom: 8 }}>{item.brand}</p>
-                <div className="product-image-wrap">
-                  {item.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.thumbnail} alt={item.title} className="product-image" />
-                  ) : (
-                    <div className="product-image placeholder">IMIDGE</div>
-                  )}
-                </div>
+                <Link href={`/product/${item.handle}`} aria-label={`Открыть товар ${item.title}`}>
+                  <div className="product-image-wrap">
+                    {item.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.thumbnail} alt={item.title} className="product-image" />
+                    ) : (
+                      <div className="product-image placeholder">IMIDGE</div>
+                    )}
+                  </div>
+                </Link>
 
-                <h3>{item.title}</h3>
+                <h3>
+                  <Link href={`/product/${item.handle}`} aria-label={`Открыть товар ${item.title}`}>
+                    {item.title}
+                  </Link>
+                </h3>
                 <p className="product-handle">/{item.handle}</p>
                 <Link href={`/product/${item.handle}`} className="cta-btn product-btn">Открыть товар</Link>
               </article>

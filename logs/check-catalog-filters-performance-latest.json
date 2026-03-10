@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-03-06T13:49:49.781Z",
+  "generatedAt": "2026-03-10T13:41:48.840Z",
   "baseUrl": "http://127.0.0.1:3002",
   "limits": {
     "maxResponseMs": 2500,
     "p95BudgetMs": 2000
   },
   "metrics": {
-    "p50": 102,
-    "p95": 134,
-    "max": 134,
-    "min": 95,
-    "avg": 107.86
+    "p50": 112,
+    "p95": 150,
+    "max": 150,
+    "min": 102,
+    "avg": 117
   },
   "total": 7,
   "violations": [],
@@ -19,43 +19,43 @@
     {
       "url": "http://127.0.0.1:3002/catalog",
       "status": 200,
-      "elapsedMs": 134,
+      "elapsedMs": 150,
       "ok": true
     },
     {
       "url": "http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B",
       "status": 200,
-      "elapsedMs": 100,
+      "elapsedMs": 117,
       "ok": true
     },
     {
       "url": "http://127.0.0.1:3002/catalog?brand=Hublot",
       "status": 200,
-      "elapsedMs": 95,
+      "elapsedMs": 102,
       "ok": true
     },
     {
       "url": "http://127.0.0.1:3002/catalog?price=100_300",
       "status": 200,
-      "elapsedMs": 102,
+      "elapsedMs": 110,
       "ok": true
     },
     {
       "url": "http://127.0.0.1:3002/catalog?cat=%D0%A7%D0%B0%D1%81%D1%8B&brand=Hublot&price=100_300",
       "status": 200,
-      "elapsedMs": 97,
+      "elapsedMs": 104,
       "ok": true
     },
     {
       "url": "http://127.0.0.1:3002/catalog?page=2&cat=%D0%A7%D0%B0%D1%81%D1%8B",
       "status": 200,
-      "elapsedMs": 105,
+      "elapsedMs": 112,
       "ok": true
     },
     {
       "url": "http://127.0.0.1:3002/catalog?page=11&cat=%D0%A7%D0%B0%D1%81%D1%8B",
       "status": 200,
-      "elapsedMs": 122,
+      "elapsedMs": 124,
       "ok": true
     }
   ]

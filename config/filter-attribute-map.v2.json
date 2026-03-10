@@ -1,0 +1,86 @@
+{
+  "version": "2.0.0",
+  "lockedAt": "2026-03-10T00:00:00.000Z",
+  "description": "Final contract for product-filter model migration",
+  "requiredCoveragePct": {
+    "storeMetadata": 95,
+    "legacyFilters": 95
+  },
+  "attributeNamespaces": {
+    "legacy": "attributes",
+    "storeMetadataPrefixes": [
+      "attr_",
+      "attribute_"
+    ]
+  },
+  "mappings": [
+    {
+      "canonicalFacet": "filter_brand",
+      "required": true,
+      "metadataKeys": ["filter_brand", "brand", "legacy_brand"],
+      "legacyKeys": ["brand"],
+      "legacyField": "NAME",
+      "strategy": "extract_brand_from_title",
+      "normalization": "brandAliases"
+    },
+    {
+      "canonicalFacet": "filter_category",
+      "required": true,
+      "metadataKeys": ["filter_category", "category", "legacy_category"],
+      "legacyKeys": ["category"],
+      "legacyField": "SECTION_NAME",
+      "strategy": "normalize_category_label",
+      "normalization": "categoryAliases"
+    },
+    {
+      "canonicalFacet": "filter_price_range",
+      "required": true,
+      "metadataKeys": ["filter_price_range"],
+      "legacyKeys": ["price_range"],
+      "legacyField": "PRICE_MIN",
+      "strategy": "bucket_price_range",
+      "normalization": "priceRangeAliases"
+    },
+    {
+      "canonicalFacet": "filter_availability",
+      "required": true,
+      "metadataKeys": ["filter_availability"],
+      "legacyKeys": ["availability"],
+      "legacyField": "QUANTITY",
+      "strategy": "quantity_to_stock_flag",
+      "normalization": "availabilityAliases"
+    },
+    {
+      "canonicalFacet": "filter_gender",
+      "required": false,
+      "metadataKeys": ["filter_gender", "gender"],
+      "legacyKeys": ["attributes.gender", "attributes.sex"],
+      "legacyField": "PROPERTY_GENDER",
+      "strategy": "normalize_gender"
+    },
+    {
+      "canonicalFacet": "filter_type",
+      "required": false,
+      "metadataKeys": ["filter_type", "type"],
+      "legacyKeys": ["attributes.type", "attributes.item_type"],
+      "legacyField": "PROPERTY_ITEM_TYPE",
+      "strategy": "normalize_product_type"
+    },
+    {
+      "canonicalFacet": "filter_is_sale",
+      "required": false,
+      "metadataKeys": ["filter_is_sale", "is_sale"],
+      "legacyKeys": ["attributes.is_sale"],
+      "legacyField": "PROPERTY_IS_SALE",
+      "strategy": "normalize_boolean"
+    },
+    {
+      "canonicalFacet": "filter_is_new",
+      "required": false,
+      "metadataKeys": ["filter_is_new", "is_new"],
+      "legacyKeys": ["attributes.is_new"],
+      "legacyField": "PROPERTY_IS_NEW",
+      "strategy": "normalize_boolean"
+    }
+  ]
+}

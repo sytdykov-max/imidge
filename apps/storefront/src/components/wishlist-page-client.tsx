@@ -65,18 +65,24 @@ export function WishlistPageClient() {
         <div className="catalog-grid catalog-grid-v2">
           {items.map((item) => (
             <article className="product-card product-card-v2" key={item.id}>
-              <div className="product-image-wrap product-image-wrap-v2">
-                {item.thumbnail ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.thumbnail} alt={item.title} className="product-image" />
-                ) : (
-                  <div className="product-image placeholder">IMIDGE</div>
-                )}
-              </div>
+              <Link href={`/product/${item.handle}?v2=1`} aria-label={`Открыть товар ${item.title}`}>
+                <div className="product-image-wrap product-image-wrap-v2">
+                  {item.thumbnail ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.thumbnail} alt={item.title} className="product-image" />
+                  ) : (
+                    <div className="product-image placeholder">IMIDGE</div>
+                  )}
+                </div>
+              </Link>
 
               <div className="catalog-card-body-v2">
                 <p className="product-kicker-v2">Избранное</p>
-                <h3 className="product-title-v2">{item.title}</h3>
+                <h3 className="product-title-v2">
+                  <Link href={`/product/${item.handle}?v2=1`} aria-label={`Открыть товар ${item.title}`}>
+                    {item.title}
+                  </Link>
+                </h3>
                 {item.priceText ? (
                   <div className="catalog-price-row-v2">
                     <strong className="product-price-v2">{item.priceText}</strong>

@@ -1,0 +1,20 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>IMIDGE Logo — Mark Only Export</title>
+  <desc>Standalone IM monogram export source with explicit system font for rasterizers</desc>
+
+  <rect width="1200" height="1200" fill="#111111"/>
+
+    <g fill="#B68D6A" text-anchor="middle">
+      <text x="600" y="620"
+          font-family="Times New Roman"
+        font-size="760"
+          font-weight="500"
+        dominant-baseline="central">M</text>
+
+      <text x="600" y="620"
+          font-family="Times New Roman"
+        font-size="860"
+          font-weight="500"
+        dominant-baseline="central">I</text>
+  </g>
+</svg>

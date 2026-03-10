@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { CatalogCardActions } from "@/components/catalog-card-actions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WishlistToggleButton } from "@/components/wishlist-toggle-button";
+import { RecentlyViewedProducts } from "@/components/recently-viewed-products";
 import { extractProductBrand } from "@/lib/catalog-brand";
-import { getAllStoreProducts, getStoreProductByHandle } from "@/lib/medusa-store";
+import { getAllStoreProducts, getMinProductPrice, getStoreProductByHandle } from "@/lib/medusa-store";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://127.0.0.1:3002";
 
@@ -271,6 +273,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
   const redesignByEnv = process.env.NEXT_PUBLIC_ENABLE_PRODUCT_REDESIGN === "1";
   const redesignByQuery = query?.v2 === "1";
   const isProductRedesign = redesignByEnv || redesignByQuery;
+  const catalogHref = isProductRedesign ? "/catalog?v2=1" : "/catalog";
   const [product, regionCurrencyCodes, defaultRegionCurrencyCode] = await Promise.all([
     getStoreProductByHandle(handle),
     getRegionCurrencyCodes(),
@@ -323,6 +326,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
   ].filter((value, index, array) => array.indexOf(value) === index);
   const primaryGalleryImage = galleryImages[0] ?? productPageImage;
   const productBrand = extractProductBrand(product);
+  const productCategory = product.collection?.title?.trim() || product.type?.value?.trim() || "Каталог";
   const sku = textFromMetadata(product.metadata, "sku", "code") ?? product.handle?.toUpperCase();
   const availabilityLabel = hasPurchasableVariant ? "В наличии" : "Нет в наличии";
 
@@ -403,6 +407,10 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
     .map((candidate) => ({
       ...candidate,
       brand: extractProductBrand(candidate),
+      minPrice: getMinProductPrice(candidate),
+      variantId: candidate.variants?.find((variant) =>
+        (variant.prices ?? []).some((price) => typeof price.amount === "number" && price.amount > 0)
+      )?.id,
     }))
     .filter((candidate) => candidate.brand === productBrand)
     .slice(0, 4);
@@ -425,13 +433,13 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
               <nav className="product-v2-breadcrumbs" aria-label="Хлебные крошки">
                 <Link href="/">Главная</Link>
                 <span aria-hidden="true">›</span>
-                <Link href="/catalog?v2=1">Каталог</Link>
+                <Link href={catalogHref}>Каталог</Link>
                 <span aria-hidden="true">›</span>
                 <span>{product.title}</span>
               </nav>
             ) : (
               <nav aria-label="Хлебные крошки">
-                <Link href="/catalog" className="hero-kicker" rel="up">
+                <Link href={catalogHref} className="hero-kicker" rel="up">
                   ← Назад в каталог
                 </Link>
               </nav>
@@ -522,31 +530,90 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
                 ) : (
                   <p className="hero-kicker">Похожие товары</p>
                 )}
-                <div className={`catalog-grid${isProductRedesign ? " product-related-grid-v2" : ""}`}>
-                  {relatedProducts.map((related) => (
-                    <article className={`product-card${isProductRedesign ? " product-card-v2" : ""}`} key={related.id}>
-                      <p className={`hero-kicker${isProductRedesign ? " product-kicker-v2" : ""}`}>
-                        {related.brand}
-                      </p>
-                      <div className={`product-image-wrap${isProductRedesign ? " product-image-wrap-v2" : ""}`}>
-                        {related.thumbnail ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={related.thumbnail} alt={related.title} className="product-image" />
-                        ) : (
-                          <div className="product-image placeholder">IMIDGE</div>
-                        )}
-                      </div>
+                <div className={`catalog-grid${isProductRedesign ? " catalog-grid-v2 product-related-grid-v2" : ""}`}>
+                  {relatedProducts.map((related) => {
+                    const relatedHref = isProductRedesign ? `/product/${related.handle}?v2=1` : `/product/${related.handle}`;
 
-                      <h3 className={isProductRedesign ? "product-title-v2" : undefined}>{related.title}</h3>
-                      <p className={`product-handle${isProductRedesign ? " product-handle-v2" : ""}`}>/{related.handle}</p>
-                      <Link href={`/product/${related.handle}`} className={`cta-btn product-btn${isProductRedesign ? " product-btn-v2" : ""}`}>
-                        Открыть товар
-                      </Link>
-                    </article>
-                  ))}
+                    return (
+                      <article className={`product-card${isProductRedesign ? " product-card-v2" : ""}`} key={related.id}>
+                        <Link href={relatedHref} aria-label={`Открыть товар ${related.title}`}>
+                          <div className={`product-image-wrap${isProductRedesign ? " product-image-wrap-v2" : ""}`}>
+                            {related.thumbnail ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={related.thumbnail} alt={related.title} className="product-image" />
+                            ) : (
+                              <div className="product-image placeholder">IMIDGE</div>
+                            )}
+                          </div>
+                        </Link>
+
+                        {isProductRedesign ? (
+                          <div className="catalog-card-body-v2">
+                            <p className="product-kicker-v2">{related.brand}</p>
+                            <h3 className="product-title-v2">
+                              <Link href={relatedHref} aria-label={`Открыть товар ${related.title}`}>
+                                {related.title}
+                              </Link>
+                            </h3>
+                            <div className="catalog-price-row-v2">
+                              {related.minPrice && (
+                                <span className="product-price-old-v2">
+                                  {Math.round(related.minPrice.amount * 1.2).toLocaleString("ru-RU")}
+                                </span>
+                              )}
+                              <strong className="product-price-v2">
+                                {related.minPrice
+                                  ? `${related.minPrice.amount.toLocaleString("ru-RU")} ${related.minPrice.currency}`
+                                  : "Цена уточняется"}
+                              </strong>
+                            </div>
+                            <CatalogCardActions
+                              href={relatedHref}
+                              variantId={related.variantId}
+                              wishlistItem={{
+                                handle: related.handle,
+                                title: related.title,
+                                thumbnail: related.thumbnail,
+                                priceText: related.minPrice
+                                  ? `${related.minPrice.amount.toLocaleString("ru-RU")} ${related.minPrice.currency}`
+                                  : undefined,
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <p className="hero-kicker">{related.brand}</p>
+                            <h3>
+                              <Link href={relatedHref} aria-label={`Открыть товар ${related.title}`}>
+                                {related.title}
+                              </Link>
+                            </h3>
+                            <p className="product-handle">/{related.handle}</p>
+                            <Link href={relatedHref} className="cta-btn product-btn">
+                              Открыть товар
+                            </Link>
+                          </>
+                        )}
+                      </article>
+                    );
+                  })}
                 </div>
               </div>
             )}
+
+            <RecentlyViewedProducts
+              isProductRedesign={isProductRedesign}
+              currentItem={{
+                handle: product.handle,
+                title: product.title,
+                brand: productBrand || "Без бренда",
+                category: productCategory,
+                thumbnail: product.thumbnail,
+                priceText: currentPriceText,
+                oldPriceText,
+                variantId: defaultVariantId,
+              }}
+            />
           </div>
         </section>
       </main>

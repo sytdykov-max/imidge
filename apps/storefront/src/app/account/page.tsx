@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { AccountPageClient } from "@/components/account-page-client";
 
 export const metadata: Metadata = {
   title: "Личный кабинет",
@@ -30,12 +31,7 @@ export default function AccountPage() {
     <div>
       <SiteHeader />
       <main id="main-content" tabIndex={-1}>
-        <section className="section">
-          <div className="container">
-            <h1 className="section-title">Личный кабинет</h1>
-            <p className="section-subtitle">Подключение авторизации и профиля будет следующим шагом после checkout.</p>
-          </div>
-        </section>
+        <AccountPageClient />
       </main>
       <SiteFooter />
     </div>

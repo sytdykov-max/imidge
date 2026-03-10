@@ -52,6 +52,7 @@ export type CatalogQueryInput = {
   brand?: string | string[];
   price?: string;
   q?: string;
+  v2?: boolean;
 };
 
 function getFirstValue(value?: string | string[]) {
@@ -110,6 +111,7 @@ export function normalizeCatalogSearchParams(query: CatalogSearchParams): Catalo
 
 export function buildCatalogQuery(next: CatalogQueryInput) {
   const params = new URLSearchParams();
+  if (next.v2) params.set("v2", "1");
   if (next.cat) {
     const catValues = Array.isArray(next.cat) ? next.cat : [next.cat];
     for (const catValue of catValues) {

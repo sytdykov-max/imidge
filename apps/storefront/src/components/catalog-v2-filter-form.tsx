@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type FilterOption = {
   value: string;
@@ -48,6 +49,7 @@ export function CatalogV2FilterForm({
   priceFromValue,
   priceToValue,
 }: CatalogV2FilterFormProps) {
+  const router = useRouter();
   const [categoryValues, setCategoryValues] = useState<string[]>(normalizeSelected(selectedCategories));
   const [brandValues, setBrandValues] = useState<string[]>(normalizeSelected(selectedBrands));
 
@@ -60,8 +62,9 @@ export function CatalogV2FilterForm({
     setValues: (values: string[]) => void
   ) => {
     if (nextValue === "all") {
-      setValues(["all"]);
-      return;
+      const values = ["all"];
+      setValues(values);
+      return values;
     }
 
     const withoutAll = currentValues.filter((value) => value !== "all");
@@ -70,15 +73,48 @@ export function CatalogV2FilterForm({
       ? withoutAll.filter((value) => value !== nextValue)
       : [...withoutAll, nextValue];
 
-    setValues(nextValues.length > 0 ? nextValues : ["all"]);
+    const values = nextValues.length > 0 ? nextValues : ["all"];
+    setValues(values);
+    return values;
+  };
+
+  const applyFilters = (next: {
+    categories?: string[];
+    brands?: string[];
+    price?: string;
+  }) => {
+    const params = new URLSearchParams();
+    params.set("v2", "1");
+
+    const categories = (next.categories ?? categoryValues).filter((value) => value !== "all");
+    const brands = (next.brands ?? brandValues).filter((value) => value !== "all");
+    const price = next.price ?? selectedPrice;
+
+    for (const value of categories) {
+      params.append("cat", value);
+    }
+
+    for (const value of brands) {
+      params.append("brand", value);
+    }
+
+    if (price !== "all") {
+      params.set("price", price);
+    }
+
+    if (selectedSort !== "popular") {
+      params.set("sort", selectedSort);
+    }
+
+    if (selectedQuery) {
+      params.set("q", selectedQuery);
+    }
+
+    router.push(`/catalog?${params.toString()}`);
   };
 
   return (
-    <form className="catalog-v2-filter-form" method="get" action="/catalog" aria-label="Фильтры каталога">
-      <input type="hidden" name="v2" value="1" />
-      {selectedSort !== "popular" && <input type="hidden" name="sort" value={selectedSort} />}
-      {selectedQuery && <input type="hidden" name="q" value={selectedQuery} />}
-      <input type="hidden" name="page" value="1" />
+    <div className="catalog-v2-filter-form" aria-label="Фильтры каталога" role="group">
 
       <div className="catalog-v2-group">
         <p>Категория</p>
@@ -90,10 +126,12 @@ export function CatalogV2FilterForm({
               <label key={option.value} className={`catalog-v2-check${checked ? " active" : ""}`}>
                 <input
                   type="checkbox"
-                  name="cat"
                   value={option.value}
                   checked={checked}
-                  onChange={() => toggleGroupValue(categoryValues, option.value, setCategoryValues)}
+                  onChange={() => {
+                    const nextValues = toggleGroupValue(categoryValues, option.value, setCategoryValues);
+                    applyFilters({ categories: nextValues });
+                  }}
                 />
                 <span className="catalog-v2-checkbox" aria-hidden="true" />
                 <span>{option.label} ({option.count})</span>
@@ -122,10 +160,12 @@ export function CatalogV2FilterForm({
               <label key={option.value} className={`catalog-v2-check${checked ? " active" : ""}`}>
                 <input
                   type="checkbox"
-                  name="brand"
                   value={option.value}
                   checked={checked}
-                  onChange={() => toggleGroupValue(brandValues, option.value, setBrandValues)}
+                  onChange={() => {
+                    const nextValues = toggleGroupValue(brandValues, option.value, setBrandValues);
+                    applyFilters({ brands: nextValues });
+                  }}
                 />
                 <span className="catalog-v2-checkbox" aria-hidden="true" />
                 <span>{option.label} ({option.count})</span>
@@ -140,17 +180,18 @@ export function CatalogV2FilterForm({
         <div className="catalog-v2-links">
           {priceOptions.map((option) => (
             <label key={option.value} className={`catalog-v2-check${selectedPrice === option.value ? " active" : ""}`}>
-              <input type="radio" name="price" value={option.value} defaultChecked={selectedPrice === option.value} />
+              <input
+                type="radio"
+                value={option.value}
+                defaultChecked={selectedPrice === option.value}
+                onChange={() => applyFilters({ price: option.value })}
+              />
               <span className="catalog-v2-checkbox" aria-hidden="true" />
               <span>{option.label} ({option.count})</span>
             </label>
           ))}
         </div>
       </div>
-
-      <button type="submit" className="catalog-v2-apply-btn">
-        Применить
-      </button>
-    </form>
+    </div>
   );
 }

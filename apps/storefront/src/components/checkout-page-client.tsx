@@ -28,7 +28,11 @@ function money(value = 0, currency = "usd") {
   }).format(value);
 }
 
-export function CheckoutPageClient() {
+type CheckoutPageClientProps = {
+  isCheckoutRedesign?: boolean;
+};
+
+export function CheckoutPageClient({ isCheckoutRedesign = false }: CheckoutPageClientProps) {
   const { cart, loading, refreshCart, setCartSnapshot } = useCartStore();
   const [submitting, setSubmitting] = useState(false);
   const { notify } = useToast();
@@ -50,7 +54,18 @@ export function CheckoutPageClient() {
 
   return (
     <>
-      <h1 className="section-title">Checkout</h1>
+      {isCheckoutRedesign ? (
+        <div className="checkout-v2-head">
+          <nav className="checkout-v2-breadcrumbs" aria-label="Хлебные крошки">
+            <Link href="/">Главная</Link>
+            <span aria-hidden="true">›</span>
+            <span>Оформление заказа</span>
+          </nav>
+          <h1 className="section-title checkout-v2-title">Оформление заказа</h1>
+        </div>
+      ) : (
+        <h1 className="section-title">Checkout</h1>
+      )}
 
       {loading && (
         <p className="section-subtitle" role="status" aria-live="polite">
@@ -60,14 +75,14 @@ export function CheckoutPageClient() {
 
       {!loading && items.length === 0 && (
         <div className="empty-state">
-          Нет товаров для оформления. <Link href="/catalog">Перейти в каталог</Link>
+          Нет товаров для оформления. <Link href={isCheckoutRedesign ? "/catalog?v2=1" : "/catalog"}>Перейти в каталог</Link>
         </div>
       )}
 
       {!loading && items.length > 0 && (
-        <div className="checkout-layout">
+        <div className={isCheckoutRedesign ? "checkout-layout checkout-layout-v2" : "checkout-layout"}>
           <form
-            className="checkout-form"
+            className={isCheckoutRedesign ? "checkout-form checkout-form-v2" : "checkout-form"}
             aria-label="Форма оформления заказа"
             onSubmit={async (event) => {
               event.preventDefault();
@@ -108,7 +123,7 @@ export function CheckoutPageClient() {
                   setCartSnapshot(null);
                   const orderIdParam = result.orderId ? `&orderId=${encodeURIComponent(result.orderId)}` : "";
                   router.push(
-                    `/checkout/success?displayId=${encodeURIComponent(String(result.displayId))}${orderIdParam}`
+                    `/checkout/success?displayId=${encodeURIComponent(String(result.displayId))}${orderIdParam}${isCheckoutRedesign ? "&v2=1" : ""}`
                   );
                   return;
                 }
@@ -120,7 +135,7 @@ export function CheckoutPageClient() {
                     durationMs: 7000,
                   });
                   setCartSnapshot(null);
-                  router.push(`/checkout/success?orderId=${encodeURIComponent(result.orderId)}`);
+                  router.push(`/checkout/success?orderId=${encodeURIComponent(result.orderId)}${isCheckoutRedesign ? "&v2=1" : ""}`);
                   return;
                 }
 
@@ -143,69 +158,98 @@ export function CheckoutPageClient() {
               }
             }}
           >
-            <h3>Контактные данные</h3>
-            <input
-              className="field"
-              required
-              placeholder="Имя"
-              aria-label="Имя"
-              autoComplete="name"
-              value={formValues.name}
-              onChange={(event) => setFormValues((prev) => ({ ...prev, name: event.target.value }))}
-            />
+            <h3>{isCheckoutRedesign ? "Контактные данные" : "Контактные данные"}</h3>
+            <div className={isCheckoutRedesign ? "checkout-form-grid-v2" : "checkout-form-grid-legacy"}>
+              <div className={isCheckoutRedesign ? "checkout-field-v2" : ""}>
+                {isCheckoutRedesign && <label htmlFor="checkoutName">Имя</label>}
+                <input
+                  id="checkoutName"
+                  className="field"
+                  required
+                  placeholder="Имя"
+                  aria-label="Имя"
+                  autoComplete="name"
+                  value={formValues.name}
+                  onChange={(event) => setFormValues((prev) => ({ ...prev, name: event.target.value }))}
+                />
+              </div>
             {formErrors.name && <p className="action-message">{formErrors.name}</p>}
-            <input
-              className="field"
-              required
-              placeholder="Телефон"
-              aria-label="Телефон"
-              autoComplete="tel"
-              value={formValues.phone}
-              onChange={(event) =>
-                setFormValues((prev) => ({ ...prev, phone: formatCheckoutPhone(event.target.value) }))
-              }
-            />
+              <div className={isCheckoutRedesign ? "checkout-field-v2" : ""}>
+                {isCheckoutRedesign && <label htmlFor="checkoutPhone">Телефон</label>}
+                <input
+                  id="checkoutPhone"
+                  className="field"
+                  required
+                  placeholder="Телефон"
+                  aria-label="Телефон"
+                  autoComplete="tel"
+                  value={formValues.phone}
+                  onChange={(event) =>
+                    setFormValues((prev) => ({ ...prev, phone: formatCheckoutPhone(event.target.value) }))
+                  }
+                />
+              </div>
             {formErrors.phone && <p className="action-message">{formErrors.phone}</p>}
-            <input
-              className="field"
-              type="email"
-              required
-              placeholder="Email"
-              aria-label="Email"
-              autoComplete="email"
-              value={formValues.email}
-              onChange={(event) => setFormValues((prev) => ({ ...prev, email: event.target.value }))}
-            />
+              <div className={isCheckoutRedesign ? "checkout-field-v2 checkout-span-2-v2" : ""}>
+                {isCheckoutRedesign && <label htmlFor="checkoutEmail">Email</label>}
+                <input
+                  id="checkoutEmail"
+                  className="field"
+                  type="email"
+                  required
+                  placeholder="Email"
+                  aria-label="Email"
+                  autoComplete="email"
+                  value={formValues.email}
+                  onChange={(event) => setFormValues((prev) => ({ ...prev, email: event.target.value }))}
+                />
+              </div>
             {formErrors.email && <p className="action-message">{formErrors.email}</p>}
+            </div>
 
             <h3>Доставка</h3>
-            <input
-              className="field"
-              required
-              placeholder="Город"
-              aria-label="Город"
-              autoComplete="address-level2"
-              value={formValues.city}
-              onChange={(event) => setFormValues((prev) => ({ ...prev, city: event.target.value }))}
-            />
+            <div className={isCheckoutRedesign ? "checkout-form-grid-v2" : "checkout-form-grid-legacy"}>
+              <div className={isCheckoutRedesign ? "checkout-field-v2" : ""}>
+                {isCheckoutRedesign && <label htmlFor="checkoutCity">Город</label>}
+                <input
+                  id="checkoutCity"
+                  className="field"
+                  required
+                  placeholder="Город"
+                  aria-label="Город"
+                  autoComplete="address-level2"
+                  value={formValues.city}
+                  onChange={(event) => setFormValues((prev) => ({ ...prev, city: event.target.value }))}
+                />
+              </div>
             {formErrors.city && <p className="action-message">{formErrors.city}</p>}
-            <input
-              className="field"
-              required
-              placeholder="Адрес"
-              aria-label="Адрес"
-              autoComplete="street-address"
-              value={formValues.address}
-              onChange={(event) => setFormValues((prev) => ({ ...prev, address: event.target.value }))}
-            />
+              <div className={isCheckoutRedesign ? "checkout-field-v2" : ""}>
+                {isCheckoutRedesign && <label htmlFor="checkoutAddress">Адрес</label>}
+                <input
+                  id="checkoutAddress"
+                  className="field"
+                  required
+                  placeholder="Адрес"
+                  aria-label="Адрес"
+                  autoComplete="street-address"
+                  value={formValues.address}
+                  onChange={(event) => setFormValues((prev) => ({ ...prev, address: event.target.value }))}
+                />
+              </div>
             {formErrors.address && <p className="action-message">{formErrors.address}</p>}
+            </div>
 
             <button type="submit" className="cta-btn checkout-btn" disabled={submitting}>
               {submitting ? "Оформляем..." : "Подтвердить заказ"}
             </button>
+            {isCheckoutRedesign && (
+              <Link href="/catalog?v2=1" className="checkout-v2-back-link">
+                Продолжить покупки
+              </Link>
+            )}
           </form>
 
-          <aside className="cart-summary">
+          <aside className={isCheckoutRedesign ? "cart-summary checkout-summary-v2" : "cart-summary"}>
             <h3>Ваш заказ</h3>
             {items.map((item) => (
               <p key={item.id} className="checkout-line">

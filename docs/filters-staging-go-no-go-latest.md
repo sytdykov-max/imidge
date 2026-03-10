@@ -1,11 +1,11 @@
 # Filters Staging Go/No-Go
 
-- Generated at: 2026-03-06T13:50:22.408Z
+- Generated at: 2026-03-10T13:41:53.875Z
 - Decision: GO
 - Brand coverage: 100%
 - Category coverage: 100%
 - Consistency violations: 0
-- Performance p95: 134 ms
+- Performance p95: 150 ms
 
 ## Blockers
 

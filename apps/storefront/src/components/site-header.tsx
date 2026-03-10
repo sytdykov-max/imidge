@@ -27,7 +27,11 @@ const quickCatalogItems = [
   { href: "/catalog", label: "Бренды" },
 ];
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  compact?: boolean;
+};
+
+export function SiteHeader({ compact = false }: SiteHeaderProps) {
   const pathname = usePathname();
   const { itemCount } = useCartStore();
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -54,6 +58,40 @@ export function SiteHeader() {
       <a href="#main-content" className="skip-link">
         К содержимому
       </a>
+
+      {compact ? (
+        <>
+          <div className="top-line top-line-compact">
+            <div className="container top-line-content top-line-content-compact">
+              <p>Корзина покупателя</p>
+              <p>Оплата после просмотра · Доставка 1–2 дня</p>
+            </div>
+          </div>
+
+          <div className="container main-header main-header-compact">
+            <Link href="/" className="brand-logo" aria-label="Imidge">
+              <span className="brand-monogram" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/imidge_logo_mark_only_export.svg" alt="" className="brand-monogram-image" />
+              </span>
+              <span className="brand-logo-text">
+                <strong>IMIDGE</strong>
+                <span>ОДЕЖДА И АКСЕССУАРЫ</span>
+              </span>
+            </Link>
+
+            <nav className="header-actions header-actions-compact" aria-label="Быстрые действия">
+              <Link className="icon-btn" href="/catalog?v2=1" aria-label="Вернуться в каталог">
+                ↩
+              </Link>
+              <Link className="icon-btn" href="/wishlist?v2=1" aria-label="Избранное">
+                ✦
+              </Link>
+            </nav>
+          </div>
+        </>
+      ) : (
+        <>
 
       <div className="top-line">
         <div className="container top-line-content">
@@ -83,9 +121,13 @@ export function SiteHeader() {
 
       <div className="container main-header">
         <Link href="/" className="brand-logo" aria-label="Imidge">
+          <span className="brand-monogram" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/imidge_logo_mark_only_export.svg" alt="" className="brand-monogram-image" />
+          </span>
           <span className="brand-logo-text">
             <strong>IMIDGE</strong>
-            <span>WATCHES & ACCESSORIES</span>
+            <span>ОДЕЖДА И АКСЕССУАРЫ</span>
           </span>
         </Link>
 
@@ -131,6 +173,8 @@ export function SiteHeader() {
           </ul>
         </div>
       </nav>
+        </>
+      )}
     </header>
   );
 }

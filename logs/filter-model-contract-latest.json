@@ -1,0 +1,936 @@
+{
+  "generatedAt": "2026-03-10T13:41:34.986Z",
+  "medusaUrl": "http://127.0.0.1:9000",
+  "contractVersion": "2.0.0",
+  "sources": {
+    "legacyFiltersPath": "C:\\Users\\Pavel\\Desktop\\Imidge дизайн\\imidge_headless\\apps\\medusa\\src\\scripts\\legacy-filters.json",
+    "storeProductsTotal": 13480,
+    "legacyFiltersTotal": 13475
+  },
+  "thresholds": {
+    "storeCoverageThreshold": 95,
+    "legacyCoverageThreshold": 95
+  },
+  "ok": true,
+  "violations": [],
+  "coverage": [
+    {
+      "canonicalFacet": "filter_brand",
+      "required": true,
+      "metadataKeys": [
+        "filter_brand",
+        "brand",
+        "legacy_brand"
+      ],
+      "legacyKeys": [
+        "brand"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 13480,
+        "coveragePct": 100,
+        "missingSample": []
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 13475,
+        "coveragePct": 100,
+        "missingSample": []
+      }
+    },
+    {
+      "canonicalFacet": "filter_category",
+      "required": true,
+      "metadataKeys": [
+        "filter_category",
+        "category",
+        "legacy_category"
+      ],
+      "legacyKeys": [
+        "category"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 13480,
+        "coveragePct": 100,
+        "missingSample": []
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 13475,
+        "coveragePct": 100,
+        "missingSample": []
+      }
+    },
+    {
+      "canonicalFacet": "filter_price_range",
+      "required": true,
+      "metadataKeys": [
+        "filter_price_range"
+      ],
+      "legacyKeys": [
+        "price_range"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 13480,
+        "coveragePct": 100,
+        "missingSample": []
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 13475,
+        "coveragePct": 100,
+        "missingSample": []
+      }
+    },
+    {
+      "canonicalFacet": "filter_availability",
+      "required": true,
+      "metadataKeys": [
+        "filter_availability"
+      ],
+      "legacyKeys": [
+        "availability"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 13480,
+        "coveragePct": 100,
+        "missingSample": []
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 13475,
+        "coveragePct": 100,
+        "missingSample": []
+      }
+    },
+    {
+      "canonicalFacet": "filter_gender",
+      "required": false,
+      "metadataKeys": [
+        "filter_gender",
+        "gender"
+      ],
+      "legacyKeys": [
+        "attributes.gender",
+        "attributes.sex"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "id": "prod_01KJWQDGQQCQY52AZBKVTFKS74",
+            "handle": "shorts",
+            "title": "Medusa Shorts"
+          },
+          {
+            "id": "prod_01KJWQDGQQKH2TFAYDREX11K1F",
+            "handle": "sweatshirt",
+            "title": "Medusa Sweatshirt"
+          },
+          {
+            "id": "prod_01KJWQDGQQSW5NTXX5Q9BATPT7",
+            "handle": "sweatpants",
+            "title": "Medusa Sweatpants"
+          },
+          {
+            "id": "prod_01KJWQDGQQZCYVZYDSJ7YRR8S6",
+            "handle": "t-shirt",
+            "title": "Medusa T-Shirt"
+          },
+          {
+            "id": "prod_01KJWXS0JE0P9VG5W2B3TM4ATN",
+            "handle": "plate-midi-iz-viskozy",
+            "title": "Платье миди из вискозы"
+          },
+          {
+            "id": "prod_01KJWYMBPN12AP09DWNMQ6Z91P",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475",
+            "title": "Мужские часы Louis Vuitton Модель №H0475"
+          },
+          {
+            "id": "prod_01KJWYMBPNAZ2TY2NVMP0VXF5M",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474",
+            "title": "Мужские часы Louis Vuitton Модель №H0474"
+          },
+          {
+            "id": "prod_01KJWYMBPNC19MYA9VCW9GWPND",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020",
+            "title": "Женские часы Louis Vuitton Модель №S020"
+          },
+          {
+            "id": "prod_01KJWYMBPNK3DRFJ3HC6QBRJ95",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329",
+            "title": "Мужские часы Tag Heuer Модель №H0329"
+          },
+          {
+            "id": "prod_01KJWYMBPNMHW4EPK0JWR753GD",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016",
+            "title": "Женские часы Louis Vuitton Модель №S016 (Референс оригинала Q131F1)"
+          },
+          {
+            "id": "prod_01KJWYMBPNP0CK90XWYXVCVE1Y",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018",
+            "title": "Женские часы Louis Vuitton Модель №S018"
+          },
+          {
+            "id": "prod_01KJWYMBPP1AJY5VX9PFR8S26M",
+            "handle": "kopiya-chasov-tag-heuer-model-h0260",
+            "title": "Мужские часы Tag Heuer Модель №H0260"
+          },
+          {
+            "id": "prod_01KJWYMBPP4G0HZXMQBSVFABP4",
+            "handle": "kopiya-chasov-tag-heuer-model-h0323",
+            "title": "Мужские часы Tag Heuer Модель №H0323"
+          },
+          {
+            "id": "prod_01KJWYMBPP6RQS7EFWDBJHHPPY",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420",
+            "title": "Женские часы Louis Vuitton Модель №H0420"
+          },
+          {
+            "id": "prod_01KJWYMBPP74CTWC9BFCQD6RDK",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0887",
+            "title": "Мужские часы Audemars Piguet Модель №C0887"
+          },
+          {
+            "id": "prod_01KJWYMBPP7NE9RDHH1DHCH9SX",
+            "handle": "kopiya-chasov-tag-heuer-model-h0198",
+            "title": "Мужские часы Tag Heuer Модель №H0198"
+          },
+          {
+            "id": "prod_01KJWYMBPP9RVZY7SMSBE7695C",
+            "handle": "kopiya-chasov-tag-heuer-model-s720",
+            "title": "Мужские часы Tag Heuer Модель №S720"
+          },
+          {
+            "id": "prod_01KJWYMBPP9Z2TVX721NRWM96A",
+            "handle": "kopiya-chasov-tag-heuer-model-h0345",
+            "title": "Мужские часы Tag Heuer Модель №H0345"
+          },
+          {
+            "id": "prod_01KJWYMBPPBSXN085FKHZ3PSK0",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243",
+            "title": "Мужские часы Louis Vuitton Модель №C0243"
+          },
+          {
+            "id": "prod_01KJWYMBPPC20N1S1Z2DXA047K",
+            "handle": "kopiya-chasov-tag-heuer-model-h0377",
+            "title": "Мужские часы Tag Heuer Модель №H0377"
+          }
+        ]
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "legacy_id": "46545",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020"
+          },
+          {
+            "legacy_id": "46546",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018"
+          },
+          {
+            "legacy_id": "46547",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016"
+          },
+          {
+            "legacy_id": "46548",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475"
+          },
+          {
+            "legacy_id": "46549",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474"
+          },
+          {
+            "legacy_id": "46550",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329"
+          },
+          {
+            "legacy_id": "46551",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420"
+          },
+          {
+            "legacy_id": "46552",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0427"
+          },
+          {
+            "legacy_id": "46553",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0254"
+          },
+          {
+            "legacy_id": "46554",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243"
+          },
+          {
+            "legacy_id": "46555",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0237"
+          },
+          {
+            "legacy_id": "46556",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0236"
+          },
+          {
+            "legacy_id": "46557",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0232"
+          },
+          {
+            "legacy_id": "46558",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0228"
+          },
+          {
+            "legacy_id": "46559",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223-1"
+          },
+          {
+            "legacy_id": "46560",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223"
+          },
+          {
+            "legacy_id": "46561",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0864"
+          },
+          {
+            "legacy_id": "46562",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap1"
+          },
+          {
+            "legacy_id": "46563",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap018"
+          },
+          {
+            "legacy_id": "46564",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0863"
+          }
+        ]
+      }
+    },
+    {
+      "canonicalFacet": "filter_type",
+      "required": false,
+      "metadataKeys": [
+        "filter_type",
+        "type"
+      ],
+      "legacyKeys": [
+        "attributes.type",
+        "attributes.item_type"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "id": "prod_01KJWQDGQQCQY52AZBKVTFKS74",
+            "handle": "shorts",
+            "title": "Medusa Shorts"
+          },
+          {
+            "id": "prod_01KJWQDGQQKH2TFAYDREX11K1F",
+            "handle": "sweatshirt",
+            "title": "Medusa Sweatshirt"
+          },
+          {
+            "id": "prod_01KJWQDGQQSW5NTXX5Q9BATPT7",
+            "handle": "sweatpants",
+            "title": "Medusa Sweatpants"
+          },
+          {
+            "id": "prod_01KJWQDGQQZCYVZYDSJ7YRR8S6",
+            "handle": "t-shirt",
+            "title": "Medusa T-Shirt"
+          },
+          {
+            "id": "prod_01KJWXS0JE0P9VG5W2B3TM4ATN",
+            "handle": "plate-midi-iz-viskozy",
+            "title": "Платье миди из вискозы"
+          },
+          {
+            "id": "prod_01KJWYMBPN12AP09DWNMQ6Z91P",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475",
+            "title": "Мужские часы Louis Vuitton Модель №H0475"
+          },
+          {
+            "id": "prod_01KJWYMBPNAZ2TY2NVMP0VXF5M",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474",
+            "title": "Мужские часы Louis Vuitton Модель №H0474"
+          },
+          {
+            "id": "prod_01KJWYMBPNC19MYA9VCW9GWPND",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020",
+            "title": "Женские часы Louis Vuitton Модель №S020"
+          },
+          {
+            "id": "prod_01KJWYMBPNK3DRFJ3HC6QBRJ95",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329",
+            "title": "Мужские часы Tag Heuer Модель №H0329"
+          },
+          {
+            "id": "prod_01KJWYMBPNMHW4EPK0JWR753GD",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016",
+            "title": "Женские часы Louis Vuitton Модель №S016 (Референс оригинала Q131F1)"
+          },
+          {
+            "id": "prod_01KJWYMBPNP0CK90XWYXVCVE1Y",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018",
+            "title": "Женские часы Louis Vuitton Модель №S018"
+          },
+          {
+            "id": "prod_01KJWYMBPP1AJY5VX9PFR8S26M",
+            "handle": "kopiya-chasov-tag-heuer-model-h0260",
+            "title": "Мужские часы Tag Heuer Модель №H0260"
+          },
+          {
+            "id": "prod_01KJWYMBPP4G0HZXMQBSVFABP4",
+            "handle": "kopiya-chasov-tag-heuer-model-h0323",
+            "title": "Мужские часы Tag Heuer Модель №H0323"
+          },
+          {
+            "id": "prod_01KJWYMBPP6RQS7EFWDBJHHPPY",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420",
+            "title": "Женские часы Louis Vuitton Модель №H0420"
+          },
+          {
+            "id": "prod_01KJWYMBPP74CTWC9BFCQD6RDK",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0887",
+            "title": "Мужские часы Audemars Piguet Модель №C0887"
+          },
+          {
+            "id": "prod_01KJWYMBPP7NE9RDHH1DHCH9SX",
+            "handle": "kopiya-chasov-tag-heuer-model-h0198",
+            "title": "Мужские часы Tag Heuer Модель №H0198"
+          },
+          {
+            "id": "prod_01KJWYMBPP9RVZY7SMSBE7695C",
+            "handle": "kopiya-chasov-tag-heuer-model-s720",
+            "title": "Мужские часы Tag Heuer Модель №S720"
+          },
+          {
+            "id": "prod_01KJWYMBPP9Z2TVX721NRWM96A",
+            "handle": "kopiya-chasov-tag-heuer-model-h0345",
+            "title": "Мужские часы Tag Heuer Модель №H0345"
+          },
+          {
+            "id": "prod_01KJWYMBPPBSXN085FKHZ3PSK0",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243",
+            "title": "Мужские часы Louis Vuitton Модель №C0243"
+          },
+          {
+            "id": "prod_01KJWYMBPPC20N1S1Z2DXA047K",
+            "handle": "kopiya-chasov-tag-heuer-model-h0377",
+            "title": "Мужские часы Tag Heuer Модель №H0377"
+          }
+        ]
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "legacy_id": "46545",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020"
+          },
+          {
+            "legacy_id": "46546",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018"
+          },
+          {
+            "legacy_id": "46547",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016"
+          },
+          {
+            "legacy_id": "46548",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475"
+          },
+          {
+            "legacy_id": "46549",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474"
+          },
+          {
+            "legacy_id": "46550",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329"
+          },
+          {
+            "legacy_id": "46551",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420"
+          },
+          {
+            "legacy_id": "46552",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0427"
+          },
+          {
+            "legacy_id": "46553",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0254"
+          },
+          {
+            "legacy_id": "46554",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243"
+          },
+          {
+            "legacy_id": "46555",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0237"
+          },
+          {
+            "legacy_id": "46556",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0236"
+          },
+          {
+            "legacy_id": "46557",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0232"
+          },
+          {
+            "legacy_id": "46558",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0228"
+          },
+          {
+            "legacy_id": "46559",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223-1"
+          },
+          {
+            "legacy_id": "46560",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223"
+          },
+          {
+            "legacy_id": "46561",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0864"
+          },
+          {
+            "legacy_id": "46562",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap1"
+          },
+          {
+            "legacy_id": "46563",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap018"
+          },
+          {
+            "legacy_id": "46564",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0863"
+          }
+        ]
+      }
+    },
+    {
+      "canonicalFacet": "filter_is_sale",
+      "required": false,
+      "metadataKeys": [
+        "filter_is_sale",
+        "is_sale"
+      ],
+      "legacyKeys": [
+        "attributes.is_sale"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "id": "prod_01KJWQDGQQCQY52AZBKVTFKS74",
+            "handle": "shorts",
+            "title": "Medusa Shorts"
+          },
+          {
+            "id": "prod_01KJWQDGQQKH2TFAYDREX11K1F",
+            "handle": "sweatshirt",
+            "title": "Medusa Sweatshirt"
+          },
+          {
+            "id": "prod_01KJWQDGQQSW5NTXX5Q9BATPT7",
+            "handle": "sweatpants",
+            "title": "Medusa Sweatpants"
+          },
+          {
+            "id": "prod_01KJWQDGQQZCYVZYDSJ7YRR8S6",
+            "handle": "t-shirt",
+            "title": "Medusa T-Shirt"
+          },
+          {
+            "id": "prod_01KJWXS0JE0P9VG5W2B3TM4ATN",
+            "handle": "plate-midi-iz-viskozy",
+            "title": "Платье миди из вискозы"
+          },
+          {
+            "id": "prod_01KJWYMBPN12AP09DWNMQ6Z91P",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475",
+            "title": "Мужские часы Louis Vuitton Модель №H0475"
+          },
+          {
+            "id": "prod_01KJWYMBPNAZ2TY2NVMP0VXF5M",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474",
+            "title": "Мужские часы Louis Vuitton Модель №H0474"
+          },
+          {
+            "id": "prod_01KJWYMBPNC19MYA9VCW9GWPND",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020",
+            "title": "Женские часы Louis Vuitton Модель №S020"
+          },
+          {
+            "id": "prod_01KJWYMBPNK3DRFJ3HC6QBRJ95",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329",
+            "title": "Мужские часы Tag Heuer Модель №H0329"
+          },
+          {
+            "id": "prod_01KJWYMBPNMHW4EPK0JWR753GD",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016",
+            "title": "Женские часы Louis Vuitton Модель №S016 (Референс оригинала Q131F1)"
+          },
+          {
+            "id": "prod_01KJWYMBPNP0CK90XWYXVCVE1Y",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018",
+            "title": "Женские часы Louis Vuitton Модель №S018"
+          },
+          {
+            "id": "prod_01KJWYMBPP1AJY5VX9PFR8S26M",
+            "handle": "kopiya-chasov-tag-heuer-model-h0260",
+            "title": "Мужские часы Tag Heuer Модель №H0260"
+          },
+          {
+            "id": "prod_01KJWYMBPP4G0HZXMQBSVFABP4",
+            "handle": "kopiya-chasov-tag-heuer-model-h0323",
+            "title": "Мужские часы Tag Heuer Модель №H0323"
+          },
+          {
+            "id": "prod_01KJWYMBPP6RQS7EFWDBJHHPPY",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420",
+            "title": "Женские часы Louis Vuitton Модель №H0420"
+          },
+          {
+            "id": "prod_01KJWYMBPP74CTWC9BFCQD6RDK",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0887",
+            "title": "Мужские часы Audemars Piguet Модель №C0887"
+          },
+          {
+            "id": "prod_01KJWYMBPP7NE9RDHH1DHCH9SX",
+            "handle": "kopiya-chasov-tag-heuer-model-h0198",
+            "title": "Мужские часы Tag Heuer Модель №H0198"
+          },
+          {
+            "id": "prod_01KJWYMBPP9RVZY7SMSBE7695C",
+            "handle": "kopiya-chasov-tag-heuer-model-s720",
+            "title": "Мужские часы Tag Heuer Модель №S720"
+          },
+          {
+            "id": "prod_01KJWYMBPP9Z2TVX721NRWM96A",
+            "handle": "kopiya-chasov-tag-heuer-model-h0345",
+            "title": "Мужские часы Tag Heuer Модель №H0345"
+          },
+          {
+            "id": "prod_01KJWYMBPPBSXN085FKHZ3PSK0",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243",
+            "title": "Мужские часы Louis Vuitton Модель №C0243"
+          },
+          {
+            "id": "prod_01KJWYMBPPC20N1S1Z2DXA047K",
+            "handle": "kopiya-chasov-tag-heuer-model-h0377",
+            "title": "Мужские часы Tag Heuer Модель №H0377"
+          }
+        ]
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "legacy_id": "46545",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020"
+          },
+          {
+            "legacy_id": "46546",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018"
+          },
+          {
+            "legacy_id": "46547",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016"
+          },
+          {
+            "legacy_id": "46548",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475"
+          },
+          {
+            "legacy_id": "46549",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474"
+          },
+          {
+            "legacy_id": "46550",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329"
+          },
+          {
+            "legacy_id": "46551",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420"
+          },
+          {
+            "legacy_id": "46552",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0427"
+          },
+          {
+            "legacy_id": "46553",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0254"
+          },
+          {
+            "legacy_id": "46554",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243"
+          },
+          {
+            "legacy_id": "46555",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0237"
+          },
+          {
+            "legacy_id": "46556",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0236"
+          },
+          {
+            "legacy_id": "46557",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0232"
+          },
+          {
+            "legacy_id": "46558",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0228"
+          },
+          {
+            "legacy_id": "46559",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223-1"
+          },
+          {
+            "legacy_id": "46560",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223"
+          },
+          {
+            "legacy_id": "46561",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0864"
+          },
+          {
+            "legacy_id": "46562",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap1"
+          },
+          {
+            "legacy_id": "46563",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap018"
+          },
+          {
+            "legacy_id": "46564",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0863"
+          }
+        ]
+      }
+    },
+    {
+      "canonicalFacet": "filter_is_new",
+      "required": false,
+      "metadataKeys": [
+        "filter_is_new",
+        "is_new"
+      ],
+      "legacyKeys": [
+        "attributes.is_new"
+      ],
+      "metadata": {
+        "total": 13480,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "id": "prod_01KJWQDGQQCQY52AZBKVTFKS74",
+            "handle": "shorts",
+            "title": "Medusa Shorts"
+          },
+          {
+            "id": "prod_01KJWQDGQQKH2TFAYDREX11K1F",
+            "handle": "sweatshirt",
+            "title": "Medusa Sweatshirt"
+          },
+          {
+            "id": "prod_01KJWQDGQQSW5NTXX5Q9BATPT7",
+            "handle": "sweatpants",
+            "title": "Medusa Sweatpants"
+          },
+          {
+            "id": "prod_01KJWQDGQQZCYVZYDSJ7YRR8S6",
+            "handle": "t-shirt",
+            "title": "Medusa T-Shirt"
+          },
+          {
+            "id": "prod_01KJWXS0JE0P9VG5W2B3TM4ATN",
+            "handle": "plate-midi-iz-viskozy",
+            "title": "Платье миди из вискозы"
+          },
+          {
+            "id": "prod_01KJWYMBPN12AP09DWNMQ6Z91P",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475",
+            "title": "Мужские часы Louis Vuitton Модель №H0475"
+          },
+          {
+            "id": "prod_01KJWYMBPNAZ2TY2NVMP0VXF5M",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474",
+            "title": "Мужские часы Louis Vuitton Модель №H0474"
+          },
+          {
+            "id": "prod_01KJWYMBPNC19MYA9VCW9GWPND",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020",
+            "title": "Женские часы Louis Vuitton Модель №S020"
+          },
+          {
+            "id": "prod_01KJWYMBPNK3DRFJ3HC6QBRJ95",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329",
+            "title": "Мужские часы Tag Heuer Модель №H0329"
+          },
+          {
+            "id": "prod_01KJWYMBPNMHW4EPK0JWR753GD",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016",
+            "title": "Женские часы Louis Vuitton Модель №S016 (Референс оригинала Q131F1)"
+          },
+          {
+            "id": "prod_01KJWYMBPNP0CK90XWYXVCVE1Y",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018",
+            "title": "Женские часы Louis Vuitton Модель №S018"
+          },
+          {
+            "id": "prod_01KJWYMBPP1AJY5VX9PFR8S26M",
+            "handle": "kopiya-chasov-tag-heuer-model-h0260",
+            "title": "Мужские часы Tag Heuer Модель №H0260"
+          },
+          {
+            "id": "prod_01KJWYMBPP4G0HZXMQBSVFABP4",
+            "handle": "kopiya-chasov-tag-heuer-model-h0323",
+            "title": "Мужские часы Tag Heuer Модель №H0323"
+          },
+          {
+            "id": "prod_01KJWYMBPP6RQS7EFWDBJHHPPY",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420",
+            "title": "Женские часы Louis Vuitton Модель №H0420"
+          },
+          {
+            "id": "prod_01KJWYMBPP74CTWC9BFCQD6RDK",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0887",
+            "title": "Мужские часы Audemars Piguet Модель №C0887"
+          },
+          {
+            "id": "prod_01KJWYMBPP7NE9RDHH1DHCH9SX",
+            "handle": "kopiya-chasov-tag-heuer-model-h0198",
+            "title": "Мужские часы Tag Heuer Модель №H0198"
+          },
+          {
+            "id": "prod_01KJWYMBPP9RVZY7SMSBE7695C",
+            "handle": "kopiya-chasov-tag-heuer-model-s720",
+            "title": "Мужские часы Tag Heuer Модель №S720"
+          },
+          {
+            "id": "prod_01KJWYMBPP9Z2TVX721NRWM96A",
+            "handle": "kopiya-chasov-tag-heuer-model-h0345",
+            "title": "Мужские часы Tag Heuer Модель №H0345"
+          },
+          {
+            "id": "prod_01KJWYMBPPBSXN085FKHZ3PSK0",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243",
+            "title": "Мужские часы Louis Vuitton Модель №C0243"
+          },
+          {
+            "id": "prod_01KJWYMBPPC20N1S1Z2DXA047K",
+            "handle": "kopiya-chasov-tag-heuer-model-h0377",
+            "title": "Мужские часы Tag Heuer Модель №H0377"
+          }
+        ]
+      },
+      "legacy": {
+        "total": 13475,
+        "covered": 0,
+        "coveragePct": 0,
+        "missingSample": [
+          {
+            "legacy_id": "46545",
+            "handle": "kopiya-chasov-louis-vuitton-model-s020"
+          },
+          {
+            "legacy_id": "46546",
+            "handle": "kopiya-chasov-louis-vuitton-model-s018"
+          },
+          {
+            "legacy_id": "46547",
+            "handle": "kopiya-chasov-louis-vuitton-model-s016"
+          },
+          {
+            "legacy_id": "46548",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0475"
+          },
+          {
+            "legacy_id": "46549",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0474"
+          },
+          {
+            "legacy_id": "46550",
+            "handle": "kopiya-chasov-tag-heuer-model-h0329"
+          },
+          {
+            "legacy_id": "46551",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0420"
+          },
+          {
+            "legacy_id": "46552",
+            "handle": "kopiya-chasov-louis-vuitton-model-h0427"
+          },
+          {
+            "legacy_id": "46553",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0254"
+          },
+          {
+            "legacy_id": "46554",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0243"
+          },
+          {
+            "legacy_id": "46555",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0237"
+          },
+          {
+            "legacy_id": "46556",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0236"
+          },
+          {
+            "legacy_id": "46557",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0232"
+          },
+          {
+            "legacy_id": "46558",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0228"
+          },
+          {
+            "legacy_id": "46559",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223-1"
+          },
+          {
+            "legacy_id": "46560",
+            "handle": "kopiya-chasov-louis-vuitton-model-c0223"
+          },
+          {
+            "legacy_id": "46561",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0864"
+          },
+          {
+            "legacy_id": "46562",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap1"
+          },
+          {
+            "legacy_id": "46563",
+            "handle": "kopiya-chasov-audemars-piguet-model-sap018"
+          },
+          {
+            "legacy_id": "46564",
+            "handle": "kopiya-chasov-audemars-piguet-model-c0863"
+          }
+        ]
+      }
+    }
+  ],
+  "dynamicAttributes": {
+    "storeMetadataKeys": [],
+    "legacyAttributeKeys": []
+  }
+}
