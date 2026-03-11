@@ -37,17 +37,14 @@ const plans = [
 
 const aboutMenu = [
   { label: "О нас", href: "/about" },
-  {
-    label: "О качестве копий",
-    href: "https://imidge.com.ua/news/stati/what-is-the-difference-between-originals-and-copies-hours/",
-  },
-  { label: "Наши преимущества", href: "https://imidge.com.ua/about/our-advantages/" },
-  { label: "Часы знаменитостей", href: "https://imidge.com.ua/celeb-clock/" },
-  { label: "Сотрудничество", href: "https://imidge.com.ua/about/cooperation-providers/" },
-  { label: "Доставка и оплата", href: "https://imidge.com.ua/delivery-payment/" },
-  { label: "Гарантия", href: "https://imidge.com.ua/guarantee/" },
-  { label: "Отзывы клиентов", href: "https://imidge.com.ua/about/client-reviews/" },
-  { label: "Контакты", href: "https://imidge.com.ua/about/contacts/" },
+  { label: "О качестве копий", href: "/blog" },
+  { label: "Наши преимущества", href: "/our-advantages" },
+  { label: "Часы знаменитостей", href: "/celeb-clock" },
+  { label: "Сотрудничество", href: "/cooperation-providers" },
+  { label: "Доставка и оплата", href: "/delivery-payment" },
+  { label: "Гарантия", href: "/guarantee" },
+  { label: "Отзывы клиентов", href: "/reviews" },
+  { label: "Контакты", href: "/contacts" },
 ];
 
 export default function AboutPage() {
@@ -134,7 +131,7 @@ export default function AboutPage() {
                 покупкой.
               </p>
               <p>
-                <a className="about-link" href="https://imidge.com.ua/about/client-reviews/">
+                <a className="about-link" href="/reviews">
                   Прочитать отзывы
                 </a>
               </p>
@@ -211,28 +208,44 @@ export default function AboutPage() {
 
             <div className="about-card">
               <h3>Реквизиты и график</h3>
-              <p>
-                ФЛП Бурба В.И., код ЕГРПОУ 208962223284331, Донецкая обл., г. Краматорск,
-                ул. Юбилейная, д. 17, кв. 66.
-              </p>
               <p>График работы: 9:00 до 19:00 (Пн.–Сб.).</p>
               <p>Гарантийная мастерская: Украина, Киев, ул. Парково-Сырецкая, 1.</p>
             </div>
 
             <div className="about-card">
               <h3>Мы в соцсетях</h3>
-              <p>
-                <a href="https://www.tiktok.com/@imidge.shop">Магазин Имидж в TikTok</a>
-              </p>
-              <p>
-                <a href="https://www.youtube.com/channel/UCv2ObgugaaZ4iUVH4VvhIsw">Магазин Имидж в YouTube</a>
-              </p>
-              <p>
-                <a href="https://t.me/+4rLfxsskbiU3Y2Ey">Следите за нашим каналом Telegram</a>
-              </p>
+              <div className="about-social-icons" aria-label="Ссылки на соцсети">
+                <a
+                  className="about-social-icon-btn"
+                  href="https://t.me/+4rLfxsskbiU3Y2Ey"
+                  aria-label="Telegram"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21.6 4.2a1 1 0 0 0-1-.1L3.4 11a1 1 0 0 0 .1 1.9l4.7 1.5 1.7 5.3a1 1 0 0 0 1.8.2l2.6-3.5 4.5 3.3a1 1 0 0 0 1.6-.6l2.2-13.8a1 1 0 0 0-.5-1.1Zm-3 2.3-8.3 7.7a1 1 0 0 0-.3.5l-.5 2.8-.8-2.4a1 1 0 0 0-.6-.6l-2.9-.9 13.4-5.1Z" />
+                  </svg>
+                </a>
+                <a
+                  className="about-social-icon-btn"
+                  href="https://www.tiktok.com/@imidge.shop"
+                  aria-label="TikTok"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M14.8 3h2.5c.2 1.9 1.3 3.3 3.2 3.5v2.6a6.4 6.4 0 0 1-3.2-1V14a5.6 5.6 0 1 1-5.6-5.6c.5 0 .9.1 1.3.2v2.9a2.7 2.7 0 1 0 1.8 2.5V3Z" />
+                  </svg>
+                </a>
+                <a
+                  className="about-social-icon-btn"
+                  href="https://www.youtube.com/channel/UCv2ObgugaaZ4iUVH4VvhIsw"
+                  aria-label="YouTube"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M23 12c0-2.3-.3-3.8-.6-4.7-.3-.8-.9-1.4-1.8-1.7C19.3 5 12 5 12 5s-7.3 0-8.6.6c-.9.3-1.5.9-1.8 1.7C1.3 8.2 1 9.7 1 12s.3 3.8.6 4.7c.3.8.9 1.4 1.8 1.7C4.7 19 12 19 12 19s7.3 0 8.6-.6c.9-.3 1.5-.9 1.8-1.7.3-.9.6-2.4.6-4.7Zm-13.1 3V9l5.2 3-5.2 3Z" />
+                  </svg>
+                </a>
+              </div>
               <p className="about-rating-note">
                 97% наших клиентов остались довольны —{" "}
-                <a href="https://imidge.com.ua/about/client-reviews/">Прочитать отзывы</a>
+                <a href="/reviews">Прочитать отзывы</a>
               </p>
             </div>
           </div>

@@ -1018,6 +1018,39 @@ textarea:focus-visible,
   color: var(--primary-accent);
 }
 
+.about-social-icons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+
+.about-social-icon-btn {
+  width: 110px;
+  height: 48px;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f2f2f2;
+  background: rgba(255, 255, 255, 0.01);
+  transition: border-color 0.25s ease, color 0.25s ease, background-color 0.25s ease;
+}
+
+.about-social-icon-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: currentcolor;
+}
+
+.about-social-icon-btn:hover {
+  border-color: rgba(182, 141, 106, 0.8);
+  color: var(--primary-accent);
+  background: rgba(182, 141, 106, 0.12);
+}
+
 .about-clients-block {
   margin-top: 10px;
   padding-top: 10px;
@@ -1067,6 +1100,186 @@ textarea:focus-visible,
   margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.info-page .about-sidebar-title,
+.info-page .about-title,
+.info-page .about-section-title {
+  font-family: inherit;
+}
+
+.info-page .about-sidebar-title {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.info-page .about-title {
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: 1.16;
+  letter-spacing: 0.1px;
+}
+
+.info-page .about-section-title {
+  font-size: clamp(21px, 2.1vw, 29px);
+  line-height: 1.28;
+  margin-top: 18px;
+}
+
+.info-page .about-content p,
+.info-page .about-content li {
+  font-size: 15px;
+  line-height: 1.68;
+}
+
+.info-page .about-kicker {
+  letter-spacing: 1.1px;
+  font-size: 11px;
+}
+
+.info-page-cooperation-providers .about-title {
+  font-family: inherit;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.18;
+}
+
+.info-page-cooperation-providers .about-section-title {
+  font-family: inherit;
+  font-size: 22px;
+  line-height: 1.3;
+  margin-top: 18px;
+}
+
+.info-page-cooperation-providers .about-content p,
+.info-page-cooperation-providers .about-content li {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.info-page-public-offer .about-content p,
+.info-page-public-offer .about-content li,
+.info-page-privacy-policy .about-content p,
+.info-page-privacy-policy .about-content li {
+  font-size: 14px;
+  line-height: 1.72;
+}
+
+.info-page-public-offer .about-section-title,
+.info-page-privacy-policy .about-section-title {
+  font-size: clamp(20px, 1.9vw, 26px);
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+.info-page-public-offer .about-content ul,
+.info-page-privacy-policy .about-content ul {
+  gap: 9px;
+}
+
+.info-page-public-offer .about-content li,
+.info-page-privacy-policy .about-content li {
+  padding-left: 18px;
+}
+
+.info-page-guarantee .about-content p,
+.info-page-return-repair .about-content p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.public-offer-list {
+  counter-reset: item;
+}
+
+.public-offer-list li {
+  line-height: 1.74;
+}
+
+.faq-accordion {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--line);
+  padding: 0;
+}
+
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  color: #d7d7d7;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 7px 2px;
+  line-height: 1.55;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-answer {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 14px;
+  margin: 2px 0 8px;
+}
+
+.faq-answer p {
+  margin: 0;
+}
+
+.guarantee-content .about-subhead {
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 1.35;
+  color: #f0e2d5;
+}
+
+.guarantee-ordered-list {
+  margin: 0 0 12px;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+}
+
+.guarantee-ordered-list li {
+  padding-left: 0;
+  color: #d5d5d5;
+  line-height: 1.68;
+}
+
+.guarantee-ordered-list li::before {
+  content: none;
+}
+
+.guarantee-table-wrap {
+  overflow-x: auto;
+  margin: 10px 0 12px;
+  border: 1px solid var(--line);
+}
+
+.guarantee-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.guarantee-table th,
+.guarantee-table td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d7d7d7;
+}
+
+.guarantee-table th {
+  color: #f0e2d5;
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 600;
 }
 
 @media (max-width: 1100px) {

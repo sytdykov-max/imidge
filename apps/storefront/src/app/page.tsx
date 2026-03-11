@@ -291,7 +291,7 @@ export default function Home() {
                 Только ограниченное время: премиальные модели Rolex в люкс качестве 1:1 с
                 доставкой по Украине и оплатой после осмотра.
               </p>
-              <a className="cta-btn" href="https://imidge.com.ua/ru/f-watches-rolex/">
+              <a className="cta-btn" href="/catalog?cat=Часы">
                 Смотреть коллекцию Rolex
               </a>
             </div>
@@ -300,19 +300,19 @@ export default function Home() {
 
         <section className="home-promo-links">
           <div className="container home-promo-grid">
-            <a className="home-promo-pill" href="https://imidge.com.ua/ru/f-sale/">
+            <a className="home-promo-pill" href="/catalog?sort=discount">
               Ликвидация старых коллекций
             </a>
             <a
               className="home-promo-pill"
-              href="https://imidge.com.ua/ru/f-1851-1852-1853-1890/"
+              href="/catalog?cat=Одежда"
             >
               Брендовая одежда 2026
             </a>
-            <a className="home-promo-pill" href="https://imidge.com.ua/ru/f-male-handbags/">
+            <a className="home-promo-pill" href="/catalog?cat=Сумки">
               Брендовые сумки 2026
             </a>
-            <a className="home-promo-pill" href="https://imidge.com.ua/ru/f-belts/">
+            <a className="home-promo-pill" href="/catalog?cat=Ремни">
               Брендовые ремни 2026
             </a>
           </div>
@@ -429,13 +429,13 @@ export default function Home() {
             <h2 className="section-title">Популярные бренды</h2>
             <div className="home-brands-grid">
               {brands.map((brand) => (
-                <a key={brand} className="home-brand-tile" href="https://imidge.com.ua/manufacturers/">
+                <a key={brand} className="home-brand-tile" href="/catalog">
                   {brand}
                 </a>
               ))}
             </div>
             <div className="home-brands-cta">
-              <a href="https://imidge.com.ua/manufacturers/">Все бренды</a>
+              <a href="/catalog">Все бренды</a>
             </div>
           </div>
         </section>
