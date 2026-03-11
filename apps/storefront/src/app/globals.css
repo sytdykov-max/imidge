@@ -2772,24 +2772,13 @@ textarea:focus-visible,
   color: #c8c8c8;
 }
 
-.account-track-btn {
-  min-height: 36px;
-  padding: 0 14px;
+.account-order-ttn a {
+  color: var(--primary-accent);
+  text-decoration: underline;
 }
 
-.account-track-state {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.16);
-}
-
-.account-track-state ul {
-  margin: 0;
-  padding-left: 18px;
-  display: grid;
-  gap: 4px;
-  font-size: 12px;
-  color: #c9c9c9;
+.account-order-ttn a:hover {
+  color: #f2cb6f;
 }
 
 .account-favorites-grid {
@@ -2847,19 +2836,48 @@ textarea:focus-visible,
 .account-address-card {
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.02);
-  padding: 12px;
+  padding: 10px 12px;
+}
+
+.account-address-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .account-address-card h4 {
   margin: 0;
   font-size: 13px;
+  color: var(--primary-accent);
+  font-weight: 600;
 }
 
 .account-address-card p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   font-size: 12px;
-  color: #c8c8c8;
+  color: #dfdfdf;
   line-height: 1.45;
+}
+
+.account-address-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  align-self: center;
+}
+
+.account-address-actions .account-btn {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 10px;
+}
+
+.account-address-form-box {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
 }
 
 .account-address-status {
@@ -3000,6 +3018,15 @@ textarea:focus-visible,
 
   .account-favorites-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .account-address-card-head {
+    flex-direction: column;
+  }
+
+  .account-address-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 

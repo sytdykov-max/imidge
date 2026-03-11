@@ -12,8 +12,15 @@ type DeliveryOption = {
 
 type AddressRecord = {
   id: string;
-  title: string;
-  summary: string;
+  areaRef: string;
+  areaName: string;
+  cityRef: string;
+  cityName: string;
+  warehouseRef: string;
+  warehouseName: string;
+  recipient: string;
+  phone: string;
+  isPriority: boolean;
 };
 
 type OrderItem = {
@@ -31,7 +38,6 @@ type OrderRecord = {
   statusText: string;
   totalText: string;
   ttn?: string;
-  trackingSteps: string[];
   items: OrderItem[];
 };
 
@@ -51,7 +57,6 @@ const ORDER_HISTORY: OrderRecord[] = [
     statusText: "Отправлен",
     totalText: "30 €",
     ttn: "20451099871234",
-    trackingSteps: ["Заказ создан", "Передан в службу доставки", "В пути в отделение"],
     items: [
       {
         id: "item-1",
@@ -68,7 +73,6 @@ const ORDER_HISTORY: OrderRecord[] = [
     dateText: "26.02.2026",
     statusText: "Завершён",
     totalText: "78 €",
-    trackingSteps: ["Заказ получен", "Оплата подтверждена", "Выдан клиенту"],
     items: [
       {
         id: "item-2",
@@ -119,7 +123,6 @@ const FAVORITES: FavoriteItem[] = [
 
 export function AccountPageClient() {
   const [activeTab, setActiveTab] = useState<AccountTab>("profile");
-  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(ORDER_HISTORY[0]?.id ?? null);
   const [areaOptions, setAreaOptions] = useState<DeliveryOption[]>([]);
   const [cityOptions, setCityOptions] = useState<DeliveryOption[]>([]);
   const [warehouseOptions, setWarehouseOptions] = useState<DeliveryOption[]>([]);
@@ -132,11 +135,31 @@ export function AccountPageClient() {
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [isLoadingWarehouses, setIsLoadingWarehouses] = useState(false);
   const [addressStatus, setAddressStatus] = useState("");
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [savedAddresses, setSavedAddresses] = useState<AddressRecord[]>([
     {
       id: "addr-1",
-      title: "Основной адрес",
-      summary: "Киевская область, Киев, Отделение №173 · Получатель: Павел Клиент",
+      areaRef: "",
+      areaName: "Киевская обл.",
+      cityRef: "",
+      cityName: "Киев",
+      warehouseRef: "",
+      warehouseName: "Отделение №12, ул. Крещатик, 10",
+      recipient: "Павел Клиент",
+      phone: "+380509939553",
+      isPriority: true,
+    },
+    {
+      id: "addr-2",
+      areaRef: "",
+      areaName: "Днепропетровская обл.",
+      cityRef: "",
+      cityName: "Днепр",
+      warehouseRef: "",
+      warehouseName: "Отделение №3, просп. Дмитрия Яворницкого, 81",
+      recipient: "Павел Клиент",
+      phone: "+380509939553",
+      isPriority: false,
     },
   ]);
 
@@ -272,22 +295,111 @@ export function AccountPageClient() {
     };
   }, [selectedCityRef]);
 
-  const handleAddAddress = () => {
+  const resetAddressForm = () => {
+    setSelectedAreaRef("");
+    setSelectedCityRef("");
+    setSelectedWarehouseRef("");
+    setCityOptions([]);
+    setWarehouseOptions([]);
+    setRecipient("");
+    setPhone("");
+    setEditingAddressId(null);
+  };
+
+  const handleSaveAddress = () => {
     if (!selectedAreaName || !selectedCityName || !selectedWarehouseName || !recipient.trim() || !phone.trim()) {
       setAddressStatus("Заполните все поля адреса перед добавлением.");
       return;
     }
 
+    if (editingAddressId) {
+      setSavedAddresses((current) =>
+        current.map((address) =>
+          address.id === editingAddressId
+            ? {
+                ...address,
+                areaRef: selectedAreaRef,
+                areaName: selectedAreaName,
+                cityRef: selectedCityRef,
+                cityName: selectedCityName,
+                warehouseRef: selectedWarehouseRef,
+                warehouseName: selectedWarehouseName,
+                recipient: recipient.trim(),
+                phone: phone.trim(),
+              }
+            : address
+        )
+      );
+      setAddressStatus("Адрес обновлён.");
+      resetAddressForm();
+      return;
+    }
+
+    const hasPriority = savedAddresses.some((address) => address.isPriority);
     const nextAddress: AddressRecord = {
       id: `addr-${Date.now()}`,
-      title: `Адрес ${savedAddresses.length + 1}`,
-      summary: `${selectedAreaName}, ${selectedCityName}, ${selectedWarehouseName} · Получатель: ${recipient.trim()}`,
+      areaRef: selectedAreaRef,
+      areaName: selectedAreaName,
+      cityRef: selectedCityRef,
+      cityName: selectedCityName,
+      warehouseRef: selectedWarehouseRef,
+      warehouseName: selectedWarehouseName,
+      recipient: recipient.trim(),
+      phone: phone.trim(),
+      isPriority: !hasPriority,
     };
 
     setSavedAddresses((current) => [nextAddress, ...current]);
     setAddressStatus("Адрес добавлен.");
-    setRecipient("");
-    setPhone("");
+    resetAddressForm();
+  };
+
+  const handleSetPriority = (addressId: string) => {
+    setSavedAddresses((current) => {
+      const updated = current.map((address) => ({
+        ...address,
+        isPriority: address.id === addressId,
+      }));
+
+      return [...updated].sort((first, second) => Number(second.isPriority) - Number(first.isPriority));
+    });
+    setAddressStatus("Приоритетный адрес обновлён.");
+  };
+
+  const handleDeleteAddress = (addressId: string) => {
+    setSavedAddresses((current) => {
+      const filtered = current.filter((address) => address.id !== addressId);
+      if (filtered.length === 0) {
+        return filtered;
+      }
+
+      if (filtered.some((address) => address.isPriority)) {
+        return filtered;
+      }
+
+      const [firstAddress, ...rest] = filtered;
+      return [{ ...firstAddress, isPriority: true }, ...rest];
+    });
+
+    if (editingAddressId === addressId) {
+      resetAddressForm();
+    }
+
+    setAddressStatus("Адрес удалён.");
+  };
+
+  const handleEditAddress = (address: AddressRecord) => {
+    setEditingAddressId(address.id);
+    setSelectedAreaRef(address.areaRef);
+    setSelectedCityRef(address.cityRef);
+    setSelectedWarehouseRef(address.warehouseRef);
+    setRecipient(address.recipient);
+    setPhone(address.phone);
+    setAddressStatus(
+      address.areaRef && address.cityRef && address.warehouseRef
+        ? "Режим редактирования адреса."
+        : "Режим редактирования: выберите область, населённый пункт и отделение из списков."
+    );
   };
 
   return (
@@ -345,7 +457,6 @@ export function AccountPageClient() {
               <div>
                 <h2 className="account-section-title">Заказы</h2>
                 {ORDER_HISTORY.map((order) => {
-                  const expanded = expandedOrderId === order.id;
                   return (
                     <article key={order.id} className="account-order-card">
                       <div className="account-order-head">
@@ -367,25 +478,21 @@ export function AccountPageClient() {
                       </div>
 
                       <div className="account-order-meta">
-                        <p className="account-order-ttn">ТТН: <strong>{order.ttn ?? "—"}</strong></p>
-                        <button
-                          type="button"
-                          className="account-btn account-track-btn"
-                          onClick={() => setExpandedOrderId(expanded ? null : order.id)}
-                        >
-                          {expanded ? "Скрыть трекинг" : "Показать трекинг"}
-                        </button>
+                        <p className="account-order-ttn">
+                          ТТН:{" "}
+                          {order.ttn ? (
+                            <a
+                              href={`https://novaposhta.ua/tracking/?cargo_number=${encodeURIComponent(order.ttn)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {order.ttn}
+                            </a>
+                          ) : (
+                            <strong>—</strong>
+                          )}
+                        </p>
                       </div>
-
-                      {expanded && (
-                        <div className="account-track-state">
-                          <ul>
-                            {order.trackingSteps.map((step) => (
-                              <li key={`${order.id}-${step}`}>{step}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
                     </article>
                   );
                 })}
@@ -421,64 +528,95 @@ export function AccountPageClient() {
                 <div className="account-address-list">
                   {savedAddresses.map((address) => (
                     <article key={address.id} className="account-address-card">
-                      <h4>{address.title}</h4>
-                      <p>{address.summary}</p>
+                      <div className="account-address-card-head">
+                        <div>
+                          <h4>{address.isPriority ? "Приоритетный адрес" : "Дополнительный адрес"}</h4>
+                          <p>
+                            {address.areaName}, {address.cityName}, {address.warehouseName}
+                          </p>
+                          <p>
+                            Получатель: {address.recipient} · {address.phone}
+                          </p>
+                        </div>
+                        <div className="account-address-actions">
+                          {!address.isPriority && (
+                            <button type="button" className="account-btn" onClick={() => handleSetPriority(address.id)}>
+                              Сделать приоритетным
+                            </button>
+                          )}
+                          <button type="button" className="account-btn" onClick={() => handleEditAddress(address)}>
+                            Редактировать
+                          </button>
+                          <button type="button" className="account-btn" onClick={() => handleDeleteAddress(address.id)}>
+                            Удалить
+                          </button>
+                        </div>
+                      </div>
                     </article>
                   ))}
                 </div>
 
-                <div className="account-grid-2">
-                  <label className="account-field">
-                    <span>Область</span>
-                    <select value={selectedAreaRef} onChange={(event) => setSelectedAreaRef(event.target.value)} disabled={isLoadingAreas}>
-                      <option value="">{isLoadingAreas ? "Загрузка областей..." : "Выберите область"}</option>
-                      {areaOptions.map((area) => (
-                        <option key={area.ref} value={area.ref}>{area.name}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="account-field">
-                    <span>Населенный пункт</span>
-                    <select value={selectedCityRef} onChange={(event) => setSelectedCityRef(event.target.value)} disabled={!selectedAreaRef || isLoadingCities}>
-                      <option value="">
-                        {!selectedAreaRef
-                          ? "Сначала выберите область"
-                          : isLoadingCities
-                            ? "Загрузка населённых пунктов..."
-                            : "Выберите населённый пункт"}
-                      </option>
-                      {cityOptions.map((city) => (
-                        <option key={city.ref} value={city.ref}>{city.name}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="account-field account-span-2">
-                    <span>Отделение Новой почты</span>
-                    <select value={selectedWarehouseRef} onChange={(event) => setSelectedWarehouseRef(event.target.value)} disabled={!selectedCityRef || isLoadingWarehouses}>
-                      <option value="">
-                        {!selectedCityRef
-                          ? "Сначала выберите населённый пункт"
-                          : isLoadingWarehouses
-                            ? "Загрузка отделений..."
-                            : "Выберите отделение"}
-                      </option>
-                      {warehouseOptions.map((warehouse) => (
-                        <option key={warehouse.ref} value={warehouse.ref}>{warehouse.name}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="account-field">
-                    <span>Получатель</span>
-                    <input value={recipient} onChange={(event) => setRecipient(event.target.value)} placeholder="ФИО" />
-                  </label>
-                  <label className="account-field">
-                    <span>Телефон</span>
-                    <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+380..." />
-                  </label>
-                </div>
+                <div className="account-address-form-box">
+                  <div className="account-grid-2">
+                    <label className="account-field">
+                      <span>Область</span>
+                      <select value={selectedAreaRef} onChange={(event) => setSelectedAreaRef(event.target.value)} disabled={isLoadingAreas}>
+                        <option value="">{isLoadingAreas ? "Загрузка областей..." : "Выберите область"}</option>
+                        {areaOptions.map((area) => (
+                          <option key={area.ref} value={area.ref}>{area.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="account-field">
+                      <span>Населенный пункт</span>
+                      <select value={selectedCityRef} onChange={(event) => setSelectedCityRef(event.target.value)} disabled={!selectedAreaRef || isLoadingCities}>
+                        <option value="">
+                          {!selectedAreaRef
+                            ? "Сначала выберите область"
+                            : isLoadingCities
+                              ? "Загрузка населённых пунктов..."
+                              : "Выберите населённый пункт"}
+                        </option>
+                        {cityOptions.map((city) => (
+                          <option key={city.ref} value={city.ref}>{city.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="account-field account-span-2">
+                      <span>Отделение Новой почты</span>
+                      <select value={selectedWarehouseRef} onChange={(event) => setSelectedWarehouseRef(event.target.value)} disabled={!selectedCityRef || isLoadingWarehouses}>
+                        <option value="">
+                          {!selectedCityRef
+                            ? "Сначала выберите населённый пункт"
+                            : isLoadingWarehouses
+                              ? "Загрузка отделений..."
+                              : "Выберите отделение"}
+                        </option>
+                        {warehouseOptions.map((warehouse) => (
+                          <option key={warehouse.ref} value={warehouse.ref}>{warehouse.name}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="account-field">
+                      <span>Получатель</span>
+                      <input value={recipient} onChange={(event) => setRecipient(event.target.value)} placeholder="ФИО" />
+                    </label>
+                    <label className="account-field">
+                      <span>Телефон</span>
+                      <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+380..." />
+                    </label>
+                  </div>
 
-                <div className="account-actions-row">
-                  <button type="button" className="account-btn primary" onClick={handleAddAddress}>Добавить адрес</button>
+                  <div className="account-actions-row">
+                    <button type="button" className="account-btn primary" onClick={handleSaveAddress}>
+                      {editingAddressId ? "Сохранить адрес" : "Добавить адрес"}
+                    </button>
+                    {editingAddressId && (
+                      <button type="button" className="account-btn" onClick={resetAddressForm}>
+                        Отменить
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <p className="account-address-status" aria-live="polite">{addressStatus}</p>
               </div>
