@@ -13,6 +13,7 @@ type Props = {
   wishlistItem: {
     handle: string;
     title: string;
+    brand?: string;
     thumbnail?: string | null;
     priceText?: string;
   };

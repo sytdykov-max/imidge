@@ -1,6 +1,7 @@
 export type WishlistItem = {
   handle: string;
   title: string;
+  brand?: string;
   thumbnail?: string | null;
   priceText?: string;
 };
@@ -66,6 +67,7 @@ export function getWishlistItems(): WishlistItem[] {
       normalized.push({
         handle,
         title,
+        brand: typeof maybeItem.brand === "string" ? maybeItem.brand : undefined,
         thumbnail: typeof maybeItem.thumbnail === "string" ? maybeItem.thumbnail : null,
         priceText: typeof maybeItem.priceText === "string" ? maybeItem.priceText : undefined,
       });
@@ -101,6 +103,44 @@ export function addToWishlist(item: WishlistItem) {
   }
 
   saveWishlistItems([item, ...current]);
+  return true;
+}
+
+export function syncWishlistItemData(item: WishlistItem) {
+  const current = getWishlistItems();
+  const needle = normalizeHandle(item.handle);
+  let changed = false;
+
+  const next = current.map((entry) => {
+    if (normalizeHandle(entry.handle) !== needle) {
+      return entry;
+    }
+
+    const merged: WishlistItem = {
+      ...entry,
+      title: item.title || entry.title,
+      brand: item.brand || entry.brand,
+      thumbnail: item.thumbnail || entry.thumbnail,
+      priceText: item.priceText || entry.priceText,
+    };
+
+    if (
+      merged.title !== entry.title ||
+      merged.brand !== entry.brand ||
+      merged.thumbnail !== entry.thumbnail ||
+      merged.priceText !== entry.priceText
+    ) {
+      changed = true;
+    }
+
+    return merged;
+  });
+
+  if (!changed) {
+    return false;
+  }
+
+  saveWishlistItems(next);
   return true;
 }
 

@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   clearCurrentCart,
   deleteCartLineItem,
   updateCartLineItemQuantity,
 } from "@/lib/medusa-browser";
+import { DEFAULT_ACCOUNT_PROFILE } from "@/lib/account-profile";
 import { useCartStore } from "@/components/cart-store-provider";
 import { useToast } from "@/components/toast-provider";
 
@@ -32,6 +34,72 @@ type DeliveryOption = {
   ref: string;
   name: string;
 };
+
+function normalizeLocationLabel(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/["'`’]/g, "")
+    .replace(/\b(область|обл\.?|обл)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findDeliveryOptionByCandidate(options: DeliveryOption[], candidate: string | null) {
+  if (!candidate) {
+    return null;
+  }
+
+  const normalizedCandidate = normalizeLocationLabel(candidate);
+
+  return (
+    options.find((option) => option.ref === candidate) ??
+    options.find((option) => option.name.toLowerCase() === candidate.toLowerCase()) ??
+    options.find((option) => normalizeLocationLabel(option.name) === normalizedCandidate) ??
+    options.find((option) => {
+      const normalizedName = normalizeLocationLabel(option.name);
+      return normalizedName.includes(normalizedCandidate) || normalizedCandidate.includes(normalizedName);
+    }) ??
+    null
+  );
+}
+
+function mergeDeliveryOptions(primary: DeliveryOption[], fallback: DeliveryOption[]) {
+  const merged: DeliveryOption[] = [];
+  const seenKeys = new Set<string>();
+
+  for (const option of [...primary, ...fallback]) {
+    const key = `${normalizeLocationLabel(option.name)}|${option.ref}`;
+    if (seenKeys.has(key)) {
+      continue;
+    }
+
+    seenKeys.add(key);
+    merged.push(option);
+  }
+
+  return merged;
+}
+
+function ensureDeliveryOption(options: DeliveryOption[], refCandidate: string | null, nameCandidate: string | null) {
+  const ref = (refCandidate || "").trim();
+  const name = (nameCandidate || "").trim();
+
+  if (!ref && !name) {
+    return options;
+  }
+
+  const existing = options.find(
+    (option) =>
+      (!!ref && option.ref === ref) ||
+      (!!name && normalizeLocationLabel(option.name) === normalizeLocationLabel(name))
+  );
+
+  if (existing) {
+    return options;
+  }
+
+  return [...options, { ref: ref || name, name: name || ref }];
+}
 
 const FALLBACK_DELIVERY_REGIONS = [
   {
@@ -98,6 +166,8 @@ type CartPageClientProps = {
 
 export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) {
   const { cart, loading, refreshCart, setCartSnapshot } = useCartStore();
+  const router = useRouter();
+  const didInitialRefresh = useRef(false);
   const [busyItemId, setBusyItemId] = useState<string | null>(null);
   const [activeClientTab, setActiveClientTab] = useState<"new" | "registered">("new");
   const [isNovaApiAvailable, setIsNovaApiAvailable] = useState<boolean | null>(null);
@@ -110,13 +180,54 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
   const [selectedRegion, setSelectedRegion] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [pendingPrefillRegion, setPendingPrefillRegion] = useState<string | null>(null);
+  const [pendingPrefillCity, setPendingPrefillCity] = useState<string | null>(null);
+  const [pendingPrefillWarehouse, setPendingPrefillWarehouse] = useState<string | null>(null);
+  const [checkoutFullName, setCheckoutFullName] = useState("");
+  const [checkoutPhone, setCheckoutPhone] = useState("");
+  const [checkoutTelegram, setCheckoutTelegram] = useState("");
+  const [checkoutDeliveryMethod, setCheckoutDeliveryMethod] = useState("nova_poshta");
+  const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState("cod");
+  const [checkoutComment, setCheckoutComment] = useState("");
+  const [registeredLogin, setRegisteredLogin] = useState("");
+  const [registeredPassword, setRegisteredPassword] = useState("");
+  const [registeredStatus, setRegisteredStatus] = useState("");
+  const [isRegisteredAuthLoading, setIsRegisteredAuthLoading] = useState(false);
+  const [isRegisteredAuthenticated, setIsRegisteredAuthenticated] = useState(false);
+  const [isAddressPrefilledFromProfile, setIsAddressPrefilledFromProfile] = useState(false);
   const { notify } = useToast();
 
   useEffect(() => {
+    if (didInitialRefresh.current) {
+      return;
+    }
+
+    didInitialRefresh.current = true;
     refreshCart().catch(() => null);
   }, [refreshCart]);
 
+  useEffect(() => {
+    setCheckoutFullName(DEFAULT_ACCOUNT_PROFILE.fullName);
+    setCheckoutPhone(DEFAULT_ACCOUNT_PROFILE.phone);
+    setCheckoutTelegram(DEFAULT_ACCOUNT_PROFILE.telegram);
+    setCheckoutDeliveryMethod(DEFAULT_ACCOUNT_PROFILE.preferredDeliveryMethod);
+    setCheckoutPaymentMethod(DEFAULT_ACCOUNT_PROFILE.preferredPaymentMethod);
+  }, []);
+
   const items = useMemo<CartItem[]>(() => (cart?.items ?? []) as CartItem[], [cart]);
+
+  const warehouseSelectOptions = useMemo<DeliveryOption[]>(() => {
+    if (!selectedWarehouse) {
+      return warehouseOptions;
+    }
+
+    const hasSelectedWarehouseOption = warehouseOptions.some((warehouse) => warehouse.ref === selectedWarehouse);
+    if (hasSelectedWarehouseOption) {
+      return warehouseOptions;
+    }
+
+    return [{ ref: selectedWarehouse, name: selectedWarehouse }, ...warehouseOptions];
+  }, [selectedWarehouse, warehouseOptions]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -138,7 +249,7 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
         const payload = (await response.json()) as { areas?: DeliveryOption[] };
         const areas = payload.areas ?? [];
         if (!isCancelled) {
-          setAreaOptions(areas.length > 0 ? areas : fallbackAreas);
+          setAreaOptions(mergeDeliveryOptions(areas, fallbackAreas));
           setIsNovaApiAvailable(areas.length > 0);
         }
       } catch {
@@ -161,10 +272,26 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
   }, []);
 
   useEffect(() => {
-    setSelectedCity("");
-    setSelectedWarehouse("");
-    setCityOptions([]);
-    setWarehouseOptions([]);
+    const prefillCityOption = pendingPrefillCity
+      ? [{ ref: pendingPrefillCity, name: pendingPrefillCity }]
+      : [];
+    const prefillWarehouseOption = pendingPrefillWarehouse
+      ? [{ ref: pendingPrefillWarehouse, name: pendingPrefillWarehouse }]
+      : [];
+
+    if (pendingPrefillCity) {
+      setSelectedCity((current) => current || pendingPrefillCity);
+      setCityOptions(prefillCityOption);
+    } else if (!selectedCity) {
+      setCityOptions([]);
+    }
+
+    if (pendingPrefillWarehouse) {
+      setSelectedWarehouse((current) => current || pendingPrefillWarehouse);
+      setWarehouseOptions((current) => mergeDeliveryOptions(current, prefillWarehouseOption));
+    } else if (!selectedWarehouse) {
+      setWarehouseOptions([]);
+    }
 
     if (!selectedRegion) {
       return;
@@ -181,12 +308,16 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
       name: city.name,
     }));
 
+    const fallbackCitiesWithPrefill = pendingPrefillCity
+      ? mergeDeliveryOptions(fallbackCities, [{ ref: pendingPrefillCity, name: pendingPrefillCity }])
+      : fallbackCities;
+
     const loadCities = async () => {
       setIsLoadingCities(true);
 
       if (isNovaApiAvailable !== true) {
         if (!isCancelled) {
-          setCityOptions(fallbackCities);
+          setCityOptions(fallbackCitiesWithPrefill);
           setIsLoadingCities(false);
         }
         return;
@@ -201,11 +332,11 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
         const payload = (await response.json()) as { cities?: DeliveryOption[] };
         const cities = payload.cities ?? [];
         if (!isCancelled) {
-          setCityOptions(cities.length > 0 ? cities : fallbackCities);
+          setCityOptions(mergeDeliveryOptions(cities, fallbackCitiesWithPrefill));
         }
       } catch {
         if (!isCancelled) {
-          setCityOptions(fallbackCities);
+          setCityOptions(fallbackCitiesWithPrefill);
         }
       } finally {
         if (!isCancelled) {
@@ -219,11 +350,19 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
     return () => {
       isCancelled = true;
     };
-  }, [areaOptions, isNovaApiAvailable, selectedRegion]);
+  }, [areaOptions, isNovaApiAvailable, selectedCity, selectedRegion, selectedWarehouse]);
 
   useEffect(() => {
-    setSelectedWarehouse("");
-    setWarehouseOptions([]);
+    const prefillWarehouseOption = pendingPrefillWarehouse
+      ? [{ ref: pendingPrefillWarehouse, name: pendingPrefillWarehouse }]
+      : [];
+
+    if (pendingPrefillWarehouse) {
+      setSelectedWarehouse((current) => current || pendingPrefillWarehouse);
+      setWarehouseOptions((current) => mergeDeliveryOptions(current, prefillWarehouseOption));
+    } else if (!selectedWarehouse) {
+      setWarehouseOptions([]);
+    }
 
     if (!selectedRegion || !selectedCity) {
       return;
@@ -243,12 +382,16 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
       name: warehouse,
     }));
 
+    const fallbackWarehousesWithPrefill = pendingPrefillWarehouse
+      ? mergeDeliveryOptions(fallbackWarehouses, [{ ref: pendingPrefillWarehouse, name: pendingPrefillWarehouse }])
+      : fallbackWarehouses;
+
     const loadWarehouses = async () => {
       setIsLoadingWarehouses(true);
 
       if (isNovaApiAvailable !== true) {
         if (!isCancelled) {
-          setWarehouseOptions(fallbackWarehouses);
+          setWarehouseOptions(fallbackWarehousesWithPrefill);
           setIsLoadingWarehouses(false);
         }
         return;
@@ -263,11 +406,11 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
         const payload = (await response.json()) as { warehouses?: DeliveryOption[] };
         const warehouses = payload.warehouses ?? [];
         if (!isCancelled) {
-          setWarehouseOptions(warehouses.length > 0 ? warehouses : fallbackWarehouses);
+          setWarehouseOptions(mergeDeliveryOptions(warehouses, fallbackWarehousesWithPrefill));
         }
       } catch {
         if (!isCancelled) {
-          setWarehouseOptions(fallbackWarehouses);
+          setWarehouseOptions(fallbackWarehousesWithPrefill);
         }
       } finally {
         if (!isCancelled) {
@@ -281,7 +424,52 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
     return () => {
       isCancelled = true;
     };
-  }, [areaOptions, cityOptions, isNovaApiAvailable, selectedCity, selectedRegion]);
+  }, [areaOptions, cityOptions, isNovaApiAvailable, selectedCity, selectedRegion, selectedWarehouse]);
+
+  useEffect(() => {
+    if (!pendingPrefillRegion || areaOptions.length === 0) {
+      return;
+    }
+
+    const matchedRegion = findDeliveryOptionByCandidate(areaOptions, pendingPrefillRegion);
+
+    if (!matchedRegion) {
+      return;
+    }
+
+    setSelectedRegion(matchedRegion.ref);
+    setPendingPrefillRegion(null);
+  }, [areaOptions, pendingPrefillRegion]);
+
+  useEffect(() => {
+    if (!pendingPrefillCity || cityOptions.length === 0) {
+      return;
+    }
+
+    const matchedCity = findDeliveryOptionByCandidate(cityOptions, pendingPrefillCity);
+
+    if (!matchedCity) {
+      return;
+    }
+
+    setSelectedCity(matchedCity.ref);
+    setPendingPrefillCity(null);
+  }, [cityOptions, pendingPrefillCity]);
+
+  useEffect(() => {
+    if (!pendingPrefillWarehouse || warehouseOptions.length === 0) {
+      return;
+    }
+
+    const matchedWarehouse = findDeliveryOptionByCandidate(warehouseOptions, pendingPrefillWarehouse);
+
+    if (!matchedWarehouse) {
+      return;
+    }
+
+    setSelectedWarehouse(matchedWarehouse.ref);
+    setPendingPrefillWarehouse(null);
+  }, [pendingPrefillWarehouse, warehouseOptions]);
 
   const onChangeQuantity = async (item: CartItem, nextQty: number) => {
     if (nextQty < 1 || busyItemId) {
@@ -356,6 +544,203 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
     } finally {
       setBusyItemId(null);
     }
+  };
+
+  const onRegisteredLogin = async () => {
+    if (!registeredLogin.trim() || !registeredPassword.trim()) {
+      setRegisteredStatus("Введите логин и пароль.");
+      return;
+    }
+
+    setIsRegisteredAuthLoading(true);
+    setRegisteredStatus("Проверяем данные...");
+
+    try {
+      const response = await fetch("/api/account/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          login: registeredLogin,
+          password: registeredPassword,
+        }),
+      });
+
+      const payload = (await response.json()) as {
+        message?: string;
+        profile?: {
+          fullName?: string;
+          phone?: string;
+          email?: string;
+          telegram?: string;
+          comment?: string;
+          preferredDeliveryMethod?: string;
+          preferredPaymentMethod?: string;
+        };
+        priorityAddress?: {
+          areaRef?: string;
+          areaName?: string;
+          cityRef?: string;
+          cityName?: string;
+          warehouseRef?: string;
+          warehouseName?: string;
+          recipient?: string;
+          phone?: string;
+        } | null;
+      };
+
+      if (!response.ok || !payload.profile) {
+        setIsRegisteredAuthenticated(false);
+        setIsAddressPrefilledFromProfile(false);
+        setRegisteredStatus(payload.message || "Не удалось войти в аккаунт.");
+        return;
+      }
+
+      const profile = payload.profile;
+      setCheckoutFullName(profile.fullName ?? "");
+      setCheckoutPhone(profile.phone ?? "");
+      setCheckoutTelegram(profile.telegram ?? "");
+      setCheckoutComment(profile.comment ?? "");
+      setCheckoutDeliveryMethod(profile.preferredDeliveryMethod === "courier" ? "courier" : "nova_poshta");
+      setCheckoutPaymentMethod(profile.preferredPaymentMethod === "card" ? "card" : "cod");
+
+      if (payload.priorityAddress) {
+        const priorityAddress = payload.priorityAddress;
+        const regionCandidate = priorityAddress.areaRef || priorityAddress.areaName || null;
+        const matchedRegion = findDeliveryOptionByCandidate(areaOptions, regionCandidate);
+
+        setAreaOptions((current) =>
+          ensureDeliveryOption(current, priorityAddress.areaRef || null, priorityAddress.areaName || null)
+        );
+        setCityOptions((current) =>
+          ensureDeliveryOption(current, priorityAddress.cityRef || null, priorityAddress.cityName || null)
+        );
+        setWarehouseOptions((current) =>
+          ensureDeliveryOption(current, priorityAddress.warehouseRef || null, priorityAddress.warehouseName || null)
+        );
+
+        if (matchedRegion) {
+          setSelectedRegion(matchedRegion.ref);
+        } else {
+          setPendingPrefillRegion(regionCandidate);
+          setSelectedRegion(priorityAddress.areaRef || priorityAddress.areaName || "");
+        }
+
+        setPendingPrefillCity(priorityAddress.cityRef || priorityAddress.cityName || null);
+        setPendingPrefillWarehouse(priorityAddress.warehouseName || priorityAddress.warehouseRef || null);
+        setSelectedCity(priorityAddress.cityRef || priorityAddress.cityName || "");
+        setSelectedWarehouse(priorityAddress.warehouseName || priorityAddress.warehouseRef || "");
+
+        if (priorityAddress.recipient) {
+          setCheckoutFullName(priorityAddress.recipient);
+        }
+
+        if (priorityAddress.phone) {
+          setCheckoutPhone(priorityAddress.phone);
+        }
+
+        setIsAddressPrefilledFromProfile(true);
+      } else {
+        setIsAddressPrefilledFromProfile(false);
+      }
+
+      setRegisteredStatus("Данные профиля и приоритетный адрес загружены. Можно продолжать оформление.");
+      setRegisteredPassword("");
+      setIsRegisteredAuthenticated(true);
+      notify({ type: "success", message: "Вход выполнен. Поля автозаполнены из профиля." });
+    } catch {
+      setIsRegisteredAuthenticated(false);
+      setIsAddressPrefilledFromProfile(false);
+      setRegisteredStatus("Не удалось войти. Проверьте соединение и повторите попытку.");
+    } finally {
+      setIsRegisteredAuthLoading(false);
+    }
+  };
+
+  const onPlaceOrder = async () => {
+    if (!checkoutFullName.trim() || !checkoutPhone.trim()) {
+      notify({
+        type: "warning",
+        message: "Заполните ФИО и телефон перед оформлением заказа.",
+      });
+      return;
+    }
+
+    if (!selectedRegion || !selectedCity || !selectedWarehouse) {
+      notify({
+        type: "warning",
+        message: "Выберите область, населённый пункт и отделение Новой почты.",
+      });
+      return;
+    }
+
+    if (!items.length) {
+      notify({
+        type: "warning",
+        message: "Корзина пуста. Добавьте товары перед оформлением.",
+      });
+      return;
+    }
+
+    const now = new Date();
+    const datePart = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+    const randomPart = String(Math.floor(1000 + Math.random() * 9000));
+    const orderId = `IM-${datePart}-${randomPart}`;
+
+    try {
+      const selectedRegionName = areaOptions.find((region) => region.ref === selectedRegion)?.name ?? selectedRegion;
+      const selectedCityName = cityOptions.find((city) => city.ref === selectedCity)?.name ?? selectedCity;
+      const selectedWarehouseName =
+        warehouseSelectOptions.find((warehouse) => warehouse.ref === selectedWarehouse)?.name ?? selectedWarehouse;
+
+      localStorage.setItem("imidgeLastOrderId", orderId);
+      localStorage.setItem(
+        "imidgeLastOrderSummary",
+        JSON.stringify({
+          orderId,
+          createdAt: now.toISOString(),
+          customer: {
+            fullName: checkoutFullName,
+            phone: checkoutPhone,
+            telegram: checkoutTelegram,
+            comment: checkoutComment,
+          },
+          deliveryAddress: {
+            region: selectedRegionName,
+            city: selectedCityName,
+            warehouse: selectedWarehouseName,
+          },
+          deliveryMethod: checkoutDeliveryMethod,
+          paymentMethod: checkoutPaymentMethod,
+          subtotal: cart?.subtotal ?? 0,
+          total: cart?.total ?? cart?.subtotal ?? 0,
+          items: items.map((item) => ({
+            id: item.id,
+            title: item.title,
+            quantity: item.quantity,
+            total: item.total ?? item.subtotal ?? (item.unit_price ?? 0) * item.quantity,
+          })),
+        })
+      );
+    } catch {
+      // ignore storage errors
+    }
+
+    try {
+      const clearedCart = await clearCurrentCart();
+      setCartSnapshot(clearedCart as Cart | null);
+    } catch {
+      setCartSnapshot(null);
+    }
+
+    notify({
+      type: "success",
+      message: "Заказ принят. Перенаправляем на страницу подтверждения.",
+      durationMs: 2500,
+    });
+
+    router.push(`/thank-you?orderId=${encodeURIComponent(orderId)}${isCartRedesign ? "&v2=1" : ""}`);
   };
 
   return (
@@ -545,31 +930,62 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
                   </button>
                 </div>
 
-                {activeClientTab === "new" ? (
+                {activeClientTab === "new" || (activeClientTab === "registered" && isRegisteredAuthenticated) ? (
                   <form className="cart-v2-auth-form cart-v2-new-form" aria-label="Новый клиент" onSubmit={(event) => event.preventDefault()}>
                     <div className="cart-v2-new-grid">
                       <div>
                         <label className="cart-v2-field-label" htmlFor="cartFullName">ФИО *</label>
-                        <input id="cartFullName" className="field" placeholder="Иванов Иван Иванович" autoComplete="name" />
+                        <input
+                          id="cartFullName"
+                          className="field"
+                          placeholder="Иванов Иван Иванович"
+                          autoComplete="name"
+                          value={checkoutFullName}
+                          onChange={(event) => setCheckoutFullName(event.target.value)}
+                        />
                       </div>
                       <div>
                         <label className="cart-v2-field-label" htmlFor="cartNewPhone">Телефон *</label>
-                        <input id="cartNewPhone" className="field" placeholder="+380 XX XXX XX XX" autoComplete="tel" />
+                        <input
+                          id="cartNewPhone"
+                          className="field"
+                          placeholder="+380 XX XXX XX XX"
+                          autoComplete="tel"
+                          value={checkoutPhone}
+                          onChange={(event) => setCheckoutPhone(event.target.value)}
+                        />
                       </div>
                       <div>
                         <label className="cart-v2-field-label" htmlFor="cartTelegram">Телеграм</label>
-                        <input id="cartTelegram" className="field" placeholder="@username" autoComplete="off" />
+                        <input
+                          id="cartTelegram"
+                          className="field"
+                          placeholder="@username"
+                          autoComplete="off"
+                          value={checkoutTelegram}
+                          onChange={(event) => setCheckoutTelegram(event.target.value)}
+                        />
                       </div>
                       <div>
                         <label className="cart-v2-field-label" htmlFor="cartDeliveryMethod">Способ доставки *</label>
-                        <select id="cartDeliveryMethod" className="field" defaultValue="nova_poshta">
+                        <select
+                          id="cartDeliveryMethod"
+                          className="field"
+                          value={checkoutDeliveryMethod}
+                          onChange={(event) => setCheckoutDeliveryMethod(event.target.value)}
+                        >
                           <option value="nova_poshta">Новая почта</option>
                           <option value="courier">Курьер</option>
                         </select>
                       </div>
                       <div>
                         <label className="cart-v2-field-label" htmlFor="cartPaymentMethod">Способ оплаты *</label>
-                        <select id="cartPaymentMethod" className="field" defaultValue="cod">
+                        <select
+                          id="cartPaymentMethod"
+                          className="field"
+                          value={checkoutPaymentMethod}
+                          onChange={(event) => setCheckoutPaymentMethod(event.target.value)}
+                        >
                           <option value="cod">Наложенный платеж</option>
                           <option value="card">Оплата картой</option>
                         </select>
@@ -578,6 +994,9 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
 
                     <fieldset className="cart-v2-address-block">
                       <legend>Адрес доставки</legend>
+                      {activeClientTab === "registered" && isAddressPrefilledFromProfile && (
+                        <p className="cart-v2-field-hint">Адрес подставлен из профиля.</p>
+                      )}
                       <div className="cart-v2-new-grid">
                         <div>
                           <label className="cart-v2-field-label" htmlFor="cartRegion">Область *</label>
@@ -639,7 +1058,7 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
                                   ? "Загрузка отделений..."
                                   : "Выберите отделение"}
                             </option>
-                            {warehouseOptions.map((warehouse) => (
+                            {warehouseSelectOptions.map((warehouse) => (
                               <option key={warehouse.ref} value={warehouse.ref}>
                                 {warehouse.name}
                               </option>
@@ -658,23 +1077,51 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
 
                     <div className="cart-v2-new-span2">
                       <label className="cart-v2-field-label" htmlFor="cartComment">Комментарий</label>
-                      <textarea id="cartComment" className="field cart-v2-comment" placeholder="Удобное время звонка" />
+                      <textarea
+                        id="cartComment"
+                        className="field cart-v2-comment"
+                        placeholder="Удобное время звонка"
+                        value={checkoutComment}
+                        onChange={(event) => setCheckoutComment(event.target.value)}
+                      />
                     </div>
 
-                    <Link href="/checkout?v2=1" className="catalog-btn-v2 primary cart-v2-primary-btn">
+                    <button type="button" className="catalog-btn-v2 primary cart-v2-primary-btn" onClick={onPlaceOrder}>
                       Оформить заказ
-                    </Link>
+                    </button>
                     <Link href="/catalog?v2=1" className="cart-v2-secondary-btn">
                       Продолжить покупки
                     </Link>
                   </form>
                 ) : (
-                  <div className="cart-v2-auth-form" aria-label="Авторизация в корзине">
+                  <form
+                    className="cart-v2-auth-form"
+                    aria-label="Авторизация в корзине"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      onRegisteredLogin().catch(() => null);
+                    }}
+                  >
                     <label htmlFor="cartPhone">Телефон *</label>
-                    <input id="cartPhone" className="field" placeholder="+380 XX XXX XX XX" autoComplete="tel" />
+                    <input
+                      id="cartPhone"
+                      className="field"
+                      placeholder="Телефон или Email"
+                      autoComplete="username"
+                      value={registeredLogin}
+                      onChange={(event) => setRegisteredLogin(event.target.value)}
+                    />
 
                     <label htmlFor="cartPassword">Пароль *</label>
-                    <input id="cartPassword" type="password" className="field" placeholder="Введите пароль" autoComplete="current-password" />
+                    <input
+                      id="cartPassword"
+                      type="password"
+                      className="field"
+                      placeholder="Введите пароль"
+                      autoComplete="current-password"
+                      value={registeredPassword}
+                      onChange={(event) => setRegisteredPassword(event.target.value)}
+                    />
 
                     <a href="#" className="cart-v2-forgot" onClick={(event) => event.preventDefault()}>
                       Забыли пароль?
@@ -694,13 +1141,15 @@ export function CartPageClient({ isCartRedesign = false }: CartPageClientProps) 
 
                     <p className="cart-v2-auth-note">Войдите в аккаунт, чтобы использовать сохранённые данные доставки и быстрее оформить заказ.</p>
 
-                    <Link href="/checkout?v2=1" className="catalog-btn-v2 primary cart-v2-primary-btn">
-                      Войти и продолжить
-                    </Link>
+                    <p className="cart-v2-auth-note" aria-live="polite">{registeredStatus}</p>
+
+                    <button type="submit" className="catalog-btn-v2 primary cart-v2-primary-btn" disabled={isRegisteredAuthLoading}>
+                      {isRegisteredAuthLoading ? "Входим..." : "Войти и заполнить"}
+                    </button>
                     <Link href="/catalog?v2=1" className="cart-v2-secondary-btn">
                       Продолжить покупки
                     </Link>
-                  </div>
+                  </form>
                 )}
               </>
             ) : (

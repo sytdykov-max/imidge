@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -37,6 +38,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const [stackAnchorStyle, setStackAnchorStyle] = useState<Record<string, string>>({});
   const nextIdRef = useRef(1);
 
   const dismiss = useCallback((id: number) => {
@@ -68,12 +70,52 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ToastContextValue>(() => ({ notify, dismiss }), [notify, dismiss]);
 
+  useEffect(() => {
+    const updateToastAnchorPosition = () => {
+      const cartIcon =
+        document.querySelector<HTMLAnchorElement>('.header-actions .icon-btn[href="/cart"]') ||
+        document.querySelector<HTMLAnchorElement>('.header-actions .icon-btn[href="/cart?v2=1"]');
+
+      if (!cartIcon) {
+        setStackAnchorStyle({});
+        return;
+      }
+
+      const rect = cartIcon.getBoundingClientRect();
+      const left = rect.left + rect.width / 2;
+      const top = rect.bottom + 14;
+
+      setStackAnchorStyle({
+        left: `${Math.round(left)}px`,
+        top: `${Math.round(top)}px`,
+      });
+    };
+
+    updateToastAnchorPosition();
+    window.addEventListener("resize", updateToastAnchorPosition);
+    window.addEventListener("scroll", updateToastAnchorPosition, true);
+
+    return () => {
+      window.removeEventListener("resize", updateToastAnchorPosition);
+      window.removeEventListener("scroll", updateToastAnchorPosition, true);
+    };
+  }, [toasts.length]);
+
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="toast-stack" role="status" aria-live="polite" aria-label="Системные уведомления">
+      <div
+        className={`toast-stack${stackAnchorStyle.left ? " toast-stack-anchored" : ""}`}
+        style={stackAnchorStyle}
+        role="status"
+        aria-live="polite"
+        aria-label="Системные уведомления"
+      >
         {toasts.map((toast) => (
           <div key={toast.id} className={`toast toast-${toast.type}`}>
+            <button type="button" className="toast-close-btn" aria-label="Закрыть уведомление" onClick={() => dismiss(toast.id)}>
+              ×
+            </button>
             <p>{toast.message}</p>
             <div className="toast-actions">
               {toast.onAction && toast.actionLabel && (
@@ -88,9 +130,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   {toast.actionLabel}
                 </button>
               )}
-              <button type="button" className="toast-close-btn" onClick={() => dismiss(toast.id)}>
-                Закрыть
-              </button>
             </div>
           </div>
         ))}

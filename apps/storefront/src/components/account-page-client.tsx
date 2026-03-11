@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { getWishlistItems, getWishlistUpdateEventName, type WishlistItem } from "@/lib/wishlist";
+import { DEFAULT_ACCOUNT_PROFILE } from "@/lib/account-profile";
+import { DEFAULT_ACCOUNT_ADDRESSES, type AccountAddress } from "@/lib/account-addresses";
 
 type AccountTab = "profile" | "orders" | "favorites" | "addresses";
 
@@ -10,18 +13,7 @@ type DeliveryOption = {
   name: string;
 };
 
-type AddressRecord = {
-  id: string;
-  areaRef: string;
-  areaName: string;
-  cityRef: string;
-  cityName: string;
-  warehouseRef: string;
-  warehouseName: string;
-  recipient: string;
-  phone: string;
-  isPriority: boolean;
-};
+type AddressRecord = AccountAddress;
 
 type OrderItem = {
   id: string;
@@ -41,14 +33,7 @@ type OrderRecord = {
   items: OrderItem[];
 };
 
-type FavoriteItem = {
-  id: string;
-  brand: string;
-  title: string;
-  priceText: string;
-  href: string;
-  image: string;
-};
+type FavoriteItem = WishlistItem & { id: string };
 
 const ORDER_HISTORY: OrderRecord[] = [
   {
@@ -94,74 +79,37 @@ const ORDER_HISTORY: OrderRecord[] = [
   },
 ];
 
-const FAVORITES: FavoriteItem[] = [
-  {
-    id: "fav-1",
-    brand: "Chanel",
-    title: "Женская сумка S1238",
-    priceText: "13 700 грн",
-    href: "/product/shorts?v2=1",
-    image: "https://imidge.com.ua/upload/resize_cache/iblock/f74/600_480_10bcdf2ffa4a6625b617c01ff490c7234/sumka_chanel_model_s1238.jpg",
-  },
-  {
-    id: "fav-2",
-    brand: "Longines",
-    title: "Мужские часы MX3895",
-    priceText: "11 500 грн",
-    href: "/product/sweatshirt?v2=1",
-    image: "https://imidge.com.ua/upload/resize_cache/iblock/bf4/600_480_10bcdf2ffa4a6625b617c01ff490c7234/muzhskie_chasy_longines_model_mx3895.png",
-  },
-  {
-    id: "fav-3",
-    brand: "Celine",
-    title: "Ремень B239",
-    priceText: "3 950 грн",
-    href: "/product/t-shirt?v2=1",
-    image: "https://imidge.com.ua/upload/resize_cache/iblock/4f7/600_480_10bcdf2ffa4a6625b617c01ff490c7234/remen_celine_model_b239.jpg",
-  },
-];
-
 export function AccountPageClient() {
   const [activeTab, setActiveTab] = useState<AccountTab>("profile");
+  const [favoriteItems, setFavoriteItems] = useState<FavoriteItem[]>([]);
+  const [profileFullName, setProfileFullName] = useState(DEFAULT_ACCOUNT_PROFILE.fullName);
+  const [profilePhone, setProfilePhone] = useState(DEFAULT_ACCOUNT_PROFILE.phone);
+  const [profileEmail, setProfileEmail] = useState(DEFAULT_ACCOUNT_PROFILE.email);
+  const [profileTelegram, setProfileTelegram] = useState(DEFAULT_ACCOUNT_PROFILE.telegram);
+  const [profileComment, setProfileComment] = useState(DEFAULT_ACCOUNT_PROFILE.comment);
+  const [profilePreferredDeliveryMethod, setProfilePreferredDeliveryMethod] = useState(
+    DEFAULT_ACCOUNT_PROFILE.preferredDeliveryMethod
+  );
+  const [profilePreferredPaymentMethod, setProfilePreferredPaymentMethod] = useState(
+    DEFAULT_ACCOUNT_PROFILE.preferredPaymentMethod
+  );
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [profileStatus, setProfileStatus] = useState("");
+  const [isProfileSaving, setIsProfileSaving] = useState(false);
   const [areaOptions, setAreaOptions] = useState<DeliveryOption[]>([]);
   const [cityOptions, setCityOptions] = useState<DeliveryOption[]>([]);
   const [warehouseOptions, setWarehouseOptions] = useState<DeliveryOption[]>([]);
   const [selectedAreaRef, setSelectedAreaRef] = useState("");
   const [selectedCityRef, setSelectedCityRef] = useState("");
   const [selectedWarehouseRef, setSelectedWarehouseRef] = useState("");
-  const [recipient, setRecipient] = useState("");
-  const [phone, setPhone] = useState("");
   const [isLoadingAreas, setIsLoadingAreas] = useState(false);
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [isLoadingWarehouses, setIsLoadingWarehouses] = useState(false);
   const [addressStatus, setAddressStatus] = useState("");
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
-  const [savedAddresses, setSavedAddresses] = useState<AddressRecord[]>([
-    {
-      id: "addr-1",
-      areaRef: "",
-      areaName: "Киевская обл.",
-      cityRef: "",
-      cityName: "Киев",
-      warehouseRef: "",
-      warehouseName: "Отделение №12, ул. Крещатик, 10",
-      recipient: "Павел Клиент",
-      phone: "+380509939553",
-      isPriority: true,
-    },
-    {
-      id: "addr-2",
-      areaRef: "",
-      areaName: "Днепропетровская обл.",
-      cityRef: "",
-      cityName: "Днепр",
-      warehouseRef: "",
-      warehouseName: "Отделение №3, просп. Дмитрия Яворницкого, 81",
-      recipient: "Павел Клиент",
-      phone: "+380509939553",
-      isPriority: false,
-    },
-  ]);
+  const [savedAddresses, setSavedAddresses] = useState<AddressRecord[]>(DEFAULT_ACCOUNT_ADDRESSES);
+  const [isAddressesLoaded, setIsAddressesLoaded] = useState(false);
 
   const selectedAreaName = useMemo(
     () => areaOptions.find((area) => area.ref === selectedAreaRef)?.name ?? "",
@@ -175,6 +123,131 @@ export function AccountPageClient() {
     () => warehouseOptions.find((warehouse) => warehouse.ref === selectedWarehouseRef)?.name ?? "",
     [warehouseOptions, selectedWarehouseRef]
   );
+  const orderedAddresses = useMemo(() => {
+    const priorityAddress = savedAddresses.find((address) => address.isPriority);
+    if (!priorityAddress) {
+      return savedAddresses;
+    }
+
+    const otherAddresses = savedAddresses.filter((address) => address.id !== priorityAddress.id);
+    return [priorityAddress, ...otherAddresses];
+  }, [savedAddresses]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadProfile = async () => {
+      try {
+        const response = await fetch("/api/account/profile", { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as {
+          profile?: {
+            fullName?: string;
+            phone?: string;
+            email?: string;
+            telegram?: string;
+            comment?: string;
+            preferredDeliveryMethod?: string;
+            preferredPaymentMethod?: string;
+          };
+        };
+
+        if (cancelled || !payload.profile) {
+          return;
+        }
+
+        setProfileFullName(payload.profile.fullName ?? DEFAULT_ACCOUNT_PROFILE.fullName);
+        setProfilePhone(payload.profile.phone ?? DEFAULT_ACCOUNT_PROFILE.phone);
+        setProfileEmail(payload.profile.email ?? DEFAULT_ACCOUNT_PROFILE.email);
+        setProfileTelegram(payload.profile.telegram ?? DEFAULT_ACCOUNT_PROFILE.telegram);
+        setProfileComment(payload.profile.comment ?? DEFAULT_ACCOUNT_PROFILE.comment);
+        setProfilePreferredDeliveryMethod(
+          payload.profile.preferredDeliveryMethod === "courier" || payload.profile.preferredDeliveryMethod === "nova_poshta"
+            ? payload.profile.preferredDeliveryMethod
+            : DEFAULT_ACCOUNT_PROFILE.preferredDeliveryMethod
+        );
+        setProfilePreferredPaymentMethod(
+          payload.profile.preferredPaymentMethod === "card" || payload.profile.preferredPaymentMethod === "cod"
+            ? payload.profile.preferredPaymentMethod
+            : DEFAULT_ACCOUNT_PROFILE.preferredPaymentMethod
+        );
+      } catch {
+        return;
+      }
+    };
+
+    loadProfile().catch(() => null);
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAddresses = async () => {
+      try {
+        const response = await fetch("/api/account/addresses", { cache: "no-store" });
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as { addresses?: AddressRecord[] };
+        if (!cancelled && Array.isArray(payload.addresses) && payload.addresses.length > 0) {
+          setSavedAddresses(payload.addresses);
+        }
+      } catch {
+        return;
+      } finally {
+        if (!cancelled) {
+          setIsAddressesLoaded(true);
+        }
+      }
+    };
+
+    loadAddresses().catch(() => null);
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isAddressesLoaded) {
+      return;
+    }
+
+    fetch("/api/account/addresses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(savedAddresses),
+    }).catch(() => null);
+  }, [isAddressesLoaded, savedAddresses]);
+
+  useEffect(() => {
+    const syncFavorites = () => {
+      const nextItems = getWishlistItems().map((item, index) => ({
+        ...item,
+        id: `${item.handle}-${index}`,
+      }));
+      setFavoriteItems(nextItems);
+    };
+
+    syncFavorites();
+    window.addEventListener("storage", syncFavorites);
+    window.addEventListener(getWishlistUpdateEventName(), syncFavorites as EventListener);
+
+    return () => {
+      window.removeEventListener("storage", syncFavorites);
+      window.removeEventListener(getWishlistUpdateEventName(), syncFavorites as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -301,16 +374,17 @@ export function AccountPageClient() {
     setSelectedWarehouseRef("");
     setCityOptions([]);
     setWarehouseOptions([]);
-    setRecipient("");
-    setPhone("");
     setEditingAddressId(null);
   };
 
   const handleSaveAddress = () => {
-    if (!selectedAreaName || !selectedCityName || !selectedWarehouseName || !recipient.trim() || !phone.trim()) {
+    if (!selectedAreaName || !selectedCityName || !selectedWarehouseName) {
       setAddressStatus("Заполните все поля адреса перед добавлением.");
       return;
     }
+
+    const recipientFromProfile = profileFullName.trim() || DEFAULT_ACCOUNT_PROFILE.fullName;
+    const phoneFromProfile = profilePhone.trim() || DEFAULT_ACCOUNT_PROFILE.phone;
 
     if (editingAddressId) {
       setSavedAddresses((current) =>
@@ -324,8 +398,8 @@ export function AccountPageClient() {
                 cityName: selectedCityName,
                 warehouseRef: selectedWarehouseRef,
                 warehouseName: selectedWarehouseName,
-                recipient: recipient.trim(),
-                phone: phone.trim(),
+                recipient: recipientFromProfile,
+                phone: phoneFromProfile,
               }
             : address
         )
@@ -344,8 +418,8 @@ export function AccountPageClient() {
       cityName: selectedCityName,
       warehouseRef: selectedWarehouseRef,
       warehouseName: selectedWarehouseName,
-      recipient: recipient.trim(),
-      phone: phone.trim(),
+      recipient: recipientFromProfile,
+      phone: phoneFromProfile,
       isPriority: !hasPriority,
     };
 
@@ -393,13 +467,96 @@ export function AccountPageClient() {
     setSelectedAreaRef(address.areaRef);
     setSelectedCityRef(address.cityRef);
     setSelectedWarehouseRef(address.warehouseRef);
-    setRecipient(address.recipient);
-    setPhone(address.phone);
     setAddressStatus(
       address.areaRef && address.cityRef && address.warehouseRef
         ? "Режим редактирования адреса."
         : "Режим редактирования: выберите область, населённый пункт и отделение из списков."
     );
+  };
+
+  const handleSaveProfile = async () => {
+    const hasOldPassword = oldPassword.length > 0;
+    const hasNewPassword = newPassword.length > 0;
+
+    if (hasOldPassword !== hasNewPassword) {
+      setProfileStatus("Для смены пароля заполните поля «Старый пароль» и «Новый пароль».");
+      return;
+    }
+
+    if (hasOldPassword && hasNewPassword && newPassword.length < 8) {
+      setProfileStatus("Новый пароль должен содержать минимум 8 символов.");
+      return;
+    }
+
+    if (hasOldPassword && hasNewPassword && oldPassword === newPassword) {
+      setProfileStatus("Новый пароль должен отличаться от старого.");
+      return;
+    }
+
+    setIsProfileSaving(true);
+    setProfileStatus("Сохраняем изменения...");
+
+    try {
+      const profileResponse = await fetch("/api/account/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: profileFullName,
+          phone: profilePhone,
+          email: profileEmail,
+          telegram: profileTelegram,
+          comment: profileComment,
+          preferredDeliveryMethod: profilePreferredDeliveryMethod,
+          preferredPaymentMethod: profilePreferredPaymentMethod,
+        }),
+      });
+
+      const profilePayload = (await profileResponse.json()) as { message?: string };
+      if (!profileResponse.ok) {
+        setProfileStatus(profilePayload.message || "Не удалось сохранить профиль.");
+        return;
+      }
+
+      setSavedAddresses((current) =>
+        current.map((address) => ({
+          ...address,
+          recipient: profileFullName.trim() || DEFAULT_ACCOUNT_PROFILE.fullName,
+          phone: profilePhone.trim() || DEFAULT_ACCOUNT_PROFILE.phone,
+        }))
+      );
+
+      if (!hasOldPassword && !hasNewPassword) {
+        setProfileStatus("Профиль сохранён.");
+        return;
+      }
+
+      const response = await fetch("/api/account/password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          oldPassword,
+          newPassword,
+        }),
+      });
+
+      const payload = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        setProfileStatus(payload.message || "Не удалось изменить пароль.");
+        return;
+      }
+
+      setOldPassword("");
+      setNewPassword("");
+      setProfileStatus("Профиль сохранён. Пароль успешно изменён.");
+    } catch {
+      setProfileStatus("Не удалось изменить пароль. Проверьте соединение и попробуйте снова.");
+    } finally {
+      setIsProfileSaving(false);
+    }
   };
 
   return (
@@ -427,29 +584,75 @@ export function AccountPageClient() {
                 <div className="account-grid-2">
                   <label className="account-field">
                     <span>ФИО</span>
-                    <input defaultValue="Павел Клиент" />
+                    <input value={profileFullName} onChange={(event) => setProfileFullName(event.target.value)} />
                   </label>
                   <label className="account-field">
                     <span>Телефон</span>
-                    <input defaultValue="+380 50 993 95 53" />
+                    <input value={profilePhone} onChange={(event) => setProfilePhone(event.target.value)} autoComplete="tel" />
                   </label>
                   <label className="account-field">
                     <span>Email</span>
-                    <input defaultValue="client@example.com" />
+                    <input value={profileEmail} onChange={(event) => setProfileEmail(event.target.value)} autoComplete="email" />
                   </label>
                   <label className="account-field">
                     <span>Telegram</span>
-                    <input defaultValue="@imidge_client" />
+                    <input value={profileTelegram} onChange={(event) => setProfileTelegram(event.target.value)} />
+                  </label>
+                  <label className="account-field">
+                    <span>Способ доставки по умолчанию</span>
+                    <select
+                      value={profilePreferredDeliveryMethod}
+                      onChange={(event) => setProfilePreferredDeliveryMethod(event.target.value)}
+                    >
+                      <option value="nova_poshta">Новая почта</option>
+                      <option value="courier">Курьер</option>
+                    </select>
+                  </label>
+                  <label className="account-field">
+                    <span>Способ оплаты по умолчанию</span>
+                    <select
+                      value={profilePreferredPaymentMethod}
+                      onChange={(event) => setProfilePreferredPaymentMethod(event.target.value)}
+                    >
+                      <option value="cod">Наложенный платеж</option>
+                      <option value="card">Оплата картой</option>
+                    </select>
                   </label>
                   <label className="account-field account-span-2">
                     <span>Комментарий к профилю</span>
-                    <textarea placeholder="Предпочтения по брендам, размеру, доставке..." />
+                    <textarea
+                      value={profileComment}
+                      onChange={(event) => setProfileComment(event.target.value)}
+                      placeholder="Предпочтения по брендам, размеру, доставке..."
+                    />
+                  </label>
+                  <label className="account-field">
+                    <span>Старый пароль</span>
+                    <input
+                      type="password"
+                      value={oldPassword}
+                      onChange={(event) => setOldPassword(event.target.value)}
+                      autoComplete="current-password"
+                      placeholder="Введите старый пароль"
+                    />
+                  </label>
+                  <label className="account-field">
+                    <span>Новый пароль</span>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(event) => setNewPassword(event.target.value)}
+                      autoComplete="new-password"
+                      placeholder="Минимум 8 символов"
+                    />
                   </label>
                 </div>
                 <div className="account-actions-row">
-                  <button type="button" className="account-btn primary">Сохранить профиль</button>
-                  <button type="button" className="account-btn">Изменить пароль</button>
+                  <button type="button" className="account-btn primary" onClick={handleSaveProfile} disabled={isProfileSaving}>
+                    {isProfileSaving ? "Сохраняем..." : "Сохранить профиль"}
+                  </button>
                 </div>
+                <p className="account-profile-status" aria-live="polite">{profileStatus}</p>
               </div>
             )}
 
@@ -502,40 +705,50 @@ export function AccountPageClient() {
             {activeTab === "favorites" && (
               <div>
                 <h2 className="account-section-title">Избранное</h2>
-                <div className="account-favorites-grid">
-                  {FAVORITES.map((item) => (
-                    <article className="account-fav-card" key={item.id}>
-                      <Link href={item.href} aria-label={`Открыть товар ${item.title}`}>
-                        <img src={item.image} alt={item.title} className="account-fav-image" />
-                      </Link>
-                      <div className="account-fav-body">
-                        <p className="account-fav-brand">{item.brand}</p>
-                        <p className="account-fav-name">
-                          <Link href={item.href}>{item.title}</Link>
-                        </p>
-                        <p className="account-fav-price">{item.priceText}</p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
+                {favoriteItems.length === 0 ? (
+                  <p className="account-empty-note">В избранном пока пусто. Добавьте товары из каталога.</p>
+                ) : (
+                  <div className="account-favorites-grid">
+                    {favoriteItems.map((item) => {
+                      const href = `/product/${item.handle}?v2=1`;
+
+                      return (
+                        <article className="account-fav-card" key={item.id}>
+                          <Link href={href} aria-label={`Открыть товар ${item.title}`}>
+                            {item.thumbnail ? (
+                              <img src={item.thumbnail} alt={item.title} className="account-fav-image" />
+                            ) : (
+                              <div className="account-fav-image account-fav-image-placeholder">IMIDGE</div>
+                            )}
+                          </Link>
+                          <div className="account-fav-body">
+                            <p className="account-fav-brand">{item.brand || "Без бренда"}</p>
+                            <p className="account-fav-name">
+                              <Link href={href}>{item.title}</Link>
+                            </p>
+                            {item.priceText ? <p className="account-fav-price">{item.priceText}</p> : null}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
             {activeTab === "addresses" && (
               <div>
                 <h2 className="account-section-title">Адреса доставки</h2>
+                <p className="account-address-status">Получатель и телефон автоматически берутся из раздела «Профиль».</p>
 
                 <div className="account-address-list">
-                  {savedAddresses.map((address) => (
+                  {orderedAddresses.map((address) => (
                     <article key={address.id} className="account-address-card">
                       <div className="account-address-card-head">
                         <div>
                           <h4>{address.isPriority ? "Приоритетный адрес" : "Дополнительный адрес"}</h4>
                           <p>
                             {address.areaName}, {address.cityName}, {address.warehouseName}
-                          </p>
-                          <p>
-                            Получатель: {address.recipient} · {address.phone}
                           </p>
                         </div>
                         <div className="account-address-actions">
@@ -596,14 +809,6 @@ export function AccountPageClient() {
                           <option key={warehouse.ref} value={warehouse.ref}>{warehouse.name}</option>
                         ))}
                       </select>
-                    </label>
-                    <label className="account-field">
-                      <span>Получатель</span>
-                      <input value={recipient} onChange={(event) => setRecipient(event.target.value)} placeholder="ФИО" />
-                    </label>
-                    <label className="account-field">
-                      <span>Телефон</span>
-                      <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="+380..." />
                     </label>
                   </div>
 

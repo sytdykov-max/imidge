@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CatalogCardActions } from "@/components/catalog-card-actions";
 
 type RecentlyViewedItem = {
   handle: string;
@@ -155,8 +154,7 @@ export function RecentlyViewedProducts({ currentItem, isProductRedesign }: Recen
             </Link>
 
             {isProductRedesign ? (
-              <div className="catalog-card-body-v2">
-                <p className="product-kicker-v2">{item.brand}</p>
+              <div className="catalog-card-body-v2 catalog-card-body-v2-simple">
                 <h3 className="product-title-v2">
                   <Link
                     href={`/product/${item.handle}?v2=1`}
@@ -169,16 +167,6 @@ export function RecentlyViewedProducts({ currentItem, isProductRedesign }: Recen
                   {item.oldPriceText && <span className="product-price-old-v2">{item.oldPriceText}</span>}
                   <strong className="product-price-v2">{item.priceText || "Цена уточняется"}</strong>
                 </div>
-                <CatalogCardActions
-                  href={`/product/${item.handle}?v2=1`}
-                  variantId={item.variantId}
-                  wishlistItem={{
-                    handle: item.handle,
-                    title: item.title,
-                    thumbnail: item.thumbnail,
-                    priceText: item.priceText,
-                  }}
-                />
               </div>
             ) : (
               <>

@@ -5,6 +5,7 @@ import { useToast } from "@/components/toast-provider";
 import {
   getWishlistUpdateEventName,
   isInWishlist,
+  syncWishlistItemData,
   type WishlistItem,
   toggleWishlistItem,
 } from "@/lib/wishlist";
@@ -20,7 +21,11 @@ export function WishlistToggleButton({ item, mode = "default" }: Props) {
 
   useEffect(() => {
     const sync = () => {
-      setSelected(isInWishlist(item.handle));
+      const exists = isInWishlist(item.handle);
+      if (exists) {
+        syncWishlistItemData(item);
+      }
+      setSelected(exists);
     };
 
     sync();
@@ -31,7 +36,7 @@ export function WishlistToggleButton({ item, mode = "default" }: Props) {
       window.removeEventListener("storage", sync);
       window.removeEventListener(getWishlistUpdateEventName(), sync as EventListener);
     };
-  }, [item.handle]);
+  }, [item]);
 
   const onToggle = () => {
     const nowInWishlist = toggleWishlistItem(item);

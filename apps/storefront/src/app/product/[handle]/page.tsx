@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
 import { AddToCartButton } from "@/components/add-to-cart-button";
-import { CatalogCardActions } from "@/components/catalog-card-actions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { WishlistToggleButton } from "@/components/wishlist-toggle-button";
@@ -503,6 +502,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
                       item={{
                         handle: product.handle,
                         title: product.title,
+                        brand: productBrand || "Без бренда",
                         thumbnail: product.thumbnail,
                         priceText: currentPriceText,
                       }}
@@ -548,8 +548,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
                         </Link>
 
                         {isProductRedesign ? (
-                          <div className="catalog-card-body-v2">
-                            <p className="product-kicker-v2">{related.brand}</p>
+                          <div className="catalog-card-body-v2 catalog-card-body-v2-simple">
                             <h3 className="product-title-v2">
                               <Link href={relatedHref} aria-label={`Открыть товар ${related.title}`}>
                                 {related.title}
@@ -567,18 +566,6 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
                                   : "Цена уточняется"}
                               </strong>
                             </div>
-                            <CatalogCardActions
-                              href={relatedHref}
-                              variantId={related.variantId}
-                              wishlistItem={{
-                                handle: related.handle,
-                                title: related.title,
-                                thumbnail: related.thumbnail,
-                                priceText: related.minPrice
-                                  ? `${related.minPrice.amount.toLocaleString("ru-RU")} ${related.minPrice.currency}`
-                                  : undefined,
-                              }}
-                            />
                           </div>
                         ) : (
                           <>

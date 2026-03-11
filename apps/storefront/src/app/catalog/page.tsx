@@ -750,6 +750,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                       wishlistItem={{
                         handle: product.handle,
                         title: product.title,
+                        brand: brand || category || "Без бренда",
                         thumbnail: product.thumbnail,
                         priceText: minPrice ? `${minPrice.amount.toLocaleString("ru-RU")} ${minPrice.currency}` : undefined,
                       }}
