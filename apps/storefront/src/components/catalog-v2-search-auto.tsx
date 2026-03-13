@@ -7,6 +7,9 @@ type CatalogV2SearchAutoProps = {
   initialQuery: string;
   selectedCategories: string[];
   selectedBrands: string[];
+  selectedAvailabilities: string[];
+  selectedPriceRanges: string[];
+  selectedExtraFilters: Record<string, string[]>;
   selectedPrice: string;
   selectedSort: string;
   debounceMs?: number;
@@ -16,6 +19,9 @@ export function CatalogV2SearchAuto({
   initialQuery,
   selectedCategories,
   selectedBrands,
+  selectedAvailabilities,
+  selectedPriceRanges,
+  selectedExtraFilters,
   selectedPrice,
   selectedSort,
   debounceMs = 350,
@@ -51,6 +57,30 @@ export function CatalogV2SearchAuto({
         }
       }
 
+      for (const availability of selectedAvailabilities) {
+        if (availability !== "all") {
+          params.append("availability", availability);
+        }
+      }
+
+      for (const range of selectedPriceRanges) {
+        if (range !== "all") {
+          params.append("price_range", range);
+        }
+      }
+
+      for (const [key, values] of Object.entries(selectedExtraFilters)) {
+        if (!key.startsWith("filter_")) {
+          continue;
+        }
+
+        for (const value of values) {
+          if (value !== "all") {
+            params.append(key, value);
+          }
+        }
+      }
+
       if (selectedPrice !== "all") {
         params.set("price", selectedPrice);
       }
@@ -67,7 +97,19 @@ export function CatalogV2SearchAuto({
     }, debounceMs);
 
     return () => window.clearTimeout(timer);
-  }, [debounceMs, initialQuery, query, router, selectedBrands, selectedCategories, selectedPrice, selectedSort]);
+  }, [
+    debounceMs,
+    initialQuery,
+    query,
+    router,
+    selectedBrands,
+    selectedCategories,
+    selectedAvailabilities,
+    selectedPriceRanges,
+    selectedExtraFilters,
+    selectedPrice,
+    selectedSort,
+  ]);
 
   return (
     <div className="catalog-search-form-v2" role="search" aria-label="Поиск в каталоге">

@@ -9,7 +9,7 @@ import { CatalogCardActions } from "@/components/catalog-card-actions";
 import { CatalogSortSelectAuto } from "@/components/catalog-sort-select-auto";
 import { CatalogV2SearchAuto } from "@/components/catalog-v2-search-auto";
 import { extractProductBrand } from "@/lib/catalog-brand";
-import { getCountMap, getPriceCountMap, getTopFacetValues } from "@/lib/catalog-facets";
+import { getCountMap, getPriceCountMap } from "@/lib/catalog-facets";
 import { matchPriceRange, sortByCatalogRule } from "@/lib/catalog-filters";
 import { mapCatalogCategory } from "@/lib/catalog-mapping";
 import {
@@ -24,7 +24,7 @@ import {
   type CatalogSearchParams,
 } from "@/lib/catalog-query";
 import { matchesQuery, normalizeQueryText, rankProductsByQuery } from "@/lib/catalog-search";
-import { getAllStoreProducts, getMinProductPrice, type StoreProduct } from "@/lib/medusa-store";
+import { getAllStoreProducts, getMinProductPrice, getProductPriceByCurrency, type StoreProduct } from "@/lib/medusa-store";
 
 type CatalogPageProps = {
   searchParams: Promise<CatalogSearchParams>;
@@ -34,8 +34,198 @@ type CatalogViewProduct = {
   product: StoreProduct;
   category: string;
   brand: string;
+  availability: string;
+  priceRange: string;
+  extraFacets: Record<string, string>;
   minPrice: ReturnType<typeof getMinProductPrice>;
 };
+
+const RESERVED_DYNAMIC_FACET_KEYS = new Set([
+  "filter_brand",
+  "filter_category",
+  "filter_price_range",
+  "filter_availability",
+  "filter_sex",
+]);
+
+const EXTRA_FACET_LABEL_OVERRIDES = new Map<string, string>([
+  ["filter_gender", "Пол"],
+  ["filter_gifts", "Подарки"],
+  ["filter_style", "Стиль"],
+  ["filter_size", "Размер"],
+  ["filter_mechanism", "Механизм"],
+  ["filter_mechanism_origin", "Произв. механизма"],
+  ["filter_case_size_mm", "Размер (мм)"],
+  ["filter_case_shape", "Форма корпуса"],
+  ["filter_case_color", "Цвет корпуса"],
+  ["filter_osnova_color", "Основной цвет"],
+  ["filter_case_material", "Материал корпуса"],
+  ["filter_extra_functions", "Доп. функции"],
+  ["filter_glass", "Стекло"],
+  ["filter_water_resistance", "Влагозащита"],
+  ["filter_assembly_country", "Страна сборки"],
+]);
+
+const GLOBAL_HIDDEN_EXTRA_FACET_KEYS = new Set([
+  "filter_artnumber",
+  "filter_old_price",
+]);
+
+const IPAD_HIDDEN_EXTRA_FACET_KEYS = new Set([
+  "filter_style",
+  "filter_artnumber",
+  "filter_depth",
+  "filter_length",
+  "filter_old_price",
+  "filter_sale",
+  "filter_sex",
+  "filter_status",
+  "filter_width",
+]);
+
+const UNKNOWN_FACET_VALUES = new Set([
+  "не указано",
+  "unknown",
+  "n/a",
+  "none",
+  "null",
+  "-",
+]);
+
+const AVAILABILITY_LABELS = new Map<string, string>([
+  ["in_stock", "В наличии"],
+  ["out_of_stock", "Нет в наличии"],
+]);
+
+const LEGACY_PRICE_RANGE_LABELS = new Map<string, string>([
+  ["lt_100", "До 100 USD"],
+  ["100_300", "100-300 USD"],
+  ["300_600", "300-600 USD"],
+  ["600_1000", "600-1000 USD"],
+  ["gte_1000", "От 1000 USD"],
+]);
+
+function readMetadataString(metadata: Record<string, unknown> | null | undefined, key: string) {
+  const value = metadata?.[key];
+  return typeof value === "string" && value.trim() ? value.trim() : "";
+}
+
+function collectExtraFacetValues(metadata: Record<string, unknown> | null | undefined) {
+  const facets: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(metadata ?? {})) {
+    if (!key.startsWith("filter_") || RESERVED_DYNAMIC_FACET_KEYS.has(key)) {
+      continue;
+    }
+
+    if (typeof value !== "string") {
+      continue;
+    }
+
+    const normalized = value.trim();
+    if (normalized && !UNKNOWN_FACET_VALUES.has(normalized.toLowerCase())) {
+      facets[key] = normalizeFacetValue(key, normalized);
+    }
+  }
+
+  return facets;
+}
+
+function normalizeGiftToken(value: string) {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) {
+    return "";
+  }
+
+  if (/(black\s*friday|черн(ая|ой)\s*пятниц)/u.test(normalized)) {
+    return "Черная пятница";
+  }
+
+  if (/(8\s*марта|march\s*8|women'?s\s*day|международн(ый|ого)\s*женск)/u.test(normalized)) {
+    return "на 8 марта";
+  }
+
+  if (/(нов(ый|ого)\s*год|new\s*year|xmas|christmas|рождеств)/u.test(normalized)) {
+    return "на Новый год";
+  }
+
+  return value.trim();
+}
+
+function splitFacetValue(key: string, value: string) {
+  if (key !== "filter_gifts") {
+    return [value.trim()].filter(Boolean);
+  }
+
+  return value
+    .split(/\s*[\/|;,]+\s*/)
+    .map((token) => normalizeGiftToken(token))
+    .filter(Boolean);
+}
+
+function normalizeFacetValue(key: string, value: string) {
+  if (key !== "filter_gifts") {
+    return value.trim();
+  }
+
+  const tokens = Array.from(new Set(splitFacetValue(key, value)));
+  return tokens.join(" / ");
+}
+
+function formatFacetGroupLabel(key: string) {
+  const overridden = EXTRA_FACET_LABEL_OVERRIDES.get(key);
+  if (overridden) {
+    return overridden;
+  }
+
+  const cleaned = key.replace(/^filter_/, "").replace(/_/g, " ").trim();
+  if (!cleaned) {
+    return key;
+  }
+
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}
+
+function getAllFacetValues(countMap: Map<string, number>) {
+  return Array.from(countMap.entries())
+    .sort((a, b) => {
+      if (b[1] !== a[1]) {
+        return b[1] - a[1];
+      }
+      return a[0].localeCompare(b[0], "ru");
+    })
+    .map(([value]) => value);
+}
+
+const USD_TO_UAH_RATE = Number(process.env.NEXT_PUBLIC_USD_TO_UAH_RATE ?? 41);
+const EUR_TO_UAH_RATE = Number(process.env.NEXT_PUBLIC_EUR_TO_UAH_RATE ?? 45);
+
+function toPrimaryUahPrice(price: { amount: number; currency: string } | null) {
+  if (!price) {
+    return null;
+  }
+
+  const currency = price.currency.toUpperCase();
+  if (currency === "UAH") {
+    return price;
+  }
+
+  if (currency === "USD") {
+    return {
+      amount: Math.round(price.amount * USD_TO_UAH_RATE),
+      currency: "UAH",
+    };
+  }
+
+  if (currency === "EUR") {
+    return {
+      amount: Math.round(price.amount * EUR_TO_UAH_RATE),
+      currency: "UAH",
+    };
+  }
+
+  return price;
+}
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -91,7 +281,15 @@ function pluralizeRuItems(value: number) {
 
 export async function generateMetadata({ searchParams }: CatalogPageProps): Promise<Metadata> {
   const query = await searchParams;
-  const { selectedCategories, selectedSort, selectedBrands, selectedPrice, selectedQuery, requestedPage } = normalizeCatalogSearchParams(query);
+  const {
+    selectedCategories,
+    selectedSort,
+    selectedBrands,
+    selectedExtraFilters,
+    selectedPrice,
+    selectedQuery,
+    requestedPage,
+  } = normalizeCatalogSearchParams(query);
   const isDeepPaginationPage = requestedPage > 10;
   const categoryQueryValue = selectedCategories.includes("all") ? undefined : selectedCategories;
   const brandQueryValue = selectedBrands.includes("all") ? undefined : selectedBrands;
@@ -100,6 +298,7 @@ export async function generateMetadata({ searchParams }: CatalogPageProps): Prom
     cat: categoryQueryValue,
     sort: selectedSort !== "popular" ? selectedSort : undefined,
     brand: brandQueryValue,
+    extraFilters: selectedExtraFilters,
     price: selectedPrice !== "all" ? selectedPrice : undefined,
     q: selectedQuery || undefined,
     page: requestedPage > 1 ? requestedPage : undefined,
@@ -138,25 +337,84 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const query = await searchParams;
   const redesignByEnv = process.env.NEXT_PUBLIC_ENABLE_CATALOG_REDESIGN === "1";
   const v2QueryValue = (query as Record<string, string | string[] | undefined>).v2;
+  const disableRedesignByQuery = Array.isArray(v2QueryValue) ? v2QueryValue.includes("0") : v2QueryValue === "0";
   const redesignByQuery = Array.isArray(v2QueryValue) ? v2QueryValue.includes("1") : v2QueryValue === "1";
-  const isCatalogRedesign = redesignByEnv || redesignByQuery;
+  const isCatalogRedesign = disableRedesignByQuery ? false : redesignByEnv || redesignByQuery || typeof v2QueryValue === "undefined";
   const {
     selectedCategory,
     selectedCategories,
     selectedSort,
     selectedBrand,
     selectedBrands,
+    selectedAvailabilities,
+    selectedPriceRanges,
+    selectedExtraFilters,
     selectedPrice,
     selectedQuery,
     requestedPage,
   } = normalizeCatalogSearchParams(query);
+  const isIpadCategoryContext = selectedCategories.some(
+    (category) => category.trim().toLowerCase() === "чехлы/обложки ipad"
+  );
+  const hiddenExtraFacetKeys = new Set([
+    ...GLOBAL_HIDDEN_EXTRA_FACET_KEYS,
+    ...(isIpadCategoryContext ? [...IPAD_HIDDEN_EXTRA_FACET_KEYS] : []),
+  ]);
+  const selectedExtraFiltersVisible: Record<string, string[]> = Object.fromEntries(
+    Object.entries(selectedExtraFilters)
+      .filter(([facetKey]) => !hiddenExtraFacetKeys.has(facetKey))
+      .map(([facetKey, values]) => [
+        facetKey,
+        values
+          .map((value) => normalizeFacetValue(facetKey, value))
+          .filter((value) => value && !UNKNOWN_FACET_VALUES.has(value.trim().toLowerCase())),
+      ])
+      .filter(([, values]) => values.length > 0)
+  );
 
   const hasCategoryFilter = !selectedCategories.includes("all");
   const hasBrandFilter = !selectedBrands.includes("all");
+  const hasAvailabilityFilter = !selectedAvailabilities.includes("all");
+  const hasLegacyPriceRangeFilter = !selectedPriceRanges.includes("all");
   const selectedCategorySet = new Set(hasCategoryFilter ? selectedCategories : []);
   const selectedBrandSet = new Set(hasBrandFilter ? selectedBrands : []);
+  const selectedAvailabilitySet = new Set(hasAvailabilityFilter ? selectedAvailabilities : []);
+  const selectedPriceRangeSet = new Set(hasLegacyPriceRangeFilter ? selectedPriceRanges : []);
+  const selectedExtraFilterSets = new Map(
+    Object.entries(selectedExtraFiltersVisible).map(([key, values]) => [key, new Set(values)])
+  );
   const categoryQueryValue = hasCategoryFilter ? selectedCategories : undefined;
   const brandQueryValue = hasBrandFilter ? selectedBrands : undefined;
+  const availabilityQueryValue = hasAvailabilityFilter ? selectedAvailabilities : undefined;
+  const priceRangeQueryValue = hasLegacyPriceRangeFilter ? selectedPriceRanges : undefined;
+
+  const matchesSelectedExtraFilters = (item: CatalogViewProduct, skipFacetKey?: string) => {
+    for (const [facetKey, selectedValues] of selectedExtraFilterSets.entries()) {
+      if (facetKey === skipFacetKey) {
+        continue;
+      }
+
+      const itemValue = item.extraFacets[facetKey];
+      if (!itemValue) {
+        return false;
+      }
+
+      if (facetKey === "filter_gifts") {
+        const itemTokens = new Set(splitFacetValue(facetKey, itemValue));
+        const hasAnySelected = Array.from(selectedValues).some((selected) => itemTokens.has(String(selected)));
+        if (!hasAnySelected) {
+          return false;
+        }
+        continue;
+      }
+
+      if (!selectedValues.has(itemValue)) {
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   const buildCurrentQuery = (overrides: CatalogQueryInput = {}) => {
     return buildCatalogQuery({
@@ -164,6 +422,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       cat: categoryQueryValue,
       sort: selectedSort !== "popular" ? selectedSort : undefined,
       brand: brandQueryValue,
+      availability: availabilityQueryValue,
+      priceRange: priceRangeQueryValue,
+      extraFilters: selectedExtraFiltersVisible,
       price: selectedPrice !== "all" ? selectedPrice : undefined,
       q: selectedQuery || undefined,
       ...overrides,
@@ -181,6 +442,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       metadata: product.metadata,
     }).label,
     brand: extractProductBrand(product),
+    availability: readMetadataString(product.metadata, "filter_availability") || "unknown",
+    priceRange: readMetadataString(product.metadata, "filter_price_range") || "unknown",
+    extraFacets: collectExtraFacetValues(product.metadata),
     minPrice: getMinProductPrice(product),
   }));
 
@@ -199,31 +463,124 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
       })
     : mappedProducts;
 
-  const preCategoryProducts = !hasBrandFilter
-    ? queryFilteredProducts
-    : queryFilteredProducts.filter((item) => selectedBrandSet.has(item.brand));
+  const preCategoryProducts = queryFilteredProducts.filter((item) => {
+    const byBrand = !hasBrandFilter || selectedBrandSet.has(item.brand);
+    const byAvailability = !hasAvailabilityFilter || selectedAvailabilitySet.has(item.availability);
+    const byLegacyPriceRange = !hasLegacyPriceRangeFilter || selectedPriceRangeSet.has(item.priceRange);
+    const byExtraFacets = matchesSelectedExtraFilters(item);
+    return byBrand && byAvailability && byLegacyPriceRange && byExtraFacets;
+  });
 
   const preCategoryByPriceProducts = selectedPrice === "all"
     ? preCategoryProducts
     : preCategoryProducts.filter((item) => matchPriceRange(item.minPrice?.amount, selectedPrice, CATALOG_PRICE_RANGES));
 
   const categoryCountMap = getCountMap(preCategoryByPriceProducts.map((item) => item.category));
-  const categories = getTopFacetValues(categoryCountMap, 10);
+  const categories = getAllFacetValues(categoryCountMap);
 
   const categoryFilteredProducts = !hasCategoryFilter
     ? preCategoryByPriceProducts
     : preCategoryByPriceProducts.filter((item) => selectedCategorySet.has(item.category));
 
-  const preBrandProducts = selectedPrice === "all"
+  const preBrandProducts = (selectedPrice === "all"
     ? categoryFilteredProducts
-    : categoryFilteredProducts.filter((item) => matchPriceRange(item.minPrice?.amount, selectedPrice, CATALOG_PRICE_RANGES));
+    : categoryFilteredProducts.filter((item) => matchPriceRange(item.minPrice?.amount, selectedPrice, CATALOG_PRICE_RANGES)))
+    .filter((item) => {
+      const byAvailability = !hasAvailabilityFilter || selectedAvailabilitySet.has(item.availability);
+      const byLegacyPriceRange = !hasLegacyPriceRangeFilter || selectedPriceRangeSet.has(item.priceRange);
+      const byExtraFacets = matchesSelectedExtraFilters(item);
+      return byAvailability && byLegacyPriceRange && byExtraFacets;
+    });
 
   const brandCountMap = getCountMap(preBrandProducts.map((item) => item.brand));
-  const brands = getTopFacetValues(brandCountMap, 16);
+  const brands = getAllFacetValues(brandCountMap);
 
-  const filteredProducts = !hasBrandFilter
-    ? preBrandProducts
-    : preBrandProducts.filter((item) => selectedBrandSet.has(item.brand));
+  const preAvailabilityProducts = (selectedPrice === "all"
+    ? categoryFilteredProducts
+    : categoryFilteredProducts.filter((item) => matchPriceRange(item.minPrice?.amount, selectedPrice, CATALOG_PRICE_RANGES))
+  ).filter((item) => (!hasBrandFilter || selectedBrandSet.has(item.brand)) && matchesSelectedExtraFilters(item));
+  const availabilityCountMap = getCountMap(preAvailabilityProducts.map((item) => item.availability));
+  const availabilities = getAllFacetValues(availabilityCountMap);
+
+  const preLegacyPriceRangeProducts = (selectedPrice === "all"
+    ? categoryFilteredProducts
+    : categoryFilteredProducts.filter((item) => matchPriceRange(item.minPrice?.amount, selectedPrice, CATALOG_PRICE_RANGES))
+  ).filter((item) => {
+    const byBrand = !hasBrandFilter || selectedBrandSet.has(item.brand);
+    const byAvailability = !hasAvailabilityFilter || selectedAvailabilitySet.has(item.availability);
+    const byExtraFacets = matchesSelectedExtraFilters(item);
+    return byBrand && byAvailability && byExtraFacets;
+  });
+  const legacyPriceRangeCountMap = getCountMap(preLegacyPriceRangeProducts.map((item) => item.priceRange));
+  const legacyPriceRanges = getAllFacetValues(legacyPriceRangeCountMap)
+    .filter((value) => value.trim().toLowerCase() !== "unknown");
+
+  const discoveredExtraFacetKeys = Array.from(
+    new Set(
+      mappedProducts.flatMap((item) => Object.keys(item.extraFacets))
+    )
+  );
+
+  const allExtraFacetKeys = Array.from(
+    new Set([...Object.keys(selectedExtraFiltersVisible), ...discoveredExtraFacetKeys])
+  )
+    .filter((facetKey) => !hiddenExtraFacetKeys.has(facetKey))
+    .sort((a, b) => formatFacetGroupLabel(a).localeCompare(formatFacetGroupLabel(b), "ru"));
+
+  const extraFacetGroups = allExtraFacetKeys
+    .map((facetKey) => {
+      const pool = (selectedPrice === "all"
+        ? categoryFilteredProducts
+        : categoryFilteredProducts.filter((item) => matchPriceRange(item.minPrice?.amount, selectedPrice, CATALOG_PRICE_RANGES))
+      ).filter((item) => {
+        const byBrand = !hasBrandFilter || selectedBrandSet.has(item.brand);
+        const byAvailability = !hasAvailabilityFilter || selectedAvailabilitySet.has(item.availability);
+        const byLegacyPriceRange = !hasLegacyPriceRangeFilter || selectedPriceRangeSet.has(item.priceRange);
+        const byOtherExtraFacets = matchesSelectedExtraFilters(item, facetKey);
+        return byBrand && byAvailability && byLegacyPriceRange && byOtherExtraFacets;
+      });
+
+      const countMap = getCountMap(
+        pool
+          .flatMap((item) => {
+            const raw = item.extraFacets[facetKey];
+            if (!raw) {
+              return [] as string[];
+            }
+
+            return splitFacetValue(facetKey, raw)
+              .map((token) => normalizeFacetValue(facetKey, token))
+              .filter((token) => token && !UNKNOWN_FACET_VALUES.has(token.trim().toLowerCase()));
+          })
+      );
+      const values = getAllFacetValues(countMap)
+        .filter((value) => !UNKNOWN_FACET_VALUES.has(value.trim().toLowerCase()));
+      const activeValues = selectedExtraFiltersVisible[facetKey] ?? [];
+      const shouldRender = values.length > 1 || activeValues.length > 0;
+
+      if (!shouldRender) {
+        return null;
+      }
+
+      return {
+        key: facetKey,
+        label: formatFacetGroupLabel(facetKey),
+        options: values.map((value) => ({
+          value,
+          label: value,
+          count: countMap.get(value) ?? 0,
+        })),
+      };
+    })
+    .filter((group): group is { key: string; label: string; options: Array<{ value: string; label: string; count: number }> } => Boolean(group));
+
+  const filteredProducts = preBrandProducts.filter((item) => {
+    const byBrand = !hasBrandFilter || selectedBrandSet.has(item.brand);
+    const byAvailability = !hasAvailabilityFilter || selectedAvailabilitySet.has(item.availability);
+    const byLegacyPriceRange = !hasLegacyPriceRangeFilter || selectedPriceRangeSet.has(item.priceRange);
+    const byExtraFacets = matchesSelectedExtraFilters(item);
+    return byBrand && byAvailability && byLegacyPriceRange && byExtraFacets;
+  });
 
   const prePriceProducts = !hasCategoryFilter
     ? queryFilteredProducts
@@ -233,8 +590,15 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     ? prePriceProducts
     : prePriceProducts.filter((item) => selectedBrandSet.has(item.brand));
 
+  const prePriceFacetProducts = prePriceByBrandProducts.filter((item) => {
+    const byAvailability = !hasAvailabilityFilter || selectedAvailabilitySet.has(item.availability);
+    const byLegacyPriceRange = !hasLegacyPriceRangeFilter || selectedPriceRangeSet.has(item.priceRange);
+    const byExtraFacets = matchesSelectedExtraFilters(item);
+    return byAvailability && byLegacyPriceRange && byExtraFacets;
+  });
+
   const priceCountMap = getPriceCountMap(
-    prePriceByBrandProducts.map((item) => ({ amount: item.minPrice?.amount })),
+    prePriceFacetProducts.map((item) => ({ amount: item.minPrice?.amount })),
     CATALOG_PRICE_RANGES,
     matchPriceRange
   );
@@ -298,13 +662,16 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
     v2PageItems.push(totalPages);
   }
-  const selectedPriceRange = CATALOG_PRICE_RANGES.find((range) => range.value === selectedPrice);
-  const priceFromValue = selectedPriceRange && "min" in selectedPriceRange ? selectedPriceRange.min : 0;
-  const priceToValue = selectedPriceRange && "max" in selectedPriceRange ? selectedPriceRange.max : 28000;
+  const selectedUiPriceRange = CATALOG_PRICE_RANGES.find((range) => range.value === selectedPrice);
+  const priceFromValue = selectedUiPriceRange && "min" in selectedUiPriceRange ? selectedUiPriceRange.min : 0;
+  const priceToValue = selectedUiPriceRange && "max" in selectedUiPriceRange ? selectedUiPriceRange.max : 28000;
   const hasNextPage = currentPage < totalPages;
   const hasActiveFilters =
     hasCategoryFilter ||
     hasBrandFilter ||
+    hasAvailabilityFilter ||
+    hasLegacyPriceRangeFilter ||
+    Object.keys(selectedExtraFiltersVisible).length > 0 ||
     selectedPrice !== "all" ||
     selectedSort !== "popular" ||
     selectedQuery.length > 0 ||
@@ -324,6 +691,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           cat: selectedCategories.filter((item) => item !== categoryValue),
           sort: selectedSort !== "popular" ? selectedSort : undefined,
           brand: brandQueryValue,
+          availability: availabilityQueryValue,
+          priceRange: priceRangeQueryValue,
+          extraFilters: selectedExtraFiltersVisible,
           price: selectedPrice !== "all" ? selectedPrice : undefined,
           q: selectedQuery || undefined,
           page: 1,
@@ -342,6 +712,81 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           cat: categoryQueryValue,
           sort: selectedSort !== "popular" ? selectedSort : undefined,
           brand: selectedBrands.filter((item) => item !== brandValue),
+          availability: availabilityQueryValue,
+          priceRange: priceRangeQueryValue,
+          extraFilters: selectedExtraFiltersVisible,
+          price: selectedPrice !== "all" ? selectedPrice : undefined,
+          q: selectedQuery || undefined,
+          page: 1,
+        }),
+      });
+    }
+  }
+
+  if (hasAvailabilityFilter) {
+    for (const availabilityValue of selectedAvailabilities) {
+      activeFilterPills.push({
+        key: `availability-${availabilityValue}`,
+        label: `Наличие: ${AVAILABILITY_LABELS.get(availabilityValue) ?? availabilityValue}`,
+        href: buildCatalogQuery({
+          v2: isCatalogRedesign,
+          cat: categoryQueryValue,
+          sort: selectedSort !== "popular" ? selectedSort : undefined,
+          brand: brandQueryValue,
+          availability: selectedAvailabilities.filter((item) => item !== availabilityValue),
+          priceRange: priceRangeQueryValue,
+          extraFilters: selectedExtraFiltersVisible,
+          price: selectedPrice !== "all" ? selectedPrice : undefined,
+          q: selectedQuery || undefined,
+          page: 1,
+        }),
+      });
+    }
+  }
+
+  if (hasLegacyPriceRangeFilter) {
+    for (const rangeValue of selectedPriceRanges) {
+      activeFilterPills.push({
+        key: `price_range-${rangeValue}`,
+        label: `Сегмент: ${LEGACY_PRICE_RANGE_LABELS.get(rangeValue) ?? rangeValue}`,
+        href: buildCatalogQuery({
+          v2: isCatalogRedesign,
+          cat: categoryQueryValue,
+          sort: selectedSort !== "popular" ? selectedSort : undefined,
+          brand: brandQueryValue,
+          availability: availabilityQueryValue,
+          priceRange: selectedPriceRanges.filter((item) => item !== rangeValue),
+          extraFilters: selectedExtraFiltersVisible,
+          price: selectedPrice !== "all" ? selectedPrice : undefined,
+          q: selectedQuery || undefined,
+          page: 1,
+        }),
+      });
+    }
+  }
+
+  for (const [facetKey, selectedValues] of Object.entries(selectedExtraFiltersVisible)) {
+    for (const facetValue of selectedValues) {
+      const nextExtraFilters = { ...selectedExtraFiltersVisible };
+      const nextValues = (nextExtraFilters[facetKey] ?? []).filter((item) => item !== facetValue);
+
+      if (nextValues.length > 0) {
+        nextExtraFilters[facetKey] = nextValues;
+      } else {
+        delete nextExtraFilters[facetKey];
+      }
+
+      activeFilterPills.push({
+        key: `${facetKey}-${facetValue}`,
+        label: `${formatFacetGroupLabel(facetKey)}: ${facetValue}`,
+        href: buildCatalogQuery({
+          v2: isCatalogRedesign,
+          cat: categoryQueryValue,
+          sort: selectedSort !== "popular" ? selectedSort : undefined,
+          brand: brandQueryValue,
+          availability: availabilityQueryValue,
+          priceRange: priceRangeQueryValue,
+          extraFilters: nextExtraFilters,
           price: selectedPrice !== "all" ? selectedPrice : undefined,
           q: selectedQuery || undefined,
           page: 1,
@@ -439,25 +884,35 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   <CatalogV2FilterForm
                     selectedCategories={selectedCategories}
                     selectedBrands={selectedBrands}
+                    selectedAvailabilities={selectedAvailabilities}
+                    selectedPriceRanges={selectedPriceRanges}
+                    selectedExtraFilters={selectedExtraFiltersVisible}
                     selectedPrice={selectedPrice}
                     selectedSort={selectedSort}
                     selectedQuery={selectedQuery}
-                    categoryOptions={[
-                      { value: "all", label: "Все", count: preCategoryByPriceProducts.length },
-                      ...categories.map((category) => ({
-                        value: category,
-                        label: category,
-                        count: categoryCountMap.get(category) ?? 0,
-                      })),
-                    ]}
-                    brandOptions={[
-                      { value: "all", label: "Все бренды", count: preBrandProducts.length },
-                      ...brands.map((brand) => ({
-                        value: brand,
-                        label: brand,
-                        count: brandCountMap.get(brand) ?? 0,
-                      })),
-                    ]}
+                    categoryOptions={categories.map((category) => ({
+                      value: category,
+                      label: category,
+                      count: categoryCountMap.get(category) ?? 0,
+                    }))}
+                    brandOptions={brands.map((brand) => ({
+                      value: brand,
+                      label: brand,
+                      count: brandCountMap.get(brand) ?? 0,
+                    }))}
+                    availabilityOptions={availabilities
+                      .filter((value) => value === "in_stock")
+                      .map((value) => ({
+                        value,
+                        label: AVAILABILITY_LABELS.get(value) ?? value,
+                        count: availabilityCountMap.get(value) ?? 0,
+                      }))}
+                    priceRangeOptions={legacyPriceRanges.map((value) => ({
+                      value,
+                      label: LEGACY_PRICE_RANGE_LABELS.get(value) ?? value,
+                      count: legacyPriceRangeCountMap.get(value) ?? 0,
+                    }))}
+                    extraFacetGroups={extraFacetGroups}
                     priceOptions={CATALOG_PRICE_RANGES.map((range) => ({
                       value: range.value,
                       label: range.label,
@@ -480,6 +935,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   initialQuery={selectedQuery}
                   selectedCategories={selectedCategories}
                   selectedBrands={selectedBrands}
+                  selectedAvailabilities={selectedAvailabilities}
+                  selectedPriceRanges={selectedPriceRanges}
+                  selectedExtraFilters={selectedExtraFiltersVisible}
                   selectedPrice={selectedPrice}
                   selectedSort={selectedSort}
                 />
@@ -493,6 +951,17 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                   {(brandQueryValue ?? []).map((brand) => (
                     <input key={`sort-brand-${brand}`} type="hidden" name="brand" value={brand} />
                   ))}
+                  {(availabilityQueryValue ?? []).map((availability) => (
+                    <input key={`sort-availability-${availability}`} type="hidden" name="availability" value={availability} />
+                  ))}
+                  {(priceRangeQueryValue ?? []).map((range) => (
+                    <input key={`sort-price-range-${range}`} type="hidden" name="price_range" value={range} />
+                  ))}
+                  {Object.entries(selectedExtraFiltersVisible).flatMap(([facetKey, values]) =>
+                    values.map((value) => (
+                      <input key={`sort-${facetKey}-${value}`} type="hidden" name={facetKey} value={value} />
+                    ))
+                  )}
                   {selectedPrice !== "all" && <input type="hidden" name="price" value={selectedPrice} />}
                   {selectedQuery && <input type="hidden" name="q" value={selectedQuery} />}
                   <CatalogSortSelectAuto
@@ -710,6 +1179,13 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           <div className={`catalog-grid${isCatalogRedesign ? " catalog-grid-v2" : ""}`}>
             {renderedProducts.map(({ product, category, brand, minPrice }) => {
               const productHref = isCatalogRedesign ? `/product/${product.handle}?v2=1` : `/product/${product.handle}`;
+              const primaryPrice = toPrimaryUahPrice(minPrice);
+              const usdPrice = minPrice?.currency !== "USD" ? getProductPriceByCurrency(product, "USD") : null;
+              const secondaryUsdText = usdPrice
+                ? `≈ ${usdPrice.amount.toLocaleString("ru-RU")} ${usdPrice.currency}`
+                : minPrice && minPrice.currency !== "UAH"
+                  ? `≈ ${minPrice.amount.toLocaleString("ru-RU")} ${minPrice.currency}`
+                  : null;
 
               return (
               <article className={`product-card${isCatalogRedesign ? " product-card-v2" : ""}`} key={product.id}>
@@ -733,14 +1209,17 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                       </Link>
                     </h3>
                     <div className="catalog-price-row-v2">
-                      {minPrice && (
+                      {primaryPrice && (
                         <span className="product-price-old-v2">
-                          {Math.round(minPrice.amount * 1.2).toLocaleString("ru-RU")}
+                          {`${Math.round(primaryPrice.amount * 1.2).toLocaleString("ru-RU")} ${primaryPrice.currency}`}
                         </span>
                       )}
-                      <strong className="product-price-v2">
-                        {minPrice ? `${minPrice.amount.toLocaleString("ru-RU")} ${minPrice.currency}` : "Цена уточняется"}
-                      </strong>
+                      <div className="catalog-price-main-v2">
+                        <strong className="product-price-v2">
+                          {primaryPrice ? `${primaryPrice.amount.toLocaleString("ru-RU")} ${primaryPrice.currency}` : "Цена уточняется"}
+                        </strong>
+                        {secondaryUsdText && <span className="product-price-secondary-v2">{secondaryUsdText}</span>}
+                      </div>
                     </div>
                     <CatalogCardActions
                       href={productHref}
@@ -766,8 +1245,9 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                     </h3>
                     <p className="product-handle">/{product.handle}</p>
                     <p className="product-price">
-                      {minPrice ? `${minPrice.amount.toLocaleString("ru-RU")} ${minPrice.currency}` : "Цена уточняется"}
+                      {primaryPrice ? `${primaryPrice.amount.toLocaleString("ru-RU")} ${primaryPrice.currency}` : "Цена уточняется"}
                     </p>
+                    {secondaryUsdText && <p className="product-price-secondary">{secondaryUsdText}</p>}
                     <Link href={productHref} className="cta-btn product-btn">
                       Открыть товар
                     </Link>

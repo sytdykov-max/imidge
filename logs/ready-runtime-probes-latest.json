@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-03-06T08:21:32.910Z",
+  "generatedAt": "2026-03-12T10:37:16.912Z",
   "baseUrl": "http://127.0.0.1:3002",
   "profile": "local",
   "total": 9,
   "failed": 0,
-  "slow": 0,
+  "slow": 2,
   "maxAllowedLatencyMs": 1500,
   "maxAllowedFailures": 0,
   "probes": [
@@ -14,7 +14,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/catalog",
-      "elapsedMs": 167,
+      "elapsedMs": 4355,
       "ok": true,
       "error": ""
     },
@@ -24,7 +24,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/catalog",
-      "elapsedMs": 163,
+      "elapsedMs": 373,
       "ok": true,
       "error": ""
     },
@@ -34,7 +34,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/catalog",
-      "elapsedMs": 119,
+      "elapsedMs": 271,
       "ok": true,
       "error": ""
     },
@@ -44,7 +44,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/catalog",
-      "elapsedMs": 116,
+      "elapsedMs": 265,
       "ok": true,
       "error": ""
     },
@@ -54,7 +54,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/cart",
-      "elapsedMs": 47,
+      "elapsedMs": 67,
       "ok": true,
       "error": ""
     },
@@ -62,9 +62,9 @@
       "source": "/checkout.php",
       "destination": "/checkout",
       "sourceStatus": 308,
-      "destinationStatus": 200,
+      "destinationStatus": 307,
       "location": "/checkout",
-      "elapsedMs": 40,
+      "elapsedMs": 1479,
       "ok": true,
       "error": ""
     },
@@ -74,7 +74,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/search",
-      "elapsedMs": 143,
+      "elapsedMs": 5308,
       "ok": true,
       "error": ""
     },
@@ -84,7 +84,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/blog",
-      "elapsedMs": 63,
+      "elapsedMs": 862,
       "ok": true,
       "error": ""
     },
@@ -94,7 +94,7 @@
       "sourceStatus": 308,
       "destinationStatus": 200,
       "location": "/account",
-      "elapsedMs": 74,
+      "elapsedMs": 78,
       "ok": true,
       "error": ""
     }

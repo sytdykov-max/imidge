@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-03-12T11:22:00Z",
+  "source": "apps/medusa/src/scripts/legacy-filters.json",
+  "total_products": 13475,
+  "expected_sidebar_groups": [
+    "filter_gender",
+    "filter_style",
+    "filter_brand",
+    "filter_size",
+    "filter_mechanism",
+    "filter_mechanism_origin",
+    "filter_case_size_mm",
+    "filter_case_shape",
+    "filter_case_color",
+    "filter_case_material",
+    "filter_extra_functions",
+    "filter_glass",
+    "filter_water_resistance",
+    "filter_assembly_country"
+  ],
+  "coverage": {
+    "filter_gender": { "count": 9293, "unique_values": 3, "coverage_pct": 68.97 },
+    "filter_style": { "count": 1765, "unique_values": 4, "coverage_pct": 13.1 },
+    "filter_brand": { "count": 13475, "unique_values": 689, "coverage_pct": 100.0 },
+    "filter_size": { "count": 12, "unique_values": 4, "coverage_pct": 0.09 },
+    "filter_mechanism": { "count": 3348, "unique_values": 3, "coverage_pct": 24.85 },
+    "filter_mechanism_origin": { "count": 3540, "unique_values": 3, "coverage_pct": 26.27 },
+    "filter_case_size_mm": { "count": 12, "unique_values": 10, "coverage_pct": 0.09 },
+    "filter_case_shape": { "count": 1647, "unique_values": 4, "coverage_pct": 12.22 },
+    "filter_case_color": { "count": 4055, "unique_values": 7, "coverage_pct": 30.09 },
+    "filter_case_material": { "count": 2897, "unique_values": 5, "coverage_pct": 21.5 },
+    "filter_extra_functions": { "count": 2204, "unique_values": 20, "coverage_pct": 16.36 },
+    "filter_glass": { "count": 4452, "unique_values": 2, "coverage_pct": 33.04 },
+    "filter_water_resistance": { "count": 11, "unique_values": 5, "coverage_pct": 0.08 },
+    "filter_assembly_country": { "count": 3602, "unique_values": 4, "coverage_pct": 26.73 }
+  },
+  "top_non_core_facet_keys": [
+    ["filter_gender", 9293],
+    ["filter_glass", 4452],
+    ["filter_case_color", 4055],
+    ["filter_assembly_country", 3602],
+    ["filter_mechanism_origin", 3540],
+    ["filter_mechanism", 3348],
+    ["filter_case_material", 2897],
+    ["filter_extra_functions", 2204],
+    ["filter_style", 1765],
+    ["filter_case_shape", 1647]
+  ],
+  "conclusion": "Fallback inference now provides substantial coverage for most old-sidebar technical groups. Remaining weak groups are filter_water_resistance, filter_case_size_mm and filter_size due to sparse numeric specs in source text."
+}

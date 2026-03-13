@@ -18,11 +18,21 @@ type PriceOption = {
 type CatalogV2FilterFormProps = {
   selectedCategories: string[];
   selectedBrands: string[];
+  selectedAvailabilities: string[];
+  selectedPriceRanges: string[];
+  selectedExtraFilters: Record<string, string[]>;
   selectedPrice: string;
   selectedSort: string;
   selectedQuery: string;
   categoryOptions: FilterOption[];
   brandOptions: FilterOption[];
+  availabilityOptions: FilterOption[];
+  priceRangeOptions: FilterOption[];
+  extraFacetGroups: Array<{
+    key: string;
+    label: string;
+    options: FilterOption[];
+  }>;
   priceOptions: PriceOption[];
   priceFromValue: number;
   priceToValue: number;
@@ -40,11 +50,17 @@ function normalizeSelected(values: string[]) {
 export function CatalogV2FilterForm({
   selectedCategories,
   selectedBrands,
+  selectedAvailabilities,
+  selectedPriceRanges,
+  selectedExtraFilters,
   selectedPrice,
   selectedSort,
   selectedQuery,
   categoryOptions,
   brandOptions,
+  availabilityOptions,
+  priceRangeOptions,
+  extraFacetGroups,
   priceOptions,
   priceFromValue,
   priceToValue,
@@ -52,9 +68,30 @@ export function CatalogV2FilterForm({
   const router = useRouter();
   const [categoryValues, setCategoryValues] = useState<string[]>(normalizeSelected(selectedCategories));
   const [brandValues, setBrandValues] = useState<string[]>(normalizeSelected(selectedBrands));
+  const [availabilityValues, setAvailabilityValues] = useState<string[]>(normalizeSelected(selectedAvailabilities));
+  const [priceRangeValues, setPriceRangeValues] = useState<string[]>(normalizeSelected(selectedPriceRanges));
+  const [extraFacetValues, setExtraFacetValues] = useState<Record<string, string[]>>(() => {
+    const normalized: Record<string, string[]> = {};
+    for (const [key, values] of Object.entries(selectedExtraFilters)) {
+      const cleaned = normalizeSelected(values);
+      if (!cleaned.includes("all")) {
+        normalized[key] = cleaned;
+      }
+    }
+    return normalized;
+  });
 
   const categorySet = useMemo(() => new Set(categoryValues), [categoryValues]);
   const brandSet = useMemo(() => new Set(brandValues), [brandValues]);
+  const availabilitySet = useMemo(() => new Set(availabilityValues), [availabilityValues]);
+  const priceRangeSet = useMemo(() => new Set(priceRangeValues), [priceRangeValues]);
+  const extraFacetSets = useMemo(() => {
+    const result: Record<string, Set<string>> = {};
+    for (const [key, values] of Object.entries(extraFacetValues)) {
+      result[key] = new Set(values);
+    }
+    return result;
+  }, [extraFacetValues]);
 
   const toggleGroupValue = (
     currentValues: string[],
@@ -81,6 +118,9 @@ export function CatalogV2FilterForm({
   const applyFilters = (next: {
     categories?: string[];
     brands?: string[];
+    availabilities?: string[];
+    priceRanges?: string[];
+    extraFilters?: Record<string, string[]>;
     price?: string;
   }) => {
     const params = new URLSearchParams();
@@ -88,6 +128,9 @@ export function CatalogV2FilterForm({
 
     const categories = (next.categories ?? categoryValues).filter((value) => value !== "all");
     const brands = (next.brands ?? brandValues).filter((value) => value !== "all");
+    const availabilities = (next.availabilities ?? availabilityValues).filter((value) => value !== "all");
+    const priceRanges = (next.priceRanges ?? priceRangeValues).filter((value) => value !== "all");
+    const extraFilters = next.extraFilters ?? extraFacetValues;
     const price = next.price ?? selectedPrice;
 
     for (const value of categories) {
@@ -96,6 +139,26 @@ export function CatalogV2FilterForm({
 
     for (const value of brands) {
       params.append("brand", value);
+    }
+
+    for (const value of availabilities) {
+      params.append("availability", value);
+    }
+
+    for (const value of priceRanges) {
+      params.append("price_range", value);
+    }
+
+    for (const [key, values] of Object.entries(extraFilters)) {
+      if (!key.startsWith("filter_")) {
+        continue;
+      }
+
+      for (const value of values) {
+        if (value && value !== "all") {
+          params.append(key, value);
+        }
+      }
     }
 
     if (price !== "all") {
@@ -174,6 +237,106 @@ export function CatalogV2FilterForm({
           })}
         </div>
       </div>
+
+      <div className="catalog-v2-group">
+        <p>Наличие</p>
+        <div className="catalog-v2-checks" role="list">
+          {availabilityOptions.map((option) => {
+            const checked = availabilitySet.has(option.value);
+
+            return (
+              <label key={option.value} className={`catalog-v2-check${checked ? " active" : ""}`}>
+                <input
+                  type="checkbox"
+                  value={option.value}
+                  checked={checked}
+                  onChange={() => {
+                    const nextValues = toggleGroupValue(availabilityValues, option.value, setAvailabilityValues);
+                    applyFilters({ availabilities: nextValues });
+                  }}
+                />
+                <span className="catalog-v2-checkbox" aria-hidden="true" />
+                <span>{option.label} ({option.count})</span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="catalog-v2-group">
+        <p>Ценовой сегмент</p>
+        <div className="catalog-v2-checks" role="list">
+          {priceRangeOptions.map((option) => {
+            const checked = priceRangeSet.has(option.value);
+
+            return (
+              <label key={option.value} className={`catalog-v2-check${checked ? " active" : ""}`}>
+                <input
+                  type="checkbox"
+                  value={option.value}
+                  checked={checked}
+                  onChange={() => {
+                    const nextValues = toggleGroupValue(priceRangeValues, option.value, setPriceRangeValues);
+                    applyFilters({ priceRanges: nextValues });
+                  }}
+                />
+                <span className="catalog-v2-checkbox" aria-hidden="true" />
+                <span>{option.label} ({option.count})</span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {extraFacetGroups.map((group) => {
+        const currentValues = extraFacetValues[group.key] ?? ["all"];
+        const currentSet = extraFacetSets[group.key] ?? new Set<string>(["all"]);
+
+        return (
+          <div className="catalog-v2-group" key={group.key}>
+            <p>{group.label}</p>
+            <div className="catalog-v2-checks" role="list">
+              {group.options.map((option) => {
+                const checked = currentSet.has(option.value);
+
+                return (
+                  <label key={option.value} className={`catalog-v2-check${checked ? " active" : ""}`}>
+                    <input
+                      type="checkbox"
+                      value={option.value}
+                      checked={checked}
+                      onChange={() => {
+                        const nextValues = toggleGroupValue(currentValues, option.value, (values) => {
+                          setExtraFacetValues((prev) => {
+                            const nextMap = { ...prev };
+                            if (values.includes("all")) {
+                              delete nextMap[group.key];
+                            } else {
+                              nextMap[group.key] = values;
+                            }
+                            return nextMap;
+                          });
+                        });
+
+                        const nextExtraFilters = { ...extraFacetValues };
+                        if (nextValues.includes("all")) {
+                          delete nextExtraFilters[group.key];
+                        } else {
+                          nextExtraFilters[group.key] = nextValues;
+                        }
+
+                        applyFilters({ extraFilters: nextExtraFilters });
+                      }}
+                    />
+                    <span className="catalog-v2-checkbox" aria-hidden="true" />
+                    <span>{option.label} ({option.count})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
 
       <div className="catalog-v2-group">
         <p>Диапазон</p>

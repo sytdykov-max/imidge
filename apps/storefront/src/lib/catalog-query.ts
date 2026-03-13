@@ -4,7 +4,10 @@ export type CatalogSearchParams = {
   page?: string | string[];
   brand?: string | string[];
   price?: string | string[];
+  availability?: string | string[];
+  price_range?: string | string[];
   q?: string | string[];
+  [key: string]: string | string[] | undefined;
 };
 
 export const CATALOG_SORT_OPTIONS = [
@@ -40,6 +43,11 @@ export type CatalogNormalizedParams = {
   selectedSort: CatalogSortValue;
   selectedBrand: string;
   selectedBrands: string[];
+  selectedAvailability: string;
+  selectedAvailabilities: string[];
+  selectedPriceRange: string;
+  selectedPriceRanges: string[];
+  selectedExtraFilters: Record<string, string[]>;
   selectedPrice: CatalogPriceValue;
   selectedQuery: string;
   requestedPage: number;
@@ -50,10 +58,21 @@ export type CatalogQueryInput = {
   sort?: string;
   page?: number;
   brand?: string | string[];
+  availability?: string | string[];
+  priceRange?: string | string[];
+  extraFilters?: Record<string, string | string[] | undefined>;
   price?: string;
   q?: string;
   v2?: boolean;
 };
+
+const RESERVED_DYNAMIC_FILTER_KEYS = new Set([
+  "filter_brand",
+  "filter_category",
+  "filter_price_range",
+  "filter_availability",
+  "filter_sex",
+]);
 
 function getFirstValue(value?: string | string[]) {
   if (Array.isArray(value)) {
@@ -89,6 +108,23 @@ export function normalizeCatalogSearchParams(query: CatalogSearchParams): Catalo
     : "popular";
   const selectedBrands = normalizeMultiValue(query.brand, "all");
   const selectedBrand = selectedBrands[0] ?? "all";
+  const selectedAvailabilities = normalizeMultiValue(query.availability, "all");
+  const selectedAvailability = selectedAvailabilities[0] ?? "all";
+  const selectedPriceRanges = normalizeMultiValue(query.price_range, "all");
+  const selectedPriceRange = selectedPriceRanges[0] ?? "all";
+  const selectedExtraFilters: Record<string, string[]> = {};
+
+  for (const [key, value] of Object.entries(query)) {
+    if (!key.startsWith("filter_") || RESERVED_DYNAMIC_FILTER_KEYS.has(key)) {
+      continue;
+    }
+
+    const normalized = normalizeMultiValue(value, "all").filter((item) => item !== "all");
+    if (normalized.length > 0) {
+      selectedExtraFilters[key] = normalized;
+    }
+  }
+
   const priceValue = getFirstValue(query.price);
   const selectedPrice = CATALOG_PRICE_RANGES.some((option) => option.value === priceValue)
     ? (priceValue as CatalogPriceValue)
@@ -103,6 +139,11 @@ export function normalizeCatalogSearchParams(query: CatalogSearchParams): Catalo
     selectedSort,
     selectedBrand,
     selectedBrands,
+    selectedAvailability,
+    selectedAvailabilities,
+    selectedPriceRange,
+    selectedPriceRanges,
+    selectedExtraFilters,
     selectedPrice,
     selectedQuery,
     requestedPage,
@@ -126,6 +167,36 @@ export function buildCatalogQuery(next: CatalogQueryInput) {
     for (const brandValue of brandValues) {
       if (brandValue?.trim()) {
         params.append("brand", brandValue.trim());
+      }
+    }
+  }
+  if (next.availability) {
+    const values = Array.isArray(next.availability) ? next.availability : [next.availability];
+    for (const value of values) {
+      if (value?.trim()) {
+        params.append("availability", value.trim());
+      }
+    }
+  }
+  if (next.priceRange) {
+    const values = Array.isArray(next.priceRange) ? next.priceRange : [next.priceRange];
+    for (const value of values) {
+      if (value?.trim()) {
+        params.append("price_range", value.trim());
+      }
+    }
+  }
+  if (next.extraFilters) {
+    for (const [key, value] of Object.entries(next.extraFilters)) {
+      if (!key.startsWith("filter_")) {
+        continue;
+      }
+
+      const values = Array.isArray(value) ? value : typeof value === "string" ? [value] : [];
+      for (const item of values) {
+        if (item?.trim()) {
+          params.append(key, item.trim());
+        }
       }
     }
   }

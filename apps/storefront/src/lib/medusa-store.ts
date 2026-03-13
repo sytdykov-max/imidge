@@ -52,6 +52,11 @@ export type StoreProductsPage = {
   limit: number;
 };
 
+export type ProductPrice = {
+  amount: number;
+  currency: string;
+};
+
 type StoreProductsCache = {
   expiresAt: number;
   products: StoreProduct[];
@@ -59,23 +64,68 @@ type StoreProductsCache = {
 
 let allProductsCache: StoreProductsCache | null = null;
 
-export function getMinProductPrice(product: StoreProduct): { amount: number; currency: string } | null {
+const DEFAULT_CURRENCY_PRIORITY = ["UAH", "USD"];
+
+function collectProductPrices(product: StoreProduct): ProductPrice[] {
   const prices = product.variants
     ?.flatMap((variant) => variant.prices ?? [])
     .filter(
       (price): price is { amount: number; currency_code: string } =>
-        typeof price.amount === "number" && Boolean(price.currency_code)
-    );
+        typeof price.amount === "number" && price.amount > 0 && Boolean(price.currency_code)
+    )
+    .map((price) => ({
+      amount: price.amount,
+      currency: price.currency_code.toUpperCase(),
+    }));
 
-  if (!prices?.length) {
+  return prices ?? [];
+}
+
+export function getProductPriceByCurrency(product: StoreProduct, currencyCode: string): ProductPrice | null {
+  const normalizedCurrency = currencyCode.trim().toUpperCase();
+  if (!normalizedCurrency) {
     return null;
   }
 
-  const minPrice = prices.reduce((best, current) => (current.amount < best.amount ? current : best));
-  return {
-    amount: minPrice.amount,
-    currency: minPrice.currency_code.toUpperCase(),
-  };
+  const candidates = collectProductPrices(product).filter((price) => price.currency === normalizedCurrency);
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  return candidates.reduce((best, current) => (current.amount < best.amount ? current : best));
+}
+
+export function getPreferredProductPrice(
+  product: StoreProduct,
+  preferredCurrencies: string[] = DEFAULT_CURRENCY_PRIORITY
+): ProductPrice | null {
+  const normalizedPriority = preferredCurrencies
+    .map((currency) => currency.trim().toUpperCase())
+    .filter(Boolean);
+
+  for (const currency of normalizedPriority) {
+    const currencyPrice = getProductPriceByCurrency(product, currency);
+    if (currencyPrice) {
+      return currencyPrice;
+    }
+  }
+
+  const prices = collectProductPrices(product);
+  if (prices.length === 0) {
+    return null;
+  }
+
+  return prices.reduce((best, current) => (current.amount < best.amount ? current : best));
+}
+
+export function getMinProductPrice(product: StoreProduct): { amount: number; currency: string } | null {
+  const minPrice = getPreferredProductPrice(product);
+  return minPrice
+    ? {
+        amount: minPrice.amount,
+        currency: minPrice.currency,
+      }
+    : null;
 }
 
 function withResolvedThumbnail(product: StoreProduct): StoreProduct {

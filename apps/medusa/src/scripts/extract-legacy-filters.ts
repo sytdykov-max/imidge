@@ -19,6 +19,37 @@ type RawRow = {
   quantityRaw: string;
 };
 
+type RawPropertyRow = {
+  legacyId: string;
+  handleRaw: string;
+  propertyCode: string;
+  propertyValue: string;
+};
+const RESERVED_FILTER_KEYS = new Set([
+  "filter_brand",
+  "filter_category",
+  "filter_price_range",
+  "filter_availability",
+]);
+const PROPERTY_CODE_BLACKLIST = new Set([
+  "CML2_LINK",
+  "MORE_PHOTO",
+  "vote_count",
+  "vote_sum",
+  "rating",
+  "PRICE_SORT",
+  "SORT_TYPE_PRODUCT",
+  "METKA",
+  "NOTE",
+  "PRICE_OPT",
+  "LINK_YOUTUBE",
+  "LINK_MEDIA",
+  "FULL_REVIEW",
+  "ARTICLE_LINK",
+  "ALT_PREV",
+  "ALT_OSN",
+]);
+
 type FilterRecord = {
   legacy_id: string;
   handle: string;
@@ -33,10 +64,35 @@ type FilterRecord = {
 
 function inferGender(title: string, handle: string) {
   const vector = `${title} ${handle}`.toLowerCase();
-  if (/(мужск|male|men|man)/u.test(vector)) return "male";
-  if (/(женск|female|women|woman)/u.test(vector)) return "female";
-  if (/(unisex|унисекс)/u.test(vector)) return "unisex";
-  return "unknown";
+  if (/(unisex|унисекс)/u.test(vector)) return "Унисекс";
+  if (/(мужск|male|men|man)/u.test(vector)) return "Мужской";
+  if (/(женск|female|women|woman)/u.test(vector)) return "Женский";
+  return "";
+}
+
+function normalizeGenderLabel(value: string) {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) {
+    return "";
+  }
+
+  if (/(унисекс|unisex|мужские\s*\/\s*женские|женские\s*\/\s*мужские|мужские\s*\/\s*женские\s*\/\s*унисекс|женские\s*\/\s*мужские\s*\/\s*унисекс|мужские\s*\/\s*унисекс|женские\s*\/\s*унисекс)/u.test(normalized)) {
+    return "Унисекс";
+  }
+
+  if (/(unknown|неизвест|не\s*указан|не\s*указано|n\/a|none|null)/u.test(normalized)) {
+    return "Унисекс";
+  }
+
+  if (/(мужск|male|men|man)/u.test(normalized)) {
+    return "Мужской";
+  }
+
+  if (/(женск|female|women|woman)/u.test(normalized)) {
+    return "Женский";
+  }
+
+  return "";
 }
 
 function inferProductType(title: string, category: string) {
@@ -45,6 +101,141 @@ function inferProductType(title: string, category: string) {
   if (/(сумк|bag|bags|handbag|клатч|рюкзак)/u.test(vector)) return "bag";
   if (/(футбол|shirt|dress|plate|shorts|sweat)/u.test(vector)) return "apparel";
   return "other";
+}
+
+function inferCategoryFromTypeProduct(typeProduct: string) {
+  const vector = fixMojibake(typeProduct).toLowerCase();
+
+  if (/(часы|watch|часов)/u.test(vector)) return "Часы";
+  if (/(барсет|barset)/u.test(vector)) return "Барсетки";
+  if (/(клатч|klatch|clutch)/u.test(vector)) return "Клатчи";
+  if (/(рюкзак|ryukzak|backpack)/u.test(vector)) return "Рюкзаки";
+  if (/(портмон|portmone)/u.test(vector)) return "Портмоне";
+  if (/(визитниц|vizitnits|cardholder|business\s*card)/u.test(vector)) return "Визитницы";
+  if (/(кошел|koshel|wallet)/u.test(vector)) return "Кошельки";
+  if (/(ремен|ремн|belt)/u.test(vector)) return "Ремни";
+  if (/(чехл|обложк|ipad\s*case|ipad\s*cover|кейс\s*ipad)/u.test(vector)) return "Чехлы/Обложки iPad";
+  if (/(телефон|смартфон|smartphone|mobile\s*phone|iphone|nokia|mobiado|vertu|ipod)/u.test(vector)) return "Телефоны";
+  if (/(сумк|bag)/u.test(vector)) return "Сумки";
+  if (/(футбол|рубаш|поло|dress|shirt|shorts|шорт|плать|одеж|джинс|штаны|брюк|свитер|толстов|куртк|жилет|майк|галстук|шарф|платк|кепк|шапк|костюм|ветровк|постельн|белье)/u.test(vector)) return "Одежда";
+  if (/(кед|кроссов|ботин|туфл|сандал|шлепан|обув)/u.test(vector)) return "Обувь";
+  if (/(зажигал|ручк|зонт|аксессуар|accessor|блокнот|брелок|ключниц|зажим|маникюр|гильотин|пепельниц|хьюмидор|коробк|сертификат|бижутер|пакет|застежк|сѓс‡|рµрјр|ручк)/u.test(vector)) return "Аксессуары";
+  if (/(electronics|электрон)/u.test(vector)) return "Электроника";
+
+  return "";
+}
+
+const CATEGORY_PREFIX_MAP: Array<{ category: string; prefixes: string[] }> = [
+  {
+    category: "Часы",
+    prefixes: ["kopiya-chasov", "chasy", "muzhskie-chasy", "zhenskie-chasy", "nastennye-chasy", "watch"],
+  },
+  {
+    category: "Барсетки",
+    prefixes: ["barsetka"],
+  },
+  {
+    category: "Клатчи",
+    prefixes: ["klatch", "clutch"],
+  },
+  {
+    category: "Рюкзаки",
+    prefixes: ["ryukzak", "backpack"],
+  },
+  {
+    category: "Портмоне",
+    prefixes: ["portmone"],
+  },
+  {
+    category: "Визитницы",
+    prefixes: ["vizitnitsa", "cardholder", "business-card"],
+  },
+  {
+    category: "Кошельки",
+    prefixes: ["koshelek", "wallet"],
+  },
+  {
+    category: "Ремни",
+    prefixes: ["remen", "belt"],
+  },
+  {
+    category: "Чехлы/Обложки iPad",
+    prefixes: ["chehol-ipad", "oblozhka-ipad", "ipad-case", "ipad-cover", "case-for-ipad", "cover-for-ipad"],
+  },
+  {
+    category: "Телефоны",
+    prefixes: ["telefon", "smartfon", "smartphone", "iphone", "nokia", "mobiado", "vertu", "ipod"],
+  },
+  {
+    category: "Сумки",
+    prefixes: ["sumka", "sumki", "bag"],
+  },
+  {
+    category: "Одежда",
+    prefixes: ["futbolka", "rubashka", "polo", "plate", "dress", "shorts", "hoodie", "sweatshirt", "odezhda"],
+  },
+  {
+    category: "Обувь",
+    prefixes: ["krossovki", "kedy", "tufli", "botinki", "sapogi", "obuv", "shoes"],
+  },
+  {
+    category: "Аксессуары",
+    prefixes: [
+      "remen",
+      "zazhigalka",
+      "ruchka",
+      "zont",
+      "zaponki",
+      "brelok",
+      "braslet",
+      "korobka-dlya-chasov",
+      "zastezhka",
+      "aksessuary",
+      "accessories",
+    ],
+  },
+  {
+    category: "Электроника",
+    prefixes: ["vertu", "nokia", "mobiado", "iphone", "ipod", "telefon", "smartfon", "electronics"],
+  },
+];
+
+function inferCategoryFromHandle(handle: string) {
+  const normalizedHandle = handle.toLowerCase();
+
+  for (const mapping of CATEGORY_PREFIX_MAP) {
+    if (mapping.prefixes.some((prefix) => normalizedHandle === prefix || normalizedHandle.startsWith(`${prefix}-`))) {
+      return mapping.category;
+    }
+  }
+
+  return "";
+}
+
+function inferCategoryFromText(title: string, handle: string) {
+  const vector = `${title} ${handle}`.toLowerCase();
+
+  if (/(часы|часов|watch|watches|chasov)/u.test(vector)) return "Часы";
+  if (/(барсет|barset)/u.test(vector)) return "Барсетки";
+  if (/(клатч|klatch|clutch)/u.test(vector)) return "Клатчи";
+  if (/(рюкзак|ryukzak|backpack)/u.test(vector)) return "Рюкзаки";
+  if (/(портмон|portmone)/u.test(vector)) return "Портмоне";
+  if (/(визитниц|vizitnits|vizitnitsa|cardholder|business\s*card)/u.test(vector)) return "Визитницы";
+  if (/(кошел|koshel|wallet)/u.test(vector)) return "Кошельки";
+  if (/(ремен|ремн|belt)/u.test(vector)) return "Ремни";
+  if (/(чехл|обложк|ipad\s*case|ipad\s*cover|кейс\s*ipad)/u.test(vector)) return "Чехлы/Обложки iPad";
+  if (/(телефон|смартфон|smartphone|mobile\s*phone|iphone|nokia|mobiado|vertu|ipod)/u.test(vector)) return "Телефоны";
+  if (/(сумк|bag|bags|handbag|chemodan|чемодан)/u.test(vector)) return "Сумки";
+  if (/(футбол|рубаш|поло|dress|shirt|shorts|шорт|plate|плать|hoodie|sweat|одеж|kurtka|dzhins|bryuki|sviter|tolstovk|galstuk|sharf|platok|kepk|shapka|kostyum|vetrovk|zhilet|maika|postelnog|belya|белье|постельн)/u.test(vector)) return "Одежда";
+  if (/(кроссовк|кед|туфл|ботин|сапог|shoes|sneaker|krossov|kedy|tufli|sandali|slantsy)/u.test(vector)) return "Обувь";
+  if (/(зажигал|ручк|зонт|запонк|аксессуар|accessor|bloknot|brelok|klyuchnitsa|zazhim|manikyurn|gilotina|pepelnitsa|humidor|khyumidor|korobka|sertifikat|bijuteri|paket|sterzhen)/u.test(vector)) return "Аксессуары";
+  if (/(electronics|электрон)/u.test(vector)) return "Электроника";
+
+  return "";
+}
+
+function isGenericCategory(category: string) {
+  return /^(без категории|каталог|catalog|неактивные)$/iu.test(category);
 }
 
 function inferSaleFlag(title: string) {
@@ -122,6 +313,127 @@ function normalizeHandle(handle: string, legacyId: string) {
   return normalized || `legacy-${legacyId}`;
 }
 
+function sanitizePropertyValue(value: string) {
+  return normalizeLabel(value, "")
+    .replace(/\s*\|\s*/g, " ")
+    .replace(/\s*\/\s*/g, " ")
+    .trim();
+}
+
+function toFilterKeyFromPropertyCode(propertyCode: string) {
+  const key = propertyCode
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  if (!key) {
+    return "";
+  }
+
+  return `filter_${key}`;
+}
+
+function mergeAttributeValue(existing: unknown, next: string) {
+  if (typeof existing !== "string" || !existing.trim()) {
+    return next;
+  }
+
+  if (existing === next) {
+    return existing;
+  }
+
+  const uniqueValues = new Set([
+    ...existing.split(" / ").map((item) => item.trim()).filter(Boolean),
+    next,
+  ]);
+
+  return [...uniqueValues].slice(0, 4).join(" / ");
+}
+
+async function loadPropertyAttributesByHandle(mysqlExe: string) {
+  const sql = `
+SET NAMES utf8mb4;
+SELECT CONCAT_WS('\t',
+  e.ID,
+  HEX(IFNULL(e.CODE, '')),
+  HEX(IFNULL(p.CODE, '')),
+  HEX(IFNULL(TRIM(COALESCE(pe.VALUE, ep.VALUE)), ''))
+) AS row_tsv
+FROM b_iblock_element e
+JOIN b_iblock_element_property ep ON ep.IBLOCK_ELEMENT_ID = e.ID
+JOIN b_iblock_property p ON p.ID = ep.IBLOCK_PROPERTY_ID
+LEFT JOIN b_iblock_property_enum pe ON pe.ID = ep.VALUE_ENUM
+WHERE e.IBLOCK_ID = 26
+  AND e.ACTIVE = 'Y'
+  AND p.IBLOCK_ID = 26
+  AND p.ACTIVE = 'Y'
+  AND p.CODE IS NOT NULL
+  AND p.CODE <> ''
+  AND TRIM(COALESCE(pe.VALUE, ep.VALUE, '')) <> ''
+ORDER BY e.ID;
+`;
+
+  const { stdout } = await execFileAsync(
+    mysqlExe,
+    [
+      "-u",
+      "root",
+      "-D",
+      "dbimidge",
+      "--default-character-set=utf8mb4",
+      "--batch",
+      "--raw",
+      "--skip-column-names",
+      "-e",
+      sql,
+    ],
+    {
+      encoding: "buffer",
+      maxBuffer: 200 * 1024 * 1024,
+      windowsHide: true,
+    }
+  );
+
+  const rows: RawPropertyRow[] = (stdout as Buffer)
+    .toString("utf8")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [legacyId = "", handleHex = "", propertyCodeHex = "", propertyValueHex = ""] = line.split("\t");
+      return {
+        legacyId,
+        handleRaw: decodeBestTextFromHex(handleHex),
+        propertyCode: decodeBestTextFromHex(propertyCodeHex),
+        propertyValue: decodeBestTextFromHex(propertyValueHex),
+      };
+    });
+
+  const attributesByHandle = new Map<string, Record<string, string>>();
+
+  for (const row of rows) {
+    const handle = normalizeHandle(row.handleRaw, row.legacyId);
+    const propertyCode = row.propertyCode.trim();
+    const propertyValue = sanitizePropertyValue(row.propertyValue);
+
+    if (!propertyCode || !propertyValue || PROPERTY_CODE_BLACKLIST.has(propertyCode)) {
+      continue;
+    }
+
+    const filterKey = toFilterKeyFromPropertyCode(propertyCode);
+    if (!filterKey || RESERVED_FILTER_KEYS.has(filterKey)) {
+      continue;
+    }
+
+    const current = attributesByHandle.get(handle) ?? {};
+    current[filterKey] = mergeAttributeValue(current[filterKey], propertyValue);
+    attributesByHandle.set(handle, current);
+  }
+
+  return attributesByHandle;
+}
+
 function toDisplayBrandFromHandle(handle: string) {
   if (!handle) {
     return "Без бренда";
@@ -148,7 +460,46 @@ function normalizeBrandLabel(value: string) {
   return compact.charAt(0).toUpperCase() + compact.slice(1).toLowerCase();
 }
 
-function extractBrand(title: string, normalizedHandle: string) {
+function toTitleWordsFromSlug(slug: string) {
+  const compact = slug
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!compact) {
+    return "";
+  }
+
+  return compact
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => (/^[a-z]{1,3}$/i.test(word) ? word.toUpperCase() : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`))
+    .join(" ");
+}
+
+function inferIpadCaseBrandFromHandle(normalizedHandle: string) {
+  const brandMatch = normalizedHandle.match(/(?:chekhol-dlya-ipad-|ipad-case-|ipad-cover-)([a-z0-9-]+?)-model-/i);
+  if (!brandMatch) {
+    return "";
+  }
+
+  const slug = brandMatch[1]
+    .replace(/(?:^|-)ipad(?:-|$)/gi, "-")
+    .replace(/(?:^|-)case(?:-|$)/gi, "-")
+    .replace(/(?:^|-)cover(?:-|$)/gi, "-")
+    .replace(/(?:^|-)chekhol(?:-|$)/gi, "-")
+    .replace(/(?:^|-)oblozhka(?:-|$)/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  if (!slug || /^(model|unknown|bez-brenda|no-brand)$/i.test(slug)) {
+    return "";
+  }
+
+  return toTitleWordsFromSlug(slug);
+}
+
+function extractBrand(title: string, normalizedHandle: string, category: string) {
   const titleBrandMatch = title.match(/(?:часы|часов|watch|watches)\s+([A-Za-zА-Яа-я0-9-]+)/iu);
   const titleBrand = titleBrandMatch?.[1]?.trim();
   if (titleBrand) {
@@ -159,6 +510,13 @@ function extractBrand(title: string, normalizedHandle: string) {
   const handleBrandRaw = handleBrandMatch?.[1]?.split("-")?.[0];
   if (handleBrandRaw) {
     return normalizeBrandLabel(toDisplayBrandFromHandle(handleBrandRaw));
+  }
+
+  if (category === "Чехлы/Обложки iPad") {
+    const ipadBrand = inferIpadCaseBrandFromHandle(normalizedHandle);
+    if (ipadBrand) {
+      return ipadBrand;
+    }
   }
 
   return "Без бренда";
@@ -178,6 +536,7 @@ function toPriceRange(minPrice: number | null): FilterRecord["price_range"] {
 
 async function run() {
   const mysqlExe = "C:/xampp/mysql/bin/mysql.exe";
+  const propertyAttributesByHandle = await loadPropertyAttributesByHandle(mysqlExe);
 
   const sql = `
 SET NAMES utf8mb4;
@@ -271,7 +630,19 @@ ORDER BY e.ID;
     const handle = normalizeHandle(sourceHandle, row.legacyId);
     const title = normalizeLabel(row.title, `Товар ${row.legacyId}`);
     const category = normalizeLabel(row.sectionName || row.sectionCode, "Без категории");
-    const brand = extractBrand(title, handle);
+    const propertyAttributes = propertyAttributesByHandle.get(handle) ?? {};
+
+    const typeProductValue = typeof propertyAttributes.filter_type_product === "string"
+      ? propertyAttributes.filter_type_product
+      : "";
+    const inferredCategoryFromTypeProduct = inferCategoryFromTypeProduct(typeProductValue);
+    const inferredCategoryFromHandle = inferCategoryFromHandle(handle);
+    const inferredCategoryFromText = inferCategoryFromText(title, handle);
+    const inferredCategory = inferredCategoryFromTypeProduct || inferredCategoryFromHandle || inferredCategoryFromText || "";
+    const normalizedCategory = (isGenericCategory(category) || /^сумки$/iu.test(category))
+      ? inferredCategory || category
+      : category;
+    const brand = extractBrand(title, handle, normalizedCategory);
 
     const minPrice = Number(row.minPriceRaw);
     const validPrice = Number.isFinite(minPrice) && minPrice > 0 ? minPrice : null;
@@ -288,19 +659,31 @@ ORDER BY e.ID;
     const quantity = Number(row.quantityRaw);
     const availability: FilterRecord["availability"] = Number.isFinite(quantity) && quantity > 0 ? "in_stock" : "out_of_stock";
 
+    const rawGender =
+      (typeof propertyAttributes.filter_gender === "string" ? propertyAttributes.filter_gender : "") ||
+      (typeof propertyAttributes.filter_sex === "string" ? propertyAttributes.filter_sex : "") ||
+      inferGender(title, handle);
+    const normalizedGender = normalizeGenderLabel(rawGender);
+    const {
+      filter_gender: _legacyFilterGender,
+      filter_sex: _legacyFilterSex,
+      ...cleanPropertyAttributes
+    } = propertyAttributes;
+
     const nextRecord: FilterRecord = {
       legacy_id: row.legacyId,
       handle,
       brand,
-      category,
+      category: normalizedCategory,
       price_range: toPriceRange(validPrice),
       availability,
       attributes: {
-        filter_gender: inferGender(title, handle),
-        filter_type: inferProductType(title, category),
+        ...(normalizedGender ? { filter_gender: normalizedGender } : {}),
+        filter_type: inferProductType(title, normalizedCategory),
         filter_is_sale: inferSaleFlag(title),
         filter_is_new: inferNewFlag(title),
         legacy_section_code: normalizeLabel(row.sectionCode, ""),
+        ...cleanPropertyAttributes,
       },
       currency: normalizedCurrency,
       min_price: validPrice,
@@ -310,7 +693,7 @@ ORDER BY e.ID;
       dirty.missing_brand.push(row.legacyId);
     }
 
-    if (!category || category === "Без категории") {
+    if (!normalizedCategory || normalizedCategory === "Без категории") {
       dirty.missing_category.push(row.legacyId);
     }
 

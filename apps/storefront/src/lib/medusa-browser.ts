@@ -5,6 +5,9 @@ const STORE_API_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_STORE_API_TIMEOUT_MS
 type Region = {
   id: string;
   currency_code?: string;
+  countries?: Array<{
+    iso_2?: string;
+  }>;
 };
 
 type Cart = {
@@ -189,8 +192,13 @@ async function resolveCheckoutCountryCode(cartId: string): Promise<string> {
 }
 
 async function getFirstRegionId(): Promise<string> {
-  const data = await storeFetch<{ regions: Region[] }>("/store/regions?limit=1");
-  const regionId = data.regions?.[0]?.id;
+  const data = await storeFetch<{ regions: Region[] }>("/store/regions?limit=100");
+  const regions = data.regions ?? [];
+  const preferredRegion =
+    regions.find((region) =>
+      (region.countries ?? []).some((country) => country.iso_2?.toLowerCase() === "ua")
+    ) || regions.find((region) => region.currency_code?.toLowerCase() === "uah") || regions[0];
+  const regionId = preferredRegion?.id;
 
   if (!regionId) {
     throw new Error("No region found in Medusa store");
@@ -201,7 +209,18 @@ async function getFirstRegionId(): Promise<string> {
 
 async function getAllRegionIds(): Promise<string[]> {
   const data = await storeFetch<{ regions: Region[] }>("/store/regions?limit=100");
-  return (data.regions ?? []).map((region) => region.id).filter(Boolean);
+  const regions = data.regions ?? [];
+  const preferredRegion =
+    regions.find((region) =>
+      (region.countries ?? []).some((country) => country.iso_2?.toLowerCase() === "ua")
+    ) || regions.find((region) => region.currency_code?.toLowerCase() === "uah") || null;
+
+  const orderedRegionIds = [
+    ...(preferredRegion ? [preferredRegion.id] : []),
+    ...regions.map((region) => region.id).filter((id) => id !== preferredRegion?.id),
+  ];
+
+  return orderedRegionIds.filter(Boolean);
 }
 
 function pushCartDebug(event: string, details?: Record<string, unknown>) {

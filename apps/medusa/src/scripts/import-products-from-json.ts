@@ -31,6 +31,7 @@ type LegacyFilterRecord = {
   price_range?: string;
   availability?: string;
   legacy_id?: string;
+  attributes?: Record<string, unknown>;
 };
 
 type LegacyFiltersPayload = {
@@ -118,6 +119,100 @@ function inferCategory(title: string, handle: string) {
   return "Каталог";
 }
 
+function scoreDecodedText(value: string) {
+  const replacementCount = (value.match(/�/g) ?? []).length;
+  const cyrillicCount = (value.match(/[А-Яа-яЁё]/g) ?? []).length;
+  const mojibakeCount = (value.match(/[╨╤▒▓░]/g) ?? []).length;
+  const brokenRuPatternCount = (value.match(/Р[А-Яа-яЁё]/g) ?? []).length;
+
+  return cyrillicCount * 2 - replacementCount * 10 - mojibakeCount * 6 - brokenRuPatternCount * 4;
+}
+
+function repairMojibakeText(value: string | undefined) {
+  if (!value) {
+    return value;
+  }
+
+  const repaired = Buffer.from(value, "latin1").toString("utf8");
+  const originalScore = scoreDecodedText(value);
+  const repairedScore = scoreDecodedText(repaired);
+
+  return repairedScore > originalScore + 1 ? repaired : value;
+}
+
+function toTitleWordsFromSlug(slug: string) {
+  const compact = slug
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!compact) {
+    return "";
+  }
+
+  return compact
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => (/^[a-z]{1,3}$/i.test(word) ? word.toUpperCase() : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`))
+    .join(" ");
+}
+
+function buildIpadTitleFromHandle(handle: string) {
+  const match = handle.match(/(?:^|\/)(?:chekhol-dlya-ipad-|ipad-case-|ipad-cover-)([a-z0-9-]+)-model-([a-z0-9]+)$/i);
+  if (!match) {
+    return "";
+  }
+
+  const brandSlug = match[1]
+    .replace(/(?:^|-)ipad(?:-|$)/gi, "-")
+    .replace(/(?:^|-)case(?:-|$)/gi, "-")
+    .replace(/(?:^|-)cover(?:-|$)/gi, "-")
+    .replace(/(?:^|-)chekhol(?:-|$)/gi, "-")
+    .replace(/(?:^|-)oblozhka(?:-|$)/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  const modelCode = match[2].toUpperCase();
+  const brandTitle = /^(model|unknown|bez-brenda|no-brand)$/i.test(brandSlug)
+    ? ""
+    : toTitleWordsFromSlug(brandSlug);
+
+  return `Чехол для iPad${brandTitle ? ` ${brandTitle}` : ""} Модель №${modelCode}`;
+}
+
+function inferGenderRu(title: string, handle: string) {
+  const vector = `${title} ${handle}`.toLowerCase();
+  if (/(unisex|унисекс)/u.test(vector)) return "Унисекс";
+  if (/(мужск|male|men|man)/u.test(vector)) return "Мужской";
+  if (/(женск|female|women|woman)/u.test(vector)) return "Женский";
+  return "";
+}
+
+function normalizeGenderValue(value: string) {
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) {
+    return "";
+  }
+
+  if (/(унисекс|unisex|мужские\s*\/\s*женские|женские\s*\/\s*мужские|мужские\s*\/\s*женские\s*\/\s*унисекс|женские\s*\/\s*мужские\s*\/\s*унисекс|мужские\s*\/\s*унисекс|женские\s*\/\s*унисекс)/u.test(normalized)) {
+    return "Унисекс";
+  }
+
+  if (/(unknown|неизвест|не\s*указан|не\s*указано|n\/a|none|null)/u.test(normalized)) {
+    return "Унисекс";
+  }
+
+  if (/(мужск|male|men|man)/u.test(normalized)) {
+    return "Мужской";
+  }
+
+  if (/(женск|female|women|woman)/u.test(normalized)) {
+    return "Женский";
+  }
+
+  return "";
+}
+
 function inferAvailability(variants: ImportedVariant[]) {
   const hasAnyPrice = variants.some((variant) =>
     (variant.prices ?? []).some((price) => typeof price.amount === "number" && price.amount > 0)
@@ -133,21 +228,28 @@ async function loadLegacyFiltersByHandle(baseDir: string) {
     const raw = await fs.readFile(legacyFiltersPath, "utf8");
     const parsed = JSON.parse(raw) as LegacyFiltersPayload;
     const index = new Map<string, LegacyFilterRecord>();
+    const categories = new Set<string>();
 
     for (const record of parsed.filters ?? []) {
       if (!record?.handle) {
         continue;
       }
       index.set(normalizeHandle(record.handle), record);
+      const category = typeof record.category === "string" ? record.category.trim() : "";
+      if (category) {
+        categories.add(category);
+      }
     }
 
     return {
       index,
+      categories,
       path: legacyFiltersPath,
     };
   } catch {
     return {
       index: new Map<string, LegacyFilterRecord>(),
+      categories: new Set<string>(),
       path: legacyFiltersPath,
     };
   }
@@ -185,13 +287,47 @@ function normalizeByAlias(value: string, aliases: Record<string, string> | undef
   return aliases[lower] ?? normalized;
 }
 
+function pickDynamicFilterAttributes(
+  currentMetadata: Record<string, unknown>,
+  filterRecord: LegacyFilterRecord | undefined
+) {
+  const merged: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(currentMetadata)) {
+    if (!key.startsWith("filter_") || ["filter_brand", "filter_category", "filter_price_range", "filter_availability", "filter_gender", "filter_sex"].includes(key)) {
+      continue;
+    }
+
+    if (typeof value === "string" && value.trim()) {
+      merged[key] = value.trim();
+    }
+  }
+
+  for (const [key, value] of Object.entries(filterRecord?.attributes ?? {})) {
+    if (!key.startsWith("filter_") || ["filter_brand", "filter_category", "filter_price_range", "filter_availability", "filter_gender", "filter_sex"].includes(key)) {
+      continue;
+    }
+
+    if (typeof value === "string" && value.trim()) {
+      merged[key] = value.trim();
+    }
+  }
+
+  return merged;
+}
+
 function enrichMetadataWithFilters(
   metadata: Record<string, unknown> | undefined,
   filterRecord: LegacyFilterRecord | undefined,
   product: ImportedProduct,
-  dictionary: FacetNormalizationDictionary
+  dictionary: FacetNormalizationDictionary,
+  legacyCategories: Set<string>
 ) {
   const currentMetadata = metadata ?? {};
+  const {
+    filter_sex: _legacyFilterSex,
+    ...metadataWithoutLegacySex
+  } = currentMetadata as Record<string, unknown>;
 
   const fallbackBrand = inferBrand(product.title, product.handle);
   const fallbackCategory = inferCategory(product.title, product.handle);
@@ -206,21 +342,31 @@ function enrichMetadataWithFilters(
     fallbackBrand;
   const rawCategory =
     filterRecord?.category ??
-    (currentMetadata.filter_category as string | undefined) ??
     fallbackCategory;
   const rawPriceRange =
     filterRecord?.price_range ??
     (currentMetadata.filter_price_range as string | undefined) ??
     "unknown";
-  const rawAvailability =
-    filterRecord?.availability ??
-    (currentMetadata.filter_availability as string | undefined) ??
-    fallbackAvailability;
+  const rawAvailability = "in_stock";
+  const extraFilterAttributes = pickDynamicFilterAttributes(currentMetadata, filterRecord);
+  const normalizedCategory = normalizeByAlias(rawCategory, dictionary.categoryAliases);
+  const legacySafeCategory = legacyCategories.has(normalizedCategory)
+    ? normalizedCategory
+    : "";
+  const rawGender =
+    (typeof filterRecord?.attributes?.filter_gender === "string" ? filterRecord.attributes.filter_gender : "") ||
+    (typeof filterRecord?.attributes?.filter_sex === "string" ? filterRecord.attributes.filter_sex : "") ||
+    (typeof currentMetadata.filter_gender === "string" ? currentMetadata.filter_gender : "") ||
+    (typeof currentMetadata.filter_sex === "string" ? currentMetadata.filter_sex : "") ||
+    inferGenderRu(product.title, product.handle);
+  const normalizedGender = normalizeGenderValue(rawGender);
 
   return {
-    ...currentMetadata,
+    ...metadataWithoutLegacySex,
+    ...extraFilterAttributes,
     filter_brand: normalizeByAlias(rawBrand, dictionary.brandAliases),
-    filter_category: normalizeByAlias(rawCategory, dictionary.categoryAliases),
+    filter_category: legacySafeCategory,
+    ...(normalizedGender ? { filter_gender: normalizedGender } : {}),
     filter_price_range: normalizeByAlias(rawPriceRange, dictionary.priceRangeAliases),
     filter_availability: normalizeByAlias(rawAvailability, dictionary.availabilityAliases),
     legacy_id:
@@ -297,14 +443,22 @@ export default async function importProductsFromJson({ container, args = [] }: E
   }
 
   const productsForImport = [...uniqueProducts.values()];
-  const { index: legacyFiltersByHandle, path: legacyFiltersPath } = await loadLegacyFiltersByHandle(process.cwd());
+  const { index: legacyFiltersByHandle, categories: legacyCategories, path: legacyFiltersPath } = await loadLegacyFiltersByHandle(process.cwd());
   const { dictionary: facetDictionary, path: facetDictionaryPath } = await loadFacetDictionary(process.cwd());
 
   const enrichedProductsForImport = productsForImport.map((product) => {
     const filterRecord = legacyFiltersByHandle.get(normalizeHandle(product.handle));
-    return {
+    const repairedTitle = buildIpadTitleFromHandle(product.handle) || repairMojibakeText(product.title) || product.title;
+    const repairedDescription = repairMojibakeText(product.description);
+    const repairedProduct: ImportedProduct = {
       ...product,
-      metadata: enrichMetadataWithFilters(product.metadata, filterRecord, product, facetDictionary),
+      title: repairedTitle,
+      description: repairedDescription,
+    };
+
+    return {
+      ...repairedProduct,
+      metadata: enrichMetadataWithFilters(repairedProduct.metadata, filterRecord, repairedProduct, facetDictionary, legacyCategories),
     };
   });
 
@@ -338,6 +492,7 @@ export default async function importProductsFromJson({ container, args = [] }: E
   logger.info(`Duplicate handles skipped: ${duplicateHandles}`);
   logger.info(`Products after dedupe: ${productsForImport.length}`);
   logger.info(`Legacy filters index: ${legacyFiltersByHandle.size ? `loaded (${legacyFiltersByHandle.size})` : "not loaded"}`);
+  logger.info(`Legacy category whitelist size: ${legacyCategories.size}`);
   logger.info(`Legacy filters path: ${legacyFiltersPath}`);
   logger.info(`Facet normalization dictionary path: ${facetDictionaryPath}`);
   logger.info(`Will create: ${toCreate}`);

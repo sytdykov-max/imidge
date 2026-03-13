@@ -8,9 +8,11 @@ import { SiteHeader } from "@/components/site-header";
 import { WishlistToggleButton } from "@/components/wishlist-toggle-button";
 import { RecentlyViewedProducts } from "@/components/recently-viewed-products";
 import { extractProductBrand } from "@/lib/catalog-brand";
-import { getAllStoreProducts, getMinProductPrice, getStoreProductByHandle } from "@/lib/medusa-store";
+import { getAllStoreProducts, getMinProductPrice, getProductPriceByCurrency, getStoreProductByHandle } from "@/lib/medusa-store";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://127.0.0.1:3002";
+const USD_TO_UAH_RATE = Number(process.env.NEXT_PUBLIC_USD_TO_UAH_RATE ?? 41);
+const EUR_TO_UAH_RATE = Number(process.env.NEXT_PUBLIC_EUR_TO_UAH_RATE ?? 45);
 
 type ProductPageProps = {
   params: Promise<{
@@ -34,6 +36,33 @@ function textFromMetadata(metadata: Record<string, unknown> | null | undefined, 
   }
 
   return undefined;
+}
+
+function toPrimaryUahPrice(price: { amount: number; currency: string } | null) {
+  if (!price) {
+    return null;
+  }
+
+  const currency = price.currency.toUpperCase();
+  if (currency === "UAH") {
+    return price;
+  }
+
+  if (currency === "USD") {
+    return {
+      amount: Math.round(price.amount * USD_TO_UAH_RATE),
+      currency: "UAH",
+    };
+  }
+
+  if (currency === "EUR") {
+    return {
+      amount: Math.round(price.amount * EUR_TO_UAH_RATE),
+      currency: "UAH",
+    };
+  }
+
+  return price;
 }
 
 function buildProductSeoDescription(product: {
@@ -88,7 +117,7 @@ async function getDefaultRegionCurrencyCode(): Promise<string | null> {
     return null;
   }
 
-  const response = await fetch(`${baseUrl}/store/regions?limit=1`, {
+  const response = await fetch(`${baseUrl}/store/regions?limit=100`, {
     headers: {
       "x-publishable-api-key": publishableKey,
     },
@@ -102,10 +131,19 @@ async function getDefaultRegionCurrencyCode(): Promise<string | null> {
   const data = (await response.json()) as {
     regions?: Array<{
       currency_code?: string;
+      countries?: Array<{
+        iso_2?: string;
+      }>;
     }>;
   };
 
-  return data.regions?.[0]?.currency_code?.toLowerCase() ?? null;
+  const regions = data.regions ?? [];
+  const preferredRegion =
+    regions.find((region) =>
+      (region.countries ?? []).some((country) => country.iso_2?.toLowerCase() === "ua")
+    ) || regions.find((region) => region.currency_code?.toLowerCase() === "uah") || regions[0];
+
+  return preferredRegion?.currency_code?.toLowerCase() ?? null;
 }
 
 function buildProductJsonLd(product: {
@@ -186,7 +224,8 @@ function buildProductJsonLd(product: {
 
   const primaryVariant = product.variants?.[0];
   const preferredPrice =
-    primaryVariant?.prices?.find((price) => price.currency_code?.toLowerCase() === "eur") ||
+    primaryVariant?.prices?.find((price) => price.currency_code?.toLowerCase() === "uah") ||
+    primaryVariant?.prices?.find((price) => price.currency_code?.toLowerCase() === "usd") ||
     primaryVariant?.prices?.[0];
   const hasStock =
     primaryVariant?.manage_inventory === false ||
@@ -335,20 +374,30 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
       return typeof price.amount === "number" && price.amount > 0 && typeof price.currency_code === "string";
     });
 
-  const regionCurrency = defaultRegionCurrencyCode?.toLowerCase();
-  const displayPrice =
-    (regionCurrency
-      ? availablePrices.find((price) => price.currency_code.toLowerCase() === regionCurrency)
-      : undefined) ||
-    availablePrices.find((price) => regionCurrencyCodes.includes(price.currency_code.toLowerCase())) ||
-    availablePrices[0];
+  const regionCurrency = defaultRegionCurrencyCode?.toUpperCase();
+  const uahPrice = getProductPriceByCurrency(product, "UAH");
+  const regionalPrice = regionCurrency ? getProductPriceByCurrency(product, regionCurrency) : null;
+  const allowedRegionPrice =
+    regionCurrencyCodes
+      .map((currency) => getProductPriceByCurrency(product, currency))
+      .find((price): price is { amount: number; currency: string } => Boolean(price)) ?? null;
+  const fallbackPrice = getMinProductPrice(product);
+  const baseDisplayPrice = uahPrice || regionalPrice || allowedRegionPrice || fallbackPrice;
+  const displayPrice = toPrimaryUahPrice(baseDisplayPrice);
+  const usdPrice = getProductPriceByCurrency(product, "USD");
 
   const currentPriceText = displayPrice
-    ? `${displayPrice.amount.toLocaleString("ru-RU")} ${displayPrice.currency_code.toUpperCase()}`
+    ? `${displayPrice.amount.toLocaleString("ru-RU")} ${displayPrice.currency}`
     : "Цена уточняется";
   const oldPriceText = displayPrice
-    ? `${Math.round(displayPrice.amount * 1.2).toLocaleString("ru-RU")} ${displayPrice.currency_code.toUpperCase()}`
+    ? `${Math.round(displayPrice.amount * 1.2).toLocaleString("ru-RU")} ${displayPrice.currency}`
     : undefined;
+  const secondaryUsdText =
+    displayPrice && displayPrice.currency !== "USD" && usdPrice
+      ? `≈ ${usdPrice.amount.toLocaleString("ru-RU")} ${usdPrice.currency}`
+      : baseDisplayPrice && baseDisplayPrice.currency !== "UAH"
+        ? `≈ ${baseDisplayPrice.amount.toLocaleString("ru-RU")} ${baseDisplayPrice.currency}`
+      : undefined;
 
   const optionDefinitions = (product.options ?? [])
     .map((option) => {
@@ -407,6 +456,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
       ...candidate,
       brand: extractProductBrand(candidate),
       minPrice: getMinProductPrice(candidate),
+      usdPrice: getProductPriceByCurrency(candidate, "USD"),
       variantId: candidate.variants?.find((variant) =>
         (variant.prices ?? []).some((price) => typeof price.amount === "number" && price.amount > 0)
       )?.id,
@@ -478,8 +528,11 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
 
                 {isProductRedesign && (
                   <div className="product-price-row-v2">
-                    {oldPriceText && <span className="product-price-old-v2">{oldPriceText}</span>}
-                    <strong className="product-price-new-v2">{currentPriceText}</strong>
+                    <div className="product-price-main-v2">
+                      {oldPriceText && <span className="product-price-old-v2">{oldPriceText}</span>}
+                      <strong className="product-price-new-v2">{currentPriceText}</strong>
+                      {secondaryUsdText && <span className="product-price-secondary-v2">{secondaryUsdText}</span>}
+                    </div>
                   </div>
                 )}
 
@@ -533,6 +586,12 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
                 <div className={`catalog-grid${isProductRedesign ? " catalog-grid-v2 product-related-grid-v2" : ""}`}>
                   {relatedProducts.map((related) => {
                     const relatedHref = isProductRedesign ? `/product/${related.handle}?v2=1` : `/product/${related.handle}`;
+                    const relatedPrimaryPrice = toPrimaryUahPrice(related.minPrice);
+                    const relatedSecondaryText = related.usdPrice
+                      ? `≈ ${related.usdPrice.amount.toLocaleString("ru-RU")} ${related.usdPrice.currency}`
+                      : related.minPrice && related.minPrice.currency !== "UAH"
+                        ? `≈ ${related.minPrice.amount.toLocaleString("ru-RU")} ${related.minPrice.currency}`
+                        : null;
 
                     return (
                       <article className={`product-card${isProductRedesign ? " product-card-v2" : ""}`} key={related.id}>
@@ -555,16 +614,19 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
                               </Link>
                             </h3>
                             <div className="catalog-price-row-v2">
-                              {related.minPrice && (
+                              {relatedPrimaryPrice && (
                                 <span className="product-price-old-v2">
-                                  {Math.round(related.minPrice.amount * 1.2).toLocaleString("ru-RU")}
+                                  {`${Math.round(relatedPrimaryPrice.amount * 1.2).toLocaleString("ru-RU")} ${relatedPrimaryPrice.currency}`}
                                 </span>
                               )}
-                              <strong className="product-price-v2">
-                                {related.minPrice
-                                  ? `${related.minPrice.amount.toLocaleString("ru-RU")} ${related.minPrice.currency}`
-                                  : "Цена уточняется"}
-                              </strong>
+                              <div className="catalog-price-main-v2">
+                                <strong className="product-price-v2">
+                                  {relatedPrimaryPrice
+                                    ? `${relatedPrimaryPrice.amount.toLocaleString("ru-RU")} ${relatedPrimaryPrice.currency}`
+                                    : "Цена уточняется"}
+                                </strong>
+                                {relatedSecondaryText && <span className="product-price-secondary-v2">{relatedSecondaryText}</span>}
+                              </div>
                             </div>
                           </div>
                         ) : (
